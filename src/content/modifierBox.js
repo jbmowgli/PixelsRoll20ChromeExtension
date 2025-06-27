@@ -49,8 +49,8 @@
                     window.pixelsModifierName = "Modifier 1";
                 }
             }
-            
-            setupModifierRowLogic(); // Re-setup event listeners
+              setupModifierRowLogic(); // Re-setup event listeners
+            updateSelectedModifier(); // Update header to show current modifier
             isInitialized = true;
             return modifierBox;
         }
@@ -90,13 +90,18 @@
 
         modifierBox.querySelector('.pixels-minimize').addEventListener('click', () => {
             modifierBox.classList.toggle('minimized');
-        });
+        });        // Add row functionality
+        setupModifierRowLogic();
 
-        // Add row functionality
-        setupModifierRowLogic();        document.body.appendChild(modifierBox);
+        document.body.appendChild(modifierBox);
         isModifierBoxVisible = true;
-        isInitialized = true;        // Position relative to textchatcontainer
+        isInitialized = true;
+
+        // Position relative to textchatcontainer
         positionModifierBox();
+        
+        // Update header to show initial modifier
+        updateSelectedModifier();
         
         // Add window resize listener to reposition the box
         window.addEventListener('resize', positionModifierBox);
@@ -449,9 +454,7 @@
                 };
             });
         }
-    }
-
-    function updateSelectedModifier() {
+    }    function updateSelectedModifier() {
         const selectedRadio = modifierBox.querySelector('input[name="modifier-select"]:checked');
         if (selectedRadio) {
             const index = parseInt(selectedRadio.value);
@@ -467,7 +470,18 @@
                 }
                 if (typeof window.pixelsModifier !== 'undefined') {
                     window.pixelsModifier = valueInput.value || "0";
-                }                console.log(`Selected modifier: ${nameInput.value || "Unnamed"} = ${valueInput.value || "0"}`);
+                }
+
+                // Update the header title to show the selected modifier
+                const headerTitle = modifierBox.querySelector('.pixels-title');
+                if (headerTitle) {
+                    const modifierName = nameInput.value || "Unnamed";
+                    const modifierValue = valueInput.value || "0";
+                    const valueText = modifierValue === "0" ? "±0" : (modifierValue > 0 ? `+${modifierValue}` : modifierValue);
+                    headerTitle.textContent = `🎲 ${modifierName} (${valueText})`;
+                }
+
+                console.log(`Selected modifier: ${nameInput.value || "Unnamed"} = ${valueInput.value || "0"}`);
                 
                 // Send message to extension if the function exists
                 if (typeof window.sendMessageToExtension === 'function') {
