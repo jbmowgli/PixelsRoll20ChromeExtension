@@ -67,9 +67,9 @@
         <h2>Test Controls</h2>
         <button class="test-button" onclick="testShowModifier()">Show Modifier Box</button>
         <button class="test-button" onclick="testHideModifier()">Hide Modifier Box</button>        <button class="test-button" onclick="testAddRow()">Test Add Row</button>
-        <button class="test-button" onclick="testRemoveRow()">Test Remove Row</button>
-        <button class="test-button" onclick="testRemoveAll()">Test Remove All</button>
+        <button class="test-button" onclick="testRemoveRow()">Test Remove Row</button>        <button class="test-button" onclick="testRemoveAll()">Test Remove All</button>
         <button class="test-button" onclick="testSelection()">Test Selection</button>
+        <button class="test-button" onclick="testSingleton()">Test Singleton</button>
         
         <div style="clear: both;"></div>
         
@@ -130,9 +130,7 @@
             } else {
                 alert('No removable rows found');
             }
-        }
-
-        function testRemoveAll() {
+        }        function testRemoveAll() {
             // Keep clicking remove buttons until only one row is left, then test the reset functionality
             let removeButtons = document.querySelectorAll('.remove-row-btn');
             while (removeButtons.length > 0) {
@@ -143,6 +141,26 @@
                     setTimeout(() => {}, 100);
                 }
             }
+        }
+
+        function testSingleton() {
+            // Test singleton behavior
+            console.log('Testing singleton behavior...');
+            const instance1 = window.ModifierBox.getElement();
+            const instance2 = window.ModifierBox.create();
+            const instance3 = window.ModifierBox.getElement();
+            
+            console.log('Instance 1:', instance1);
+            console.log('Instance 2:', instance2);
+            console.log('Instance 3:', instance3);
+            console.log('All instances are the same?', instance1 === instance2 && instance2 === instance3);
+            console.log('Is initialized?', window.ModifierBox.isInitialized());
+            
+            // Check DOM for duplicate elements
+            const domElements = document.querySelectorAll('#pixels-modifier-box');
+            console.log('Number of modifier boxes in DOM:', domElements.length);
+            
+            alert(`Singleton test complete! Check console for details.\nInstances are same: ${instance1 === instance2 && instance2 === instance3}\nDOM elements: ${domElements.length}`);
         }
 
         function testSelection() {

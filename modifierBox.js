@@ -1,13 +1,20 @@
 'use strict';
 
 //
-// Floating Modifier Box Module
+// Floating Modifier Box Module - Singleton Pattern
 //
 (function() {
-    // Module variables
+    // Singleton instance variables
     let modifierBox = null;
     let isModifierBoxVisible = false;
     let rowCounter = 1; // Start from 1 since we have row 0
+    let isInitialized = false;
+
+    // Prevent multiple initialization
+    if (window.ModifierBox) {
+        console.warn("ModifierBox module already loaded, skipping re-initialization");
+        return;
+    }
 
     // Export functions to global scope
     window.ModifierBox = {
@@ -16,12 +23,27 @@
         hide: hideModifierBox,
         isVisible: () => isModifierBoxVisible,
         getElement: () => modifierBox,
-        updateSelectedModifier: updateSelectedModifier
-    };
-
-    function createModifierBox() {
+        updateSelectedModifier: updateSelectedModifier,
+        isInitialized: () => isInitialized
+    };    function createModifierBox() {
         console.log("Creating modifier box...");
-        if (modifierBox) return;
+        
+        // Singleton check - ensure only one instance exists
+        if (modifierBox) {
+            console.log("Modifier box already exists, returning existing instance");
+            return modifierBox;
+        }
+
+        // Check if an existing modifier box exists in the DOM
+        const existingBox = document.getElementById('pixels-modifier-box');
+        if (existingBox) {
+            console.log("Found existing modifier box in DOM, adopting it");
+            modifierBox = existingBox;
+            isModifierBoxVisible = existingBox.style.display !== 'none';
+            setupModifierRowLogic(); // Re-setup event listeners
+            isInitialized = true;
+            return modifierBox;
+        }
 
         // Create the floating box
         modifierBox = document.createElement('div');
@@ -63,10 +85,9 @@
         });
 
         // Add row functionality
-        setupModifierRowLogic();
-
-        document.body.appendChild(modifierBox);
+        setupModifierRowLogic();        document.body.appendChild(modifierBox);
         isModifierBoxVisible = true;
+        isInitialized = true;
 
         // Position relative to textchatcontainer
         positionModifierBox();
@@ -75,6 +96,7 @@
         window.addEventListener('resize', positionModifierBox);
         
         console.log("Modifier box created and added to page");
+        return modifierBox;
     }
 
     function addModifierBoxStyles() {
@@ -411,12 +433,16 @@
             modifierBox.style.right = '20px';
             modifierBox.style.left = 'auto';
         }
-    }
-
-    function showModifierBox() {
+    }    function showModifierBox() {
         console.log("showModifierBox called");
+        
+        // Singleton check
         if (!modifierBox) {
-            createModifierBox();
+            const result = createModifierBox();
+            if (!result) {
+                console.error("Failed to create modifier box");
+                return;
+            }
         } else {
             console.log("Modifier box already exists, showing it");
             modifierBox.style.display = 'block';
@@ -447,9 +473,12 @@
             modifierBox.style.display = 'none';
             isModifierBoxVisible = false;
             console.log("Modifier box hidden");
-        } else {
-            console.log("Cannot hide - modifierBox is null");
+        } else {            console.log("Cannot hide - modifierBox is null");
         }
     }
+
+    // Mark module as initialized
+    isInitialized = true;
+    console.log("ModifierBox module initialized as singleton");
 
 })();

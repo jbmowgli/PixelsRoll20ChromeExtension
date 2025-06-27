@@ -7,13 +7,14 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     // Global modifier variables (accessed by modifierBox.js)
     //
     window.pixelsModifier = "0";
-    window.pixelsModifierName = "None";
-
-    //
+    window.pixelsModifierName = "None";    //
     // Modifier Box Functions (delegated to modifierBox.js)
     //
     function showModifierBox() {
         if (typeof window.ModifierBox !== 'undefined') {
+            if (!window.ModifierBox.isInitialized()) {
+                log("ModifierBox module not initialized yet");
+            }
             window.ModifierBox.show();
         } else {
             log("ModifierBox module not loaded");

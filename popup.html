@@ -70,17 +70,26 @@
       }
       .buttons button:hover {
         background-color: #CCC;
-      }
-      .connectdice {
-        margin-top: 10px;
-        display: block;
+      }      .connectdice {
+        display: inline-block;
         border: none;
         border-radius: 10px;
         padding: 5px 10px;
-        margin-left: auto;
-        margin-right: auto;
         cursor: pointer;
         font-size: 11px;
+      }
+      .connectdice.main-button {
+        margin-top: 10px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .button-container {
+        text-align: center;
+        margin-top: 10px;
+      }
+      .button-container .connectdice {
+        margin: 0 5px;
       }
       .connectdice span {
         margin-right: 8px;
@@ -91,17 +100,15 @@
       }
     </style>
   </head>
-  <body>
-    <button id="connect" class="connectdice">
+  <body>    <button id="connect" class="connectdice main-button">
       <span>&#10133;</span>
       Connect to Pixel
     </button>
     <p></p>    <div class="blockdice">
       <div id="text" class="dicename"></div>
-    </div>
-    <div class="blockdetail">
-      <div style="margin-top: 10px;">
-        <button id="showModifier" class="connectdice" style="margin-right: 5px;">
+    </div>    <div class="blockdetail">
+      <div class="button-container">
+        <button id="showModifier" class="connectdice">
           <span>👁</span>
           Show Modifier Box
         </button>
