@@ -17,6 +17,8 @@ function hookButton(name) {
 
 // Hooks "connect" and "disconnect" buttons to injected JS
 hookButton('connect');
+hookButton('showModifier');
+hookButton('hideModifier');
 //hookButton('disconnect');
 
 function showText(txt) {
@@ -60,6 +62,10 @@ function sendMessage(data, responseCallback) {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action == "showText")
     showText(request.text);
+  else if (request.action == "modifierChanged") {
+    // Store the modifier value when changed from floating box
+    chrome.storage.sync.set({ modifier: request.modifier });
+  }
 });
 
 // Inject code in website
@@ -70,6 +76,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     { file: "roll20.js" },
     _ => {
       sendMessage({ action: "getStatus" });
-      chrome.storage.sync.get('formula', data => sendMessage({ action: "setFormula", formula: data.formula }))
+      chrome.storage.sync.get('formula', data => sendMessage({ action: "setFormula", formula: data.formula }));
+      chrome.storage.sync.get('modifier', data => sendMessage({ action: "setModifier", modifier: data.modifier || "0" }));
     })
 });

@@ -4,6 +4,184 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     var roll20PixelsLoaded = true;
 
     //
+    // Floating Modifier Box
+    //
+    let modifierBox = null;
+    let isModifierBoxVisible = false;
+
+    function createModifierBox() {
+        log("Creating modifier box...");
+        if (modifierBox) return;
+
+        // Create the floating box
+        modifierBox = document.createElement('div');
+        modifierBox.id = 'pixels-modifier-box';
+        modifierBox.setAttribute('data-testid', 'pixels-modifier-box');
+        modifierBox.className = 'PIXELS_EXTENSION_BOX_FIND_ME';
+        
+        modifierBox.innerHTML = `
+            <div class="pixels-header">
+                <span class="pixels-title">🎲 Pixels Modifier</span>
+                <button class="pixels-close" title="Close">×</button>
+            </div>
+            <div class="pixels-content">
+                <label>Modifier:</label>
+                <input type="number" id="pixels-modifier-input" value="0" min="-99" max="99">
+            </div>
+        `;
+
+        // Add CSS styles
+        const style = document.createElement('style');
+        style.textContent = `
+            #pixels-modifier-box {
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                width: 200px;
+                background: #2b2b2b;
+                border: 2px solid #4CAF50;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                font-family: Arial, sans-serif;
+                z-index: 999999;
+                user-select: none;
+                color: white;
+            }
+            .pixels-header {
+                background: #1a1a1a;
+                padding: 8px 12px;
+                border-radius: 6px 6px 0 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: move;
+                border-bottom: 1px solid #555;
+            }
+            .pixels-title {
+                color: #4CAF50;
+                font-size: 13px;
+                font-weight: bold;
+            }
+            .pixels-close {
+                background: none;
+                border: none;
+                color: #ccc;
+                font-size: 16px;
+                font-weight: bold;
+                width: 24px;
+                height: 24px;
+                border-radius: 3px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .pixels-close:hover {
+                background: #444;
+                color: #fff;
+            }
+            .pixels-content {
+                padding: 12px;
+            }
+            .pixels-content label {
+                display: block;
+                margin-bottom: 4px;
+                font-size: 12px;
+                color: #ccc;
+            }
+            #pixels-modifier-input {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #555;
+                border-radius: 4px;
+                background: #333;
+                color: #fff;
+                font-size: 16px;
+                text-align: center;
+                box-sizing: border-box;
+            }
+            #pixels-modifier-input:focus {
+                outline: none;
+                border-color: #4CAF50;
+                box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add drag functionality
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+
+        modifierBox.querySelector('.pixels-header').addEventListener('mousedown', (e) => {
+            isDragging = true;
+            const rect = modifierBox.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+
+        function onMouseMove(e) {
+            if (!isDragging) return;
+            modifierBox.style.left = (e.clientX - dragOffset.x) + 'px';
+            modifierBox.style.top = (e.clientY - dragOffset.y) + 'px';
+            modifierBox.style.right = 'auto';
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+
+        // Add close functionality
+        modifierBox.querySelector('.pixels-close').addEventListener('click', () => {
+            hideModifierBox();
+        });
+
+        // Add input change functionality
+        const input = modifierBox.querySelector('#pixels-modifier-input');
+        input.addEventListener('input', (e) => {
+            pixelsModifier = e.target.value;
+            pixelsModifierName = "Manual Entry";
+            log(`Modifier updated: ${pixelsModifier}`);
+            sendMessageToExtension({ action: "modifierChanged", modifier: pixelsModifier });
+        });
+
+        document.body.appendChild(modifierBox);
+        isModifierBoxVisible = true;
+        
+        log("Modifier box created and added to page");
+    }
+
+    function showModifierBox() {
+        log("showModifierBox called");
+        if (!modifierBox) {
+            createModifierBox();
+        } else {
+            log("Modifier box already exists, showing it");
+            modifierBox.style.display = 'block';
+            isModifierBoxVisible = true;
+        }
+        // Update input with current modifier value
+        const input = modifierBox.querySelector('#pixels-modifier-input');
+        if (input) {
+            input.value = pixelsModifier;
+        }
+    }
+
+    function hideModifierBox() {
+        log("hideModifierBox called");
+        if (modifierBox) {
+            modifierBox.style.display = 'none';
+            isModifierBoxVisible = false;
+            log("Modifier box hidden");
+        } else {
+            log("Cannot hide - modifierBox is null");
+        }
+    }
+
+    //
     // Helpers
     //
 
@@ -134,9 +312,7 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             if (value.getUint8(0) == 3) {
                 this._handleFaceEvent(value.getUint8(1), value.getUint8(2))
             }
-        }
-    
-        _handleFaceEvent(ev, face) {
+        }        _handleFaceEvent(ev, face) {
             if (!this._hasMoved) {
                 if (ev != 1) {
                     this._hasMoved = true;
@@ -147,10 +323,24 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                 let txt = this._name + ': face up = ' + (face + 1);
                 log(txt);
 
-                pixelsFormula.replaceAll("#face_value", face + 1)
+                const diceValue = face + 1;
+                const modifier = parseInt(pixelsModifier) || 0;
+                const result = diceValue + modifier;
+                
+                log('Dice value: ' + diceValue + ', Modifier: ' + modifier + ', Result: ' + result);
+                log('pixelsModifierName: "' + pixelsModifierName + '"');
+                log('Formula before replacement: ' + pixelsFormula);
+
+                let message = pixelsFormula
+                    .replaceAll("#modifier_name", pixelsModifierName)
+                    .replaceAll("#face_value", diceValue.toString())
                     .replaceAll("#pixel_name", this._name)
-                    .split("\\n")
-                    .forEach(s => postChatMessage(s));
+                    .replaceAll("#modifier", modifier.toString())
+                    .replaceAll("#result", result.toString());
+                
+                log('Formula after replacement: ' + message);
+                
+                message.split("\\n").forEach(s => postChatMessage(s));
 
                 sendTextToExtension(txt);
             }
@@ -187,14 +377,12 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
 
     //
     // Initialize
-    //
-
-    log("Starting Pixels Roll20 extension");
+    //    log("Starting Pixels Roll20 extension");
 
     var pixels = []
-    var pixelsFormula = "#face_value";
-
-    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    var pixelsFormula = "&{template:default} {{name=#modifier_name}} {{Dice=#face_value}}{{Mod=#modifier}} {{Result=[[#face_value + #modifier]]}}";
+    var pixelsModifier = "0";
+    var pixelsModifierName = "Manual Entry";    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         log("Received message from extension: " + msg.action);
         if (msg.action == "getStatus") {
             sendStatusToExtension();            
@@ -205,6 +393,25 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                 log("Updated Roll20 formula: " + pixelsFormula);
             }
         }
+        else if (msg.action == "setModifier") {
+            if (pixelsModifier != msg.modifier) {
+                pixelsModifier = msg.modifier || "0";
+                log("Updated modifier: " + pixelsModifier);
+                // Update floating box if it exists
+                const input = modifierBox?.querySelector('#pixels-modifier-input');
+                if (input) {
+                    input.value = pixelsModifier;
+                }
+            }
+        }
+        else if (msg.action == "showModifier") {
+            log("Received showModifier message");
+            showModifierBox();
+        }
+        else if (msg.action == "hideModifier") {
+            log("Received hideModifier message");
+            hideModifierBox();
+        }
         else if (msg.action == "connect") {
             connectToPixel();
         }
@@ -214,7 +421,16 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             pixels = []
             sendStatusToExtension();
         }
-    });
-
-    sendStatusToExtension();
+    });    sendStatusToExtension();
+    
+    // Show modifier box by default
+    log("Attempting to show modifier box automatically...");
+    setTimeout(() => {
+        try {
+            showModifierBox();
+            log("Modifier box shown successfully on page load");
+        } catch (error) {
+            log("Error showing modifier box: " + error);
+        }
+    }, 1000);
 }

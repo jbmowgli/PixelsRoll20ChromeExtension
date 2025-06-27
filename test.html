@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page for Pixels Extension</title>
+</head>
+<body>
+    <h1>Test Page for Pixels Roll20 Extension</h1>
+    <p>Open this page in Chrome with the extension loaded to test the modifier box.</p>
+    
+    <!-- Simulate Roll20's chat container -->
+    <div class="textchatcontainer" style="position: fixed; bottom: 20px; right: 300px; width: 250px; height: 200px; background: #f0f0f0; border: 1px solid #ccc;">
+        <p style="padding: 10px; margin: 0;">Simulated Roll20 Chat Container</p>
+        <div id="textchat-input">
+            <textarea placeholder="Chat message..."></textarea>
+            <button>Send</button>
+        </div>
+    </div>
+    
+    <p>Instructions:</p>
+    <ul>
+        <li>Load the extension in Chrome (Developer mode)</li>
+        <li>Refresh this page</li>
+        <li>You should see a red "PIXELS EXTENSION LOADED" message for 3 seconds</li>
+        <li>You should see a green-bordered modifier box on the right side</li>
+        <li>The box should be draggable and have minimize/close buttons</li>
+        <li>The input should accept numbers and update the modifier value</li>
+    </ul>
+</body>
+</html>

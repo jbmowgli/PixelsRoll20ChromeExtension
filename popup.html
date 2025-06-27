@@ -100,16 +100,25 @@
     <div class="blockdice">
       <div id="text" class="dicename"></div>
     </div>
-    <div class="blockdetail">
-      <label>
+    <div class="blockdetail">      <label>
         <span>Macro</span>
         <textarea id="formula" class="macro" placeholder="Roll20 macro"></textarea>
-        <p>Keywords: #pixel_name and #face_value</p>
+        <p>Keywords: #pixel_name, #face_value, #modifier, #modifier_name, #result</p>
       </label>
       <button id="save" class="connectdice">
         <span>&#128190;</span>
         Save
       </button>
+      <div style="margin-top: 10px;">
+        <button id="showModifier" class="connectdice" style="margin-right: 5px;">
+          <span>👁</span>
+          Show Modifier Box
+        </button>
+        <button id="hideModifier" class="connectdice">
+          <span>🙈</span>
+          Hide Modifier Box
+        </button>
+      </div>
     </div>
     <!-- <button id="disconnect">Disconnect</button> -->
     <script src="popup.js"></script>
