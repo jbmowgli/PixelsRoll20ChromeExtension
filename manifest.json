@@ -1,13 +1,12 @@
 {
-  "name": "Pixels on Roll20",
-  "version": "0.1",
-  "description": "Bring the magic of Pixels into Roll20!",
-  "permissions": ["activeTab", "declarativeContent", "storage"],
+  "name": "Pixels Roll20 Integration",
+  "version": "1.0.0",
+  "description": "Connect Pixels dice to Roll20 via Bluetooth with advanced modifier support and seamless integration.",
+  "permissions": ["activeTab", "scripting", "bluetooth"],
   "background": {
-    "scripts": ["src/background/background.js"],
-    "persistent": false
+    "service_worker": "src/background/background.js"
   },
-  "page_action": {
+  "action": {
     "default_popup": "src/popup/popup.html",
     "default_icon": {
       "64": "assets/images/logo-64.png"
@@ -17,5 +16,13 @@
     "64": "assets/images/logo-64.png"
   },
   "options_page": "src/options/options.html",
-  "manifest_version": 2
+  "content_scripts": [
+    {
+      "matches": ["https://roll20.net/editor/*", "https://app.roll20.net/editor/*"],
+      "js": ["src/content/theme-detector.js", "src/content/modifierBox.js", "src/content/roll20.js"]
+    }
+  ],
+  "manifest_version": 3,
+  "author": "Enhanced by community contributors",
+  "homepage_url": "https://github.com/[your-username]/PixelsRoll20ChromeExtension"
 }

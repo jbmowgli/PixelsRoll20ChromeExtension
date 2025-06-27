@@ -1,33 +1,26 @@
-# Pixels on Roll20 - Enhanced Edition
+# Pixels Roll20 Integration
 
-**Enhanced fork** of the original Pixels Roll20 Chrome extension with advanced modifier support, robust connection management, and improved user experience.
+Connect your Pixels dice to Roll20 via Bluetooth for seamless physical dice rolling in virtual tabletop sessions.
 
-| :exclamation: :exclamation: :exclamation: This an experimental project, not an official product. :exclamation: :exclamation: :exclamation: |
-|--------------------------------------------------------------------------------------------------------------------------------------------|
+## ✨ Features
 
-## About This Fork
-
-This is an enhanced version of the original [Pixels Roll20 Chrome Extension](https://github.com/GameWithPixels/PixelsRoll20ChromeExtension) created by the Pixels team. The original extension was developed by **Olivier Basille** and the **GameWithPixels** team as a proof of concept for connecting Pixels dice to Roll20.
-
-### Original Authors & Attribution
-
-- **Original Project**: [GameWithPixels/PixelsRoll20ChromeExtension](https://github.com/GameWithPixels/PixelsRoll20ChromeExtension)
-- **Created by**: Olivier Basille ([@obasille](https://github.com/obasille)) and the GameWithPixels team
-- **Original License**: MIT License
-- **Copyright**: © 2023 Pixels - Electronic Dice
-
-### Enhancements in This Fork
-
-This enhanced version adds significant new functionality while maintaining compatibility with the original design:
-
-## ✨ New Features
+### 🎲 Bluetooth Dice Integration
+- **Modern & Legacy Support**: Compatible with all Pixels dice generations
+- **Multi-Dice Support**: Connect multiple dice simultaneously  
+- **Auto-Reconnection**: Reliable connection management with health monitoring
+- **Instant Results**: Physical rolls appear immediately in Roll20 chat
 
 ### 🎯 Advanced Modifier System
+- **Floating Interface**: Draggable modifier box overlay
+- **Custom Modifiers**: Add/remove modifiers with custom names and values
+- **Quick Selection**: Radio buttons for easy modifier switching
+- **Smart Integration**: Automatic Roll20 macro formatting
 
-- **Floating Modifier Box**: A draggable overlay that appears on Roll20 pages
-- **Multi-row Support**: Add multiple modifier rows with custom names and values
-- **Dynamic Selection**: Radio buttons to select which modifier to apply to rolls
-- **Smart Integration**: Modifiers are automatically integrated into Roll20 macro format
+### 🎨 Seamless Integration
+- **Theme Adaptation**: Automatically matches Roll20's light/dark themes
+- **Non-Intrusive**: Minimizable interface that doesn't disrupt gameplay
+- **Session Memory**: Maintains settings during browser session
+- **Zero Configuration**: Works immediately after installation
 - **Persistent UI**: Modifier box remembers position and state across page interactions
 
 ### 🔄 Robust Connection Management
@@ -158,7 +151,22 @@ If problems persist:
 
 ### Contributing
 
-This is a community fork. Feel free to submit issues or pull requests for improvements.
+This is an open-source project. Feel free to submit issues or pull requests for improvements.
+
+## 📝 Attribution & License
+
+### Original Project
+This extension is based on the original [Pixels Roll20 Chrome Extension](https://github.com/GameWithPixels/PixelsRoll20ChromeExtension) created by:
+- **Olivier Basille** ([@obasille](https://github.com/obasille))
+- **GameWithPixels Team**
+
+### License
+MIT License - See [LICENSE](LICENSE) file for details.
+
+### Enhanced Edition
+This enhanced version includes significant improvements and new features while maintaining full attribution to the original creators and preserving the MIT License terms.
+
+**Note**: This extension is not officially affiliated with Roll20 or Pixels but provides integration between the two platforms.
 
 ## Support & Issues
 
@@ -166,8 +174,6 @@ For issues with this enhanced version, please open a [GitHub issue](https://gith
 
 For general Pixels dice support, visit the [official Pixels support](https://github.com/GameWithPixels/PixelsRoll20ChromeExtension/issues).
 
-## License
+**Note**: This enhanced version includes significant improvements and new features while maintaining full attribution to the original creators and preserving the MIT License terms.
 
-This project maintains the same MIT License as the original. See [LICENSE](LICENSE) for details.
-
-**Note**: Connections are lost upon reloading the page, but the extension will attempt to automatically reconnect to previously paired dice.
+**Disclaimer**: This extension is not officially affiliated with Roll20 or Pixels but provides integration between the two platforms.

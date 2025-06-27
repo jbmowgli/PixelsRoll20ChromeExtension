@@ -1,6 +1,12 @@
 MIT License
 
-Copyright (c) 2023 Pixels - Electronic Dice
+Original Copyright (c) 2023 Pixels - Electronic Dice (GameWithPixels team)
+Enhanced Edition Copyright (c) 2025 Community Contributors
+
+This project is an enhanced fork of the original Pixels Roll20 Chrome Extension
+created by Olivier Basille and the GameWithPixels team.
+
+Original Project: https://github.com/GameWithPixels/PixelsRoll20ChromeExtension
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
