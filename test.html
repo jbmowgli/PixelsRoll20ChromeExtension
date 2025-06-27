@@ -63,14 +63,14 @@
             <h3>Mock Chat</h3>
             <p>This simulates the Roll20 chat container.</p>
         </div>
-        
-        <h2>Test Controls</h2>
+          <h2>Test Controls</h2>
         <button class="test-button" onclick="testShowModifier()">Show Modifier Box</button>
         <button class="test-button" onclick="testHideModifier()">Hide Modifier Box</button>        <button class="test-button" onclick="testAddRow()">Test Add Row</button>
         <button class="test-button" onclick="testRemoveRow()">Test Remove Row</button>        <button class="test-button" onclick="testRemoveAll()">Test Remove All</button>
         <button class="test-button" onclick="testSelection()">Test Selection</button>
         <button class="test-button" onclick="testSingleton()">Test Singleton</button>
         <button class="test-button" onclick="testConnection()">Test Connection</button>
+        <button class="test-button" onclick="testBluetoothPicker()">Test Bluetooth Device Picker</button>
         
         <div style="clear: both;"></div>
         
@@ -179,15 +179,29 @@
             } else {
                 alert('No pixels connected. Try connecting a Pixel device first.');
             }
-        }
-
-        function testSelection() {
+        }        function testSelection() {
             const radios = document.querySelectorAll('input[name="modifier-select"]');
             if (radios.length > 1) {
                 // Select the second radio button if it exists
                 radios[1].click();
             } else {
                 alert('Not enough rows to test selection');
+            }
+        }
+        
+        function testBluetoothPicker() {
+            console.log('Testing Bluetooth device picker...');
+            if (typeof connectToPixel === 'function') {
+                connectToPixel().catch(error => {
+                    console.log('Bluetooth test result:', error.message);
+                    if (error.message.includes('User cancelled')) {
+                        alert('Bluetooth device picker appeared and was cancelled - this is expected behavior!');
+                    } else {
+                        alert('Error testing Bluetooth: ' + error.message);
+                    }
+                });
+            } else {
+                alert('connectToPixel function not found. Make sure roll20.js is loaded.');
             }
         }
     </script>    <!-- Load the extension scripts -->

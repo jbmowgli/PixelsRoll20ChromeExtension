@@ -76,30 +76,28 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     //
     // Pixels bluetooth discovery
     //    const PIXELS_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();
-    const PIXELS_NOTIFY_CHARACTERISTIC = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();
-    const PIXELS_WRITE_CHARACTERISTIC = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();
+    const PIXELS_NOTIFY_CHARACTERISTIC = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();    const PIXELS_WRITE_CHARACTERISTIC = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();    async function connectToPixel() {
+        try {
+            const options = { filters: [{ services: [PIXELS_SERVICE_UUID] }] };
+            log('Requesting Bluetooth Device with ' + JSON.stringify(options));
 
-    async function connectToPixel() {
-        const options = { filters: [{ services: [PIXELS_SERVICE_UUID] }] };
-        log('Requesting Bluetooth Device with ' + JSON.stringify(options));
+            const device = await navigator.bluetooth.requestDevice(options);
+            log('User selected Pixel "' + device.name + '", connected=' + device.gatt.connected);
 
-        const device = await navigator.bluetooth.requestDevice(options);
-        log('User selected Pixel "' + device.name + '", connected=' + device.gatt.connected);
+            // Add disconnect event listener to handle unexpected disconnections
+            device.addEventListener('gattserverdisconnected', (event) => {
+                log('Pixel device disconnected: ' + event.target.name);
+                handleDeviceDisconnection(event.target);
+            });
 
-        // Add disconnect event listener to handle unexpected disconnections
-        device.addEventListener('gattserverdisconnected', (event) => {
-            log('Pixel device disconnected: ' + event.target.name);
-            handleDeviceDisconnection(event.target);
-        });
-
-        let server, notify;
-        const connect = async () => {
-            console.log('Connecting to ' + device.name)
-            server = await device.gatt.connect();
-            const service = await server.getPrimaryService(PIXELS_SERVICE_UUID);
-            notify = await service.getCharacteristic(PIXELS_NOTIFY_CHARACTERISTIC);
-            //const write = await service.getCharacteristic(PIXELS_WRITE_CHARACTERISTIC);
-        }
+            let server, notify;
+            const connect = async () => {
+                console.log('Connecting to ' + device.name);
+                server = await device.gatt.connect();
+                const service = await server.getPrimaryService(PIXELS_SERVICE_UUID);
+                notify = await service.getCharacteristic(PIXELS_NOTIFY_CHARACTERISTIC);
+                //const write = await service.getCharacteristic(PIXELS_WRITE_CHARACTERISTIC);
+            };
 
         // Attempt to connect up to 3 times
         const maxAttempts = 3;
@@ -116,9 +114,7 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                     await new Promise((resolve) => setTimeout(() => resolve(), delay * 1000));
                 }
             }
-        }
-
-        // Subscribe to notify characteristic
+        }        // Subscribe to notify characteristic
         if (server && notify) {
             try {
                 const pixel = new Pixel(device.name, server, device);
@@ -137,6 +133,10 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                     server.disconnect();
                 }
             }
+        }
+        } catch (error) {
+            log('Error during device selection or connection: ' + error);
+            sendTextToExtension('Failed to connect to Pixel: ' + error.message);
         }
     }
 
@@ -393,10 +393,15 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         else if (msg.action == "hideModifier") {
             log("Received hideModifier message");
             hideModifierBox();
-        }
-        else if (msg.action == "connect") {
-            connectToPixel();
-        }        else if (msg.action == "disconnect") {
+        }        else if (msg.action == "connect") {
+            log("Connect button clicked, attempting to connect to Pixel");
+            try {
+                connectToPixel();
+            } catch (error) {
+                log("Error in connectToPixel: " + error);
+                sendTextToExtension("Failed to connect: " + error.message);
+            }
+        }else if (msg.action == "disconnect") {
             log("Manual disconnect requested");
             pixels.forEach(pixel => {
                 pixel.disconnect();
