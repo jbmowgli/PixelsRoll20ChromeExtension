@@ -1,13 +1,11 @@
 'use strict';
 
 if (typeof window.roll20PixelsLoaded == 'undefined') {
-    var roll20PixelsLoaded = true;
-
-    //
+    var roll20PixelsLoaded = true;    //
     // Global modifier variables (accessed by modifierBox.js)
     //
     window.pixelsModifier = "0";
-    window.pixelsModifierName = "None";    //
+    window.pixelsModifierName = "Modifier 1";//
     // Modifier Box Functions (delegated to modifierBox.js)
     //
     function showModifierBox() {

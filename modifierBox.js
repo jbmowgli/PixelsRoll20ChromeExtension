@@ -23,22 +23,33 @@
         getElement: () => modifierBox,
         updateSelectedModifier: updateSelectedModifier,
         isInitialized: () => isInitialized,
-        updateTheme: updateTheme
-    };function createModifierBox() {
+        updateTheme: updateTheme    };
+
+    function createModifierBox() {
         console.log("Creating modifier box...");
         
         // Singleton check - ensure only one instance exists
         if (modifierBox) {
             console.log("Modifier box already exists, returning existing instance");
             return modifierBox;
-        }
-
-        // Check if an existing modifier box exists in the DOM
+        }        // Check if an existing modifier box exists in the DOM
         const existingBox = document.getElementById('pixels-modifier-box');
         if (existingBox) {
             console.log("Found existing modifier box in DOM, adopting it");
             modifierBox = existingBox;
             isModifierBoxVisible = existingBox.style.display !== 'none';
+              // Update the first row's default values to match current standards
+            const firstNameInput = existingBox.querySelector('.modifier-name');
+            if (firstNameInput && (firstNameInput.value === "None" || firstNameInput.value === "D20")) {
+                firstNameInput.value = "Modifier 1";
+                firstNameInput.placeholder = "Modifier 1";
+                
+                // Update global variable too
+                if (typeof window.pixelsModifierName !== 'undefined') {
+                    window.pixelsModifierName = "Modifier 1";
+                }
+            }
+            
             setupModifierRowLogic(); // Re-setup event listeners
             isInitialized = true;
             return modifierBox;
@@ -48,23 +59,21 @@
         modifierBox = document.createElement('div');
         modifierBox.id = 'pixels-modifier-box';
         modifierBox.setAttribute('data-testid', 'pixels-modifier-box');
-        modifierBox.className = 'PIXELS_EXTENSION_BOX_FIND_ME';
-        modifierBox.innerHTML = `
+        modifierBox.className = 'PIXELS_EXTENSION_BOX_FIND_ME';        modifierBox.innerHTML = `
             <div class="pixels-header">
                 <span class="pixels-title">🎲 Dice Modifiers</span>
                 <div class="pixels-controls">
+                    <button class="add-modifier-btn" type="button" title="Add Row">Add</button>
                     <button class="pixels-minimize" title="Minimize">−</button>
                     <button class="pixels-close" title="Close">×</button>
                 </div>
-            </div>
-            <div class="pixels-content">
+            </div>            <div class="pixels-content">
                 <div class="modifier-row">
                     <input type="radio" name="modifier-select" value="0" class="modifier-radio" id="mod-0" checked>
-                    <input type="text" class="modifier-name" placeholder="None" value="None" data-index="0">
+                    <input type="text" class="modifier-name" placeholder="Modifier 1" value="Modifier 1" data-index="0">
                     <input type="number" class="modifier-value" value="0" min="-99" max="99" data-index="0">
                     <button class="remove-row-btn" type="button">×</button>
                 </div>
-                <button class="add-modifier-btn" type="button">+</button>
             </div>
         `;
 
@@ -86,9 +95,7 @@
         // Add row functionality
         setupModifierRowLogic();        document.body.appendChild(modifierBox);
         isModifierBoxVisible = true;
-        isInitialized = true;
-
-        // Position relative to textchatcontainer
+        isInitialized = true;        // Position relative to textchatcontainer
         positionModifierBox();
         
         // Add window resize listener to reposition the box
@@ -96,7 +103,7 @@
         
         console.log("Modifier box created and added to page");
         return modifierBox;
-    }    function addModifierBoxStyles() {
+    }function addModifierBoxStyles() {
         // Remove existing styles if they exist
         const existingStyle = document.getElementById('pixels-modifier-box-styles');
         if (existingStyle) {
@@ -174,8 +181,7 @@
                 gap: 4px;
                 flex-shrink: 0;
             }
-            
-            .pixels-controls button {
+              .pixels-controls button {
                 background: none;
                 border: none;
                 color: ${colors.textSecondary} !important;
@@ -194,6 +200,29 @@
             
             .pixels-controls button:hover {
                 background: ${colors.button};
+                color: ${colors.text} !important;
+            }
+              .add-modifier-btn {
+                background: none !important;
+                border: none !important;
+                color: ${colors.textSecondary} !important;
+                font-size: 11px !important;
+                font-weight: bold !important;
+                height: 20px !important;
+                padding: 0 6px !important;
+                border-radius: 3px !important;
+                cursor: pointer;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                transition: background-color 0.3s ease, color 0.3s ease !important;
+                flex-shrink: 0 !important;
+                margin: 0 !important;
+                white-space: nowrap !important;
+            }
+            
+            .add-modifier-btn:hover {
+                background: ${colors.button} !important;
                 color: ${colors.text} !important;
             }
             
@@ -267,38 +296,16 @@
             .remove-row-btn:hover {
                 background: ${colors.buttonHover} !important;
             }
-            
-            .modifier-name:focus, .modifier-value:focus {
+              .modifier-name:focus, .modifier-value:focus {
                 outline: none;
                 border-color: ${colors.primary};
                 background: ${colors.theme === 'dark' ? '#3a3a3a' : '#f8f8f8'} !important;
             }
             
-            .add-modifier-btn {
-                width: 20px;
-                height: 20px;
-                border: 1px solid ${colors.border};
-                border-radius: 3px;
-                background: ${colors.button} !important;
-                color: ${colors.text} !important;
-                font-size: 14px;
-                font-weight: bold;
-                cursor: pointer;
-                margin: 4px auto 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-            }
-            
-            .add-modifier-btn:hover {
-                background: ${colors.buttonHover} !important;
-                color: ${colors.text} !important;
-            }
             #pixels-modifier-box.minimized .pixels-content {
                 display: none;
             }
+            
             #pixels-modifier-box.minimized {
                 width: auto !important;
                 min-width: 120px;
@@ -333,111 +340,113 @@
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
         }
-    }
-
-    function setupModifierRowLogic() {
+    }    function setupModifierRowLogic() {
         if (!modifierBox) return;
 
-        // Add event listener for the add button
+        // Add event listener for the add button (only if not already added)
         const addButton = modifierBox.querySelector('.add-modifier-btn');
-        addButton.addEventListener('click', () => {
-            addModifierRow();
-        });
+        if (addButton && !addButton.hasAttribute('data-listener-added')) {
+            addButton.addEventListener('click', () => {
+                addModifierRow();
+            });
+            addButton.setAttribute('data-listener-added', 'true');
+        }
 
         // Add event listeners for existing radio buttons and inputs
-        updateEventListeners();
-
-        function addModifierRow() {
+        updateEventListeners();function addModifierRow() {
             const content = modifierBox.querySelector('.pixels-content');
-            const addButton = content.querySelector('.add-modifier-btn');
             
             // Create new row
             const newRow = document.createElement('div');
-            newRow.className = 'modifier-row';
-            newRow.innerHTML = `
+            newRow.className = 'modifier-row';            newRow.innerHTML = `
                 <input type="radio" name="modifier-select" value="${rowCounter}" class="modifier-radio" id="mod-${rowCounter}">
                 <input type="text" class="modifier-name" placeholder="Modifier ${rowCounter + 1}" value="Modifier ${rowCounter + 1}" data-index="${rowCounter}">
                 <input type="number" class="modifier-value" value="0" min="-99" max="99" data-index="${rowCounter}">
                 <button class="remove-row-btn" type="button">×</button>
             `;
             
-            // Insert before the add button
-            content.insertBefore(newRow, addButton);
-            rowCounter++;
-            
-            // Update event listeners for all rows
+            // Append the new row to the content area
+            content.appendChild(newRow);
+            rowCounter++;            // Update event listeners for all rows
             updateEventListeners();
             
             console.log(`Added modifier row ${rowCounter - 1}`);
-        }
-
-        function removeModifierRow(rowElement, rowIndex) {
+        }        function removeModifierRow(rowElement) {
+            if (!rowElement) {
+                console.error('removeModifierRow: rowElement is null or undefined');
+                return;
+            }
+            
             // Find the actual data-index from the radio button
             const radio = rowElement.querySelector('.modifier-radio');
+            if (!radio) {
+                console.error('removeModifierRow: radio button not found in row');
+                return;
+            }
+            
             const index = parseInt(radio.value);
             
             // Count total rows
             const totalRows = modifierBox.querySelectorAll('.modifier-row').length;
-            
-            // If this is the only row left, reset it to default values instead of removing
+              // If this is the only row left, reset it to default values instead of removing
             if (totalRows === 1) {
+                console.log('Only one row left, resetting instead of removing');
                 const nameInput = rowElement.querySelector('.modifier-name');
-                const valueInput = rowElement.querySelector('.modifier-value');
-                
-                nameInput.value = "Pixel Dice";
+                const valueInput = rowElement.querySelector('.modifier-value');                nameInput.value = "Modifier 1";
                 valueInput.value = "0";
                 
                 // Make sure it's selected
-                radio.checked = true;
-                
-                // Update the selected modifier
+                radio.checked = true;                // Update the selected modifier
                 updateSelectedModifier();
                 
                 console.log("Reset the last remaining modifier row to default values");
                 return;
             }
             
+            console.log('Proceeding to remove row');
+            
             // Check if this row was selected
             const wasSelected = radio.checked;
+            console.log('Row was selected:', wasSelected);
             
             // Remove the row
+            console.log('Removing row element from DOM');
             rowElement.remove();
             
-            // If the removed row was selected, select the first remaining row
+            console.log('Row removed, checking if need to select another row');
+              // If the removed row was selected, select the first remaining row
             if (wasSelected) {
                 const firstRadio = modifierBox.querySelector('.modifier-radio');
                 if (firstRadio) {
+                    console.log('Selecting first remaining row');
                     firstRadio.checked = true;
                     updateSelectedModifier();
+                } else {
+                    console.log('No remaining rows found');
                 }
             }
-            
-            console.log(`Removed modifier row with index ${index}`);
-        }
-
-        function updateEventListeners() {
+              console.log(`Successfully removed modifier row with index ${index}`);
+        }function updateEventListeners() {
+            // Remove all existing event listeners by clearing and re-adding rows
+            // This is simpler than trying to manage individual listeners
             const rows = modifierBox.querySelectorAll('.modifier-row');
             
-            rows.forEach((row, rowIndex) => {
-                // Radio button change
+            rows.forEach((row) => {
+                // Get elements
                 const radio = row.querySelector('.modifier-radio');
-                radio.addEventListener('change', updateSelectedModifier);
-                
-                // Name input change
                 const nameInput = row.querySelector('.modifier-name');
-                nameInput.addEventListener('input', updateSelectedModifier);
-                
-                // Value input change
                 const valueInput = row.querySelector('.modifier-value');
-                valueInput.addEventListener('input', updateSelectedModifier);
-                
-                // Remove button click
                 const removeButton = row.querySelector('.remove-row-btn');
-                if (removeButton) {
-                    removeButton.addEventListener('click', () => {
-                        removeModifierRow(row, rowIndex);
-                    });
-                }
+                
+                // Add event listeners (removing duplicates isn't critical since 
+                // addEventListener with the same function reference won't add duplicates)
+                radio.addEventListener('change', updateSelectedModifier);
+                nameInput.addEventListener('input', updateSelectedModifier);
+                valueInput.addEventListener('input', updateSelectedModifier);                // For remove button, we need to ensure we get the right row
+                // Use a closure to capture the current row element
+                removeButton.onclick = function() {
+                    removeModifierRow(row);
+                };
             });
         }
     }
@@ -458,9 +467,7 @@
                 }
                 if (typeof window.pixelsModifier !== 'undefined') {
                     window.pixelsModifier = valueInput.value || "0";
-                }
-                
-                console.log(`Selected modifier: ${nameInput.value || "Unnamed"} = ${valueInput.value || "0"}`);
+                }                console.log(`Selected modifier: ${nameInput.value || "Unnamed"} = ${valueInput.value || "0"}`);
                 
                 // Send message to extension if the function exists
                 if (typeof window.sendMessageToExtension === 'function') {

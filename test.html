@@ -66,8 +66,7 @@
           <h2>Test Controls</h2>
         <button class="test-button" onclick="testShowModifier()">Show Modifier Box</button>
         <button class="test-button" onclick="testHideModifier()">Hide Modifier Box</button>        <button class="test-button" onclick="testAddRow()">Test Add Row</button>
-        <button class="test-button" onclick="testRemoveRow()">Test Remove Row</button>        <button class="test-button" onclick="testRemoveAll()">Test Remove All</button>        <button class="test-button" onclick="testSelection()">Test Selection</button>
-        <button class="test-button" onclick="testSingleton()">Test Singleton</button>
+        <button class="test-button" onclick="testRemoveRow()">Test Remove Row</button>        <button class="test-button" onclick="testRemoveAll()">Test Remove All</button>        <button class="test-button" onclick="testSelection()">Test Selection</button>        <button class="test-button" onclick="testSingleton()">Test Singleton</button>
         <button class="test-button" onclick="testConnection()">Test Connection</button>
         <button class="test-button" onclick="testBluetoothPicker()">Test Bluetooth Device Picker</button>
         <button class="test-button" onclick="testThemeChange()">Toggle Theme</button>
@@ -217,11 +216,12 @@
                 body.classList.remove('lightmode');
                 body.classList.add('darkmode');
                 body.style.backgroundColor = '#1a1a1a';
-                body.style.color = '#ffffff';
-                alert('Switched to dark theme');
+                body.style.color = '#ffffff';                alert('Switched to dark theme');
             }
         }
-    </script>    <!-- Load the extension scripts -->
+        
+        // ...existing code...
+    </script><!-- Load the extension scripts -->
     <script src="theme-detector.js"></script>
     <script src="modifierBox.js"></script>
     <script src="roll20.js"></script>
