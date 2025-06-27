@@ -3,20 +3,18 @@
 //
 // Floating Modifier Box Module - Singleton Pattern
 //
-(function() {
-    // Singleton instance variables
+(function() {    // Singleton instance variables
     let modifierBox = null;
     let isModifierBoxVisible = false;
     let rowCounter = 1; // Start from 1 since we have row 0
     let isInitialized = false;
+    let themeObserver = null; // For monitoring theme changes
 
     // Prevent multiple initialization
     if (window.ModifierBox) {
         console.warn("ModifierBox module already loaded, skipping re-initialization");
         return;
-    }
-
-    // Export functions to global scope
+    }    // Export functions to global scope
     window.ModifierBox = {
         create: createModifierBox,
         show: showModifierBox,
@@ -24,8 +22,9 @@
         isVisible: () => isModifierBoxVisible,
         getElement: () => modifierBox,
         updateSelectedModifier: updateSelectedModifier,
-        isInitialized: () => isInitialized
-    };    function createModifierBox() {
+        isInitialized: () => isInitialized,
+        updateTheme: updateTheme
+    };function createModifierBox() {
         console.log("Creating modifier box...");
         
         // Singleton check - ensure only one instance exists
@@ -97,41 +96,69 @@
         
         console.log("Modifier box created and added to page");
         return modifierBox;
-    }
+    }    function addModifierBoxStyles() {
+        // Remove existing styles if they exist
+        const existingStyle = document.getElementById('pixels-modifier-box-styles');
+        if (existingStyle) {
+            existingStyle.remove();
+        }
 
-    function addModifierBoxStyles() {
         const style = document.createElement('style');
+        style.id = 'pixels-modifier-box-styles';
+        
+        // Get theme colors if ThemeDetector is available
+        let colors = {
+            theme: 'dark',
+            primary: '#4CAF50',
+            background: '#2b2b2b',
+            surface: '#1a1a1a',
+            border: '#555555',
+            text: '#ffffff',
+            textSecondary: '#cccccc',
+            input: '#333333',
+            inputBorder: '#555555',
+            button: '#444444',
+            buttonHover: '#555555'
+        };
+
+        if (window.ThemeDetector) {
+            colors = window.ThemeDetector.getThemeColors();
+        }
+
         style.textContent = `
             #pixels-modifier-box {
                 position: fixed;
                 width: 280px;
                 min-width: 250px;
                 max-width: 400px;
-                background: #2b2b2b;
-                border: 2px solid #4CAF50;
+                background: ${colors.background};
+                border: 2px solid ${colors.primary};
                 border-radius: 8px;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                 font-family: Arial, sans-serif;
                 z-index: 999999;
                 user-select: none;
-                color: white;
+                color: ${colors.text};
                 resize: both;
                 overflow: hidden;
+                transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             }
             .pixels-header {
-                background: #1a1a1a;
+                background: ${colors.surface};
                 padding: 8px 12px;
                 border-radius: 6px 6px 0 0;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 cursor: move;
-                border-bottom: 1px solid #555;
+                border-bottom: 1px solid ${colors.border};
+                transition: background-color 0.3s ease, border-color 0.3s ease;
             }
             .pixels-title {
-                color: #4CAF50;
+                color: ${colors.primary};
                 font-size: 12px;
                 font-weight: bold;
+                transition: color 0.3s ease;
             }
             .pixels-controls {
                 display: flex;
@@ -140,7 +167,7 @@
             .pixels-controls button {
                 background: none;
                 border: none;
-                color: #ccc;
+                color: ${colors.textSecondary};
                 font-size: 14px;
                 font-weight: bold;
                 width: 20px;
@@ -150,10 +177,11 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                transition: background-color 0.3s ease, color 0.3s ease;
             }
             .pixels-controls button:hover {
-                background: #444;
-                color: #fff;
+                background: ${colors.button};
+                color: ${colors.text};
             }
             .pixels-content {
                 padding: 8px;
@@ -172,66 +200,71 @@
                 width: 16px;
                 height: 16px;
                 flex-shrink: 0;
+                accent-color: ${colors.primary};
             }
             .modifier-name {
                 flex: 1;
                 padding: 4px 6px;
-                border: 1px solid #555;
+                border: 1px solid ${colors.inputBorder};
                 border-radius: 3px;
-                background: #333;
-                color: #fff;
+                background: ${colors.input};
+                color: ${colors.text};
                 font-size: 12px;
                 min-width: 0;
                 box-sizing: border-box;
+                transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             }
             .modifier-value {
                 width: 50px;
                 padding: 4px;
-                border: 1px solid #555;
+                border: 1px solid ${colors.inputBorder};
                 border-radius: 3px;
-                background: #333;
-                color: #fff;
+                background: ${colors.input};
+                color: ${colors.text};
                 font-size: 12px;
                 text-align: center;
                 box-sizing: border-box;
                 flex-shrink: 0;
+                transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             }
             .remove-row-btn {
                 width: 20px;
                 height: 20px;
-                border: 1px solid #777;
+                border: 1px solid ${colors.border};
                 border-radius: 3px;
-                background: #555;
-                color: #fff;
+                background: ${colors.button};
+                color: ${colors.text};
                 font-size: 12px;
                 cursor: pointer;
                 flex-shrink: 0;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             }
             .remove-row-btn:hover {
-                background: #666;
+                background: ${colors.buttonHover};
             }
             .modifier-name:focus, .modifier-value:focus {
                 outline: none;
-                border-color: #777;
-                background: #3a3a3a;
+                border-color: ${colors.primary};
+                background: ${colors.theme === 'dark' ? '#3a3a3a' : '#f8f8f8'};
             }
             .add-modifier-btn {
                 width: 100%;
                 padding: 6px;
-                border: 1px solid #555;
+                border: 1px solid ${colors.inputBorder};
                 border-radius: 4px;
-                background: #444;
-                color: #ccc;
+                background: ${colors.button};
+                color: ${colors.textSecondary};
                 font-size: 11px;
                 cursor: pointer;
                 margin-top: 4px;
+                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
             }
             .add-modifier-btn:hover {
-                background: #555;
-                color: #fff;
+                background: ${colors.buttonHover};
+                color: ${colors.text};
             }
             #pixels-modifier-box.minimized .pixels-content {
                 display: none;
@@ -321,7 +354,7 @@
                 const nameInput = rowElement.querySelector('.modifier-name');
                 const valueInput = rowElement.querySelector('.modifier-value');
                 
-                nameInput.value = "None";
+                nameInput.value = "Pixel Dice";
                 valueInput.value = "0";
                 
                 // Make sure it's selected
@@ -476,6 +509,54 @@
         } else {            console.log("Cannot hide - modifierBox is null");
         }
     }
+
+    // Theme update function
+    function updateTheme() {
+        console.log("Updating modifier box theme...");
+        addModifierBoxStyles(); // Recreate styles with new theme colors
+    }
+
+    // Start theme monitoring when box is created
+    function startThemeMonitoring() {
+        if (window.ThemeDetector && !themeObserver) {
+            console.log("Starting theme monitoring for modifier box...");
+            themeObserver = window.ThemeDetector.onThemeChange((newTheme, colors) => {
+                console.log("Theme changed to:", newTheme, colors);
+                updateTheme();
+            });
+        }
+    }
+
+    // Stop theme monitoring
+    function stopThemeMonitoring() {
+        if (themeObserver) {
+            console.log("Stopping theme monitoring for modifier box...");
+            themeObserver.disconnect();
+            themeObserver = null;
+        }
+    }
+
+    // Update the create function to start theme monitoring
+    const originalCreateModifierBox = createModifierBox;
+    createModifierBox = function() {
+        const result = originalCreateModifierBox.apply(this, arguments);
+        if (result && isInitialized) {
+            startThemeMonitoring();
+        }
+        return result;
+    };
+
+    // Update the hide function to optionally stop theme monitoring
+    const originalHideModifierBox = hideModifierBox;
+    hideModifierBox = function() {
+        originalHideModifierBox.apply(this, arguments);
+        // Keep theme monitoring active even when hidden, so it's ready when shown again
+    };
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        stopThemeMonitoring();
+    });
 
     // Mark module as initialized
     isInitialized = true;
