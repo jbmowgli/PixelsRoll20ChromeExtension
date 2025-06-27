@@ -334,11 +334,15 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                 if (ev != 1) {
                     this._hasMoved = true;
                 }
-            }
-            else if (ev == 1) {
+            }            else if (ev == 1) {
                 this._face = face;
                 let txt = this._name + ': face up = ' + (face + 1);
                 log(txt);
+
+                // Sync modifier values from the modifier box before processing roll
+                if (typeof window.ModifierBox !== 'undefined' && window.ModifierBox.syncGlobalVars) {
+                    window.ModifierBox.syncGlobalVars();
+                }
 
                 const diceValue = face + 1;
                 const modifier = parseInt(window.pixelsModifier) || 0;

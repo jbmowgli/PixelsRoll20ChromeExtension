@@ -23,7 +23,14 @@
         getElement: () => modifierBox,
         updateSelectedModifier: updateSelectedModifier,
         isInitialized: () => isInitialized,
-        updateTheme: updateTheme    };
+        updateTheme: updateTheme,
+        syncGlobalVars: () => {
+            // Force sync global variables with current modifier values
+            if (modifierBox) {
+                updateSelectedModifier();
+            }
+        }
+    };
 
     function createModifierBox() {
         console.log("Creating modifier box...");
@@ -463,32 +470,33 @@
             if (row) {
                 const nameInput = row.querySelector('.modifier-name');
                 const valueInput = row.querySelector('.modifier-value');
+                  // Update global variables (these should be defined in roll20.js)
+                const modifierName = nameInput.value || "Unnamed";
+                const modifierValue = valueInput.value || "0";
                 
-                // Update global variables (these should be defined in roll20.js)
                 if (typeof window.pixelsModifierName !== 'undefined') {
-                    window.pixelsModifierName = nameInput.value || "Unnamed";
+                    window.pixelsModifierName = modifierName;
+                    console.log(`Updated pixelsModifierName to: "${window.pixelsModifierName}"`);
                 }
                 if (typeof window.pixelsModifier !== 'undefined') {
-                    window.pixelsModifier = valueInput.value || "0";
-                }
-
-                // Update the header title to show the selected modifier
+                    window.pixelsModifier = modifierValue;
+                    console.log(`Updated pixelsModifier to: "${window.pixelsModifier}"`);
+                }                // Update the header title to show the selected modifier
                 const headerTitle = modifierBox.querySelector('.pixels-title');
                 if (headerTitle) {
-                    const modifierName = nameInput.value || "Unnamed";
-                    const modifierValue = valueInput.value || "0";
                     const valueText = modifierValue === "0" ? "±0" : (modifierValue > 0 ? `+${modifierValue}` : modifierValue);
                     headerTitle.textContent = `🎲 ${modifierName} (${valueText})`;
                 }
 
-                console.log(`Selected modifier: ${nameInput.value || "Unnamed"} = ${valueInput.value || "0"}`);
+                console.log(`Selected modifier: ${modifierName} = ${modifierValue}`);
+                console.log(`Global variables - pixelsModifierName: "${window.pixelsModifierName}", pixelsModifier: "${window.pixelsModifier}"`);
                 
                 // Send message to extension if the function exists
                 if (typeof window.sendMessageToExtension === 'function') {
                     window.sendMessageToExtension({ 
                         action: "modifierChanged", 
-                        modifier: valueInput.value || "0",
-                        name: nameInput.value || "Unnamed"
+                        modifier: modifierValue,
+                        name: modifierName
                     });
                 }
             }
