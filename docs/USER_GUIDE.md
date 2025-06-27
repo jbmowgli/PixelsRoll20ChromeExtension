@@ -1,6 +1,6 @@
 # Pixels Roll20 Chrome Extension - User Guide
 
-Welcome to the comprehensive user guide for the Pixels Roll20 Chrome Extension! This extension brings the magic of Pixels dice to your Roll20 gaming sessions.
+Welcome to the comprehensive user guide for the Pixels Roll20 Chrome Extension! This extension integrates Pixels dice with Roll20 through Bluetooth connectivity, enabling physical dice rolls to appear automatically in your Roll20 sessions with customizable modifiers.
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@ Welcome to the comprehensive user guide for the Pixels Roll20 Chrome Extension! 
 ### Prerequisites
 - Google Chrome browser (version 88 or later)
 - Pixels dice (modern or legacy versions supported)
-- Roll20 account and active game session
+- Roll20 account and active session
 
 ### Installing the Extension
 
@@ -41,8 +41,8 @@ Welcome to the comprehensive user guide for the Pixels Roll20 Chrome Extension! 
 ### First Time Setup
 
 1. **Open Roll20**
-   - Navigate to your Roll20 game session
-   - Ensure you're on a game page (URL contains `/game/`)
+   - Navigate to your Roll20 session
+   - Ensure you're on a session page (URL contains `/game/`)
 
 2. **Access the Extension**
    - Click the Pixels dice icon in your Chrome toolbar
@@ -125,7 +125,7 @@ The modifier box is a floating interface that allows you to manage different dic
 3. Customize the name and value as needed
 
 #### Editing Modifiers
-- **Name Field**: Click to edit the modifier name (e.g., "Advantage", "Blessed", "Sharpshooter")
+- **Name Field**: Click to edit the modifier name (e.g., "Advantage", "Bonus", "Penalty")
 - **Value Field**: Enter positive or negative numbers (-99 to +99)
 - **Selection**: Click the radio button to activate a modifier
 
@@ -136,18 +136,18 @@ The modifier box is a floating interface that allows you to manage different dic
 
 ### Modifier Examples
 
-**Common D&D 5e Modifiers:**
-- Advantage: +0 (advantage is handled separately)
-- Bless: +4 (1d4 average)
-- Bardic Inspiration: +3 (1d6 average)
-- Sharpshooter: -5
-- Great Weapon Master: -5
+**Common Modifier Types:**
+- Positive Bonuses: +1, +2, +3, +4, +5
+- Negative Penalties: -1, -2, -3, -4, -5
+- Situational Modifiers: Custom values as needed
+- Zero Modifiers: +0 (for tracking purposes without numeric effect)
 
-**Pathfinder Modifiers:**
-- Flanking: +2
-- High Ground: +1
-- Power Attack: -2
-- Precise Shot: +1
+**Sample Modifier Names:**
+- "Advantage" (value: +0)
+- "Bonus" (value: +2)
+- "Penalty" (value: -3)
+- "Situational" (value: +1)
+- "Standard" (value: +0)
 
 ### Modifier Box Features
 
@@ -304,8 +304,8 @@ A: The extension supports multiple dice connections, but practical limits depend
 **Q: Do I need to reconnect my dice every time?**
 A: Yes, you'll need to reconnect each time you start a new browser session.
 
-**Q: What happens if my dice battery dies during a game?**
-A: The extension will show a disconnection status. Charge your dice and reconnect to continue playing.
+**Q: What happens if my dice battery dies during a session?**
+A: The extension will show a disconnection status. Charge your dice and reconnect to continue using the extension.
 
 ### Troubleshooting Questions
 
@@ -329,4 +329,4 @@ If you're still experiencing issues:
 3. Try the test page at `tests/test.html` to isolate issues
 4. Refer to the Pixels dice official documentation for device-specific problems
 
-Remember: This extension enhances your Roll20 experience with physical dice - have fun and roll well! 🎲
+Remember: This extension integrates physical Pixels dice with Roll20 for enhanced dice rolling functionality! 🎲

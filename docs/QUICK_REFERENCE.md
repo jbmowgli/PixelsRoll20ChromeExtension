@@ -4,7 +4,7 @@
 
 ### Getting Started
 1. **Install Extension** → Load unpacked in Chrome extensions
-2. **Open Roll20** → Navigate to your game session  
+2. **Open Roll20** → Navigate to your session  
 3. **Connect Dice** → Click extension icon → "Connect" → Select Pixels dice
 4. **Roll Dice** → Physical rolls automatically appear in Roll20 chat
 
@@ -31,11 +31,10 @@
 - **Yellow** → Connecting in progress
 
 ## Common Modifier Values
-- **Advantage/Disadvantage**: ±0 (mechanical effect, not numeric)
-- **Bless/Guidance**: +4 (1d4 average)
-- **Bardic Inspiration**: +3 (1d6 average)  
-- **Sharpshooter/GWM**: -5 (feat penalty)
-- **Cover**: +2/+5 (half/three-quarters)
+- **Positive Bonuses**: +1, +2, +3, +4, +5
+- **Negative Penalties**: -1, -2, -3, -4, -5
+- **Neutral Modifiers**: ±0 (tracking without numeric effect)
+- **Custom Values**: Any value within -99 to +99 range
 
 ## Supported Dice
 - Modern Pixels dice ✓
