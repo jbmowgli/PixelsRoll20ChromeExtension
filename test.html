@@ -70,6 +70,7 @@
         <button class="test-button" onclick="testRemoveRow()">Test Remove Row</button>        <button class="test-button" onclick="testRemoveAll()">Test Remove All</button>
         <button class="test-button" onclick="testSelection()">Test Selection</button>
         <button class="test-button" onclick="testSingleton()">Test Singleton</button>
+        <button class="test-button" onclick="testConnection()">Test Connection</button>
         
         <div style="clear: both;"></div>
         
@@ -141,9 +142,7 @@
                     setTimeout(() => {}, 100);
                 }
             }
-        }
-
-        function testSingleton() {
+        }        function testSingleton() {
             // Test singleton behavior
             console.log('Testing singleton behavior...');
             const instance1 = window.ModifierBox.getElement();
@@ -161,6 +160,25 @@
             console.log('Number of modifier boxes in DOM:', domElements.length);
             
             alert(`Singleton test complete! Check console for details.\nInstances are same: ${instance1 === instance2 && instance2 === instance3}\nDOM elements: ${domElements.length}`);
+        }
+
+        function testConnection() {
+            // Test connection monitoring
+            console.log('Testing connection status...');
+            
+            if (typeof window.pixels !== 'undefined' && window.pixels.length > 0) {
+                window.pixels.forEach((pixel, index) => {
+                    console.log(`Pixel ${index}:`, {
+                        name: pixel.name,
+                        isConnected: pixel.isConnected,
+                        lastActivity: new Date(pixel.lastActivity),
+                        timeSinceActivity: Date.now() - pixel.lastActivity
+                    });
+                });
+                alert('Connection status logged to console. Check developer tools.');
+            } else {
+                alert('No pixels connected. Try connecting a Pixel device first.');
+            }
         }
 
         function testSelection() {

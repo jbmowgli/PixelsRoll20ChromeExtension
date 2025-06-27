@@ -75,11 +75,9 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
 
     //
     // Pixels bluetooth discovery
-    //
-
-    const PIXELS_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase()
-    const PIXELS_NOTIFY_CHARACTERISTIC = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase()
-    const PIXELS_WRITE_CHARACTERISTIC = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase()
+    //    const PIXELS_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();
+    const PIXELS_NOTIFY_CHARACTERISTIC = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();
+    const PIXELS_WRITE_CHARACTERISTIC = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();
 
     async function connectToPixel() {
         const options = { filters: [{ services: [PIXELS_SERVICE_UUID] }] };
@@ -87,6 +85,12 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
 
         const device = await navigator.bluetooth.requestDevice(options);
         log('User selected Pixel "' + device.name + '", connected=' + device.gatt.connected);
+
+        // Add disconnect event listener to handle unexpected disconnections
+        device.addEventListener('gattserverdisconnected', (event) => {
+            log('Pixel device disconnected: ' + event.target.name);
+            handleDeviceDisconnection(event.target);
+        });
 
         let server, notify;
         const connect = async () => {
@@ -117,32 +121,115 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         // Subscribe to notify characteristic
         if (server && notify) {
             try {
-                const pixel = new Pixel(device.name, server);
+                const pixel = new Pixel(device.name, server, device);
                 await notify.startNotifications();
                 log('Pixels notifications started!');
                 notify.addEventListener('characteristicvaluechanged', ev => pixel.handleNotifications(ev));
                 sendTextToExtension('Just connected to ' + pixel.name);
                 pixels.push(pixel);
+                
+                // Start connection monitoring
+                startConnectionMonitoring(pixel);
             } catch (error) {
                 log('Error connecting to Pixel notifications: ' + error);
-                await delay(1000);
+                // Handle notification error
+                if (server) {
+                    server.disconnect();
+                }
             }
         }
     }
 
-    //
+    function handleDeviceDisconnection(device) {
+        log('Handling disconnection for device: ' + device.name);
+        
+        // Find the pixel in our array
+        const pixelIndex = pixels.findIndex(p => p.name === device.name);
+        if (pixelIndex !== -1) {
+            const pixel = pixels[pixelIndex];
+            pixel.markDisconnected();
+            
+            // Update status
+            sendTextToExtension('Pixel ' + device.name + ' disconnected');
+            sendStatusToExtension();
+            
+            // Attempt to reconnect after a delay
+            setTimeout(() => {
+                attemptReconnection(device, pixel);
+            }, 5000); // Wait 5 seconds before attempting reconnection
+        }
+    }
+
+    async function attemptReconnection(device, pixel) {
+        if (!device.gatt.connected) {
+            log('Attempting to reconnect to ' + device.name);
+            try {
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService(PIXELS_SERVICE_UUID);
+                const notify = await service.getCharacteristic(PIXELS_NOTIFY_CHARACTERISTIC);
+                
+                await notify.startNotifications();
+                notify.addEventListener('characteristicvaluechanged', ev => pixel.handleNotifications(ev));
+                
+                pixel.reconnect(server);
+                sendTextToExtension('Reconnected to ' + pixel.name);
+                log('Successfully reconnected to ' + device.name);
+                
+                // Restart connection monitoring
+                startConnectionMonitoring(pixel);
+            } catch (error) {
+                log('Failed to reconnect to ' + device.name + ': ' + error);
+                // Try again in 10 seconds
+                setTimeout(() => {
+                    attemptReconnection(device, pixel);
+                }, 10000);
+            }
+        }
+    }    function startConnectionMonitoring(pixel) {
+        // Check connection status every 30 seconds
+        pixel._connectionMonitor = setInterval(() => {
+            if (pixel._device && !pixel._device.gatt.connected) {
+                log('Connection lost detected for ' + pixel.name);
+                handleDeviceDisconnection(pixel._device);
+                clearInterval(pixel._connectionMonitor);
+            }
+        }, 30000);
+    }
+
+    // Global connection cleanup - runs every 60 seconds
+    setInterval(() => {
+        // Remove permanently disconnected pixels after 5 minutes of inactivity
+        const now = Date.now();
+        const fiveMinutes = 5 * 60 * 1000;
+        
+        pixels = pixels.filter(pixel => {
+            if (!pixel.isConnected && (now - pixel.lastActivity) > fiveMinutes) {
+                log(`Removing stale pixel connection: ${pixel.name}`);
+                pixel.disconnect(); // Ensure cleanup
+                return false;
+            }
+            return true;
+        });
+        
+        // Update status if pixels were removed
+        sendStatusToExtension();
+    }, 60000);//
     // Holds a bluetooth connection to a pixel dice
     //
     class Pixel {
-        constructor(name, server) {
+        constructor(name, server, device) {
             this._name = name;
             this._server = server;
+            this._device = device;
             this._hasMoved = false;
             this._status = 'Ready';
+            this._isConnected = true;
+            this._connectionMonitor = null;
+            this._lastActivity = Date.now();
         }
 
         get isConnected() {
-            return this._server != null;
+            return this._isConnected && this._server != null && this._device && this._device.gatt.connected;
         }
 
         get name() {
@@ -153,12 +240,34 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             return this._face;
         }
 
-        disconnect() {
-            this._server?.disconnect();
-            this._server = null;
+        get lastActivity() {
+            return this._lastActivity;
         }
 
-        handleNotifications(event) {
+        markDisconnected() {
+            this._isConnected = false;
+            this._server = null;
+            if (this._connectionMonitor) {
+                clearInterval(this._connectionMonitor);
+                this._connectionMonitor = null;
+            }
+            log(`Pixel ${this._name} marked as disconnected`);
+        }
+
+        reconnect(server) {
+            this._server = server;
+            this._isConnected = true;
+            this._lastActivity = Date.now();
+            log(`Pixel ${this._name} reconnected successfully`);
+        }
+
+        disconnect() {
+            this.markDisconnected();
+            this._server?.disconnect();
+            log(`Pixel ${this._name} manually disconnected`);
+        }        handleNotifications(event) {
+            this._lastActivity = Date.now(); // Track activity for connection monitoring
+            
             let value = event.target.value;
             let arr = [];
             // Convert raw data bytes to hex values just for the sake of showing something.
@@ -227,15 +336,18 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
 
     function sendTextToExtension(txt) {
         sendMessageToExtension({ action: "showText", text: txt });
-    }
-
-    function sendStatusToExtension() {
-        if (pixels.length == 0)
+    }    function sendStatusToExtension() {
+        const connectedPixels = pixels.filter(p => p.isConnected);
+        const totalPixels = pixels.length;
+        
+        if (totalPixels == 0) {
             sendTextToExtension("No Pixel connected");
-        else if (pixels.length == 1)
-            sendTextToExtension("1 Pixel connected");
-        else
-            sendTextToExtension(pixels.length + " Pixels connected");
+        } else if (totalPixels == 1) {
+            const status = connectedPixels.length == 1 ? "connected" : "disconnected";
+            sendTextToExtension(`1 Pixel ${status}`);
+        } else {
+            sendTextToExtension(`${connectedPixels.length}/${totalPixels} Pixels connected`);
+        }
     }
 
     //
@@ -284,11 +396,12 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         }
         else if (msg.action == "connect") {
             connectToPixel();
-        }
-        else if (msg.action == "disconnect") {
-            log("disconnect");
-            pixels.forEach(pixel => pixel.disconnect());
-            pixels = []
+        }        else if (msg.action == "disconnect") {
+            log("Manual disconnect requested");
+            pixels.forEach(pixel => {
+                pixel.disconnect();
+            });
+            pixels = [];
             sendStatusToExtension();
         }
     });
