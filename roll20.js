@@ -31,13 +31,12 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         `;
 
         // Add CSS styles
-        const style = document.createElement('style');
-        style.textContent = `
+        const style = document.createElement('style');        style.textContent = `
             #pixels-modifier-box {
                 position: fixed;
-                top: 100px;
-                right: 20px;
-                width: 200px;
+                width: 280px;
+                min-width: 250px;
+                max-width: 400px;
                 background: #2b2b2b;
                 border: 2px solid #4CAF50;
                 border-radius: 8px;
@@ -46,6 +45,8 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                 z-index: 999999;
                 user-select: none;
                 color: white;
+                resize: both;
+                overflow: hidden;
             }
             .pixels-header {
                 background: #1a1a1a;
@@ -146,15 +147,37 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             pixelsModifierName = "Manual Entry";
             log(`Modifier updated: ${pixelsModifier}`);
             sendMessageToExtension({ action: "modifierChanged", modifier: pixelsModifier });
-        });
-
-        document.body.appendChild(modifierBox);
-        isModifierBoxVisible = true;
+        });        document.body.appendChild(modifierBox);
+        isModifierBoxVisible = true;        // Position relative to textchatcontainer
+        positionModifierBox();
+        
+        // Add window resize listener to reposition the box
+        window.addEventListener('resize', positionModifierBox);
         
         log("Modifier box created and added to page");
-    }
-
-    function showModifierBox() {
+    }    function positionModifierBox() {
+        if (!modifierBox) {
+            log("positionModifierBox called but modifierBox is null");
+            return;
+        }
+        
+        log("Positioning modifier box...");
+        const chatContainer = document.querySelector('.textchatcontainer');
+        if (chatContainer) {
+            log("Found chat container, positioning relative to it");
+            const rect = chatContainer.getBoundingClientRect();
+            const boxWidth = modifierBox.offsetWidth || 280; // Use actual width or default
+            // Position to the left of the chat container, aligned with its bottom
+            modifierBox.style.left = (rect.left - boxWidth - 20) + 'px'; // Dynamic width + 20px gap
+            modifierBox.style.top = (rect.bottom - 80) + 'px'; // Align with bottom, smaller offset
+        } else {
+            log("Chat container not found, using fallback position");
+            // Fallback to default position if chat container not found
+            modifierBox.style.top = '100px';
+            modifierBox.style.right = '20px';
+            modifierBox.style.left = 'auto';
+        }
+    }    function showModifierBox() {
         log("showModifierBox called");
         if (!modifierBox) {
             createModifierBox();
@@ -162,6 +185,8 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             log("Modifier box already exists, showing it");
             modifierBox.style.display = 'block';
             isModifierBoxVisible = true;
+            // Reposition in case the page layout has changed
+            positionModifierBox();
         }
         // Update input with current modifier value
         const input = modifierBox.querySelector('#pixels-modifier-input');
