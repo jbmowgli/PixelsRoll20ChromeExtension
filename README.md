@@ -62,53 +62,60 @@ Check the [Pixels website](https://gamewithpixels.com/) for more information.
 > Before jumping into programming please make sure to read the Pixels developer's
 > [guide](https://github.com/GameWithPixels/.github/blob/main/doc/DevelopersGuide.md).
 
-## How To Install
+## 📚 Documentation
 
-1. Download the content of this repository (*).
-2. Open Chrome extension manager (`chrome://extensions/`).
-3. Enable "Developer mode" (toggle in top right).
-4. If you downloaded this repository as a zip file, unzip it.
-5. Click "Load Unpacked" and browse to the folder where you downloaded the extension.
+For comprehensive guides and documentation:
 
-## How To Use
+- **[Installation Guide](docs/INSTALLATION.md)** - Complete installation instructions
+- **[User Guide](docs/USER_GUIDE.md)** - Comprehensive user manual with examples
+- **[Quick Reference](docs/QUICK_REFERENCE.md)** - Essential actions and shortcuts
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Solutions to common problems
+- **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Technical documentation for contributors
+- **[Project Structure](docs/PROJECT_STRUCTURE.md)** - Codebase organization and architecture
 
-### Basic Usage
+## Quick Install
 
-1. Open a game on Roll20's [website](https://roll20.net/).
-2. Click on the extension icon (puzzle piece) in Chrome's toolbar.
-3. Select the "Pixels on Roll20" extension.
-4. Click "Connect to Pixel" to pair with your dice.
-5. Your Pixels dice rolls will now appear in the Roll20 chat!
+1. Download the content of this repository
+2. Open Chrome extension manager (`chrome://extensions/`)
+3. Enable "Developer mode" (toggle in top right)
+4. Click "Load Unpacked" and browse to the extension folder
 
-### Using the Modifier System
+**For detailed installation instructions, see [docs/INSTALLATION.md](docs/INSTALLATION.md)**
 
-1. In the extension popup, click "Show Modifier Box" to display the floating modifier interface.
-2. **Add Modifiers**: Click the "+" button to add new modifier rows.
-3. **Set Values**: Enter names and modifier values (e.g., "Bless: +1d4", "Guidance: +1d4").
-4. **Select Active Modifier**: Use radio buttons to choose which modifier applies to rolls.
-5. **Remove Modifiers**: Click the "−" button to remove unwanted rows.
-6. **Hide When Done**: Click "Hide Modifier Box" in the popup to hide the interface.
+## Quick Start
 
-### Advanced Features
+1. **Install**: Load the extension in Chrome (see [Installation Guide](docs/INSTALLATION.md))
+2. **Open Roll20**: Navigate to your game session
+3. **Connect**: Click extension icon → "Connect" → Select your Pixels dice
+4. **Roll**: Physical dice rolls automatically appear in Roll20 chat
 
-- **Drag to Reposition**: Click and drag the modifier box to move it around the screen.
-- **Automatic Integration**: Selected modifiers are automatically added to your roll results.
-- **Multiple Dice**: Connect multiple Pixels dice simultaneously.
-- **Auto-Reconnection**: Disconnected dice will automatically attempt to reconnect.
+**For complete usage instructions, see [docs/USER_GUIDE.md](docs/USER_GUIDE.md)**
 
-## File Structure
+### Modifier System
+
+- **Show Box**: Click "Show Modifier Box" in extension popup
+- **Add Modifiers**: Custom names and values (e.g., "Bless: +4")
+- **Select Active**: Radio buttons to choose current modifier
+- **Auto-Integration**: Selected modifiers automatically added to rolls
+
+**For detailed modifier instructions, see [User Guide](docs/USER_GUIDE.md#using-the-modifier-box)**
+
+## 📁 Project Structure
 
 ```text
-├── manifest.json           # Extension manifest
-├── popup.html              # Extension popup interface  
-├── popup.js                # Popup logic and script injection
-├── roll20.js               # Main extension logic, Bluetooth, and Roll20 integration
-├── modifierBox.js          # Modifier box UI module (singleton)
-├── background.js           # Extension background script
-├── options.html/js         # Extension options (unused)
-├── test.html               # Test page for development
-└── images/                 # Extension icons
+PixelsRoll20ChromeExtension/
+├── src/                    # Source code
+│   ├── content/           # Content scripts (Roll20 integration)
+│   ├── popup/             # Extension popup interface
+│   ├── options/           # Extension options page
+│   └── background/        # Background scripts
+├── assets/                # Static assets (icons, images)
+├── tests/                 # Testing and development tools
+├── docs/                  # Comprehensive documentation
+└── manifest.json          # Chrome extension manifest
 ```
+
+**For detailed structure documentation, see [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)**
 
 ## Technical Details
 
@@ -124,28 +131,30 @@ Check the [Pixels website](https://gamewithpixels.com/) for more information.
 - Supports complex roll expressions with modifiers
 - Preserves original roll values while adding modifier information
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
-### Common Issues
+### Quick Fixes
+- **Not Working?** → Refresh Roll20 page, reconnect dice
+- **No Bluetooth Devices?** → Wake dice by rolling, check Bluetooth enabled
+- **No Chat Results?** → Verify dice connection in popup
+- **Box Missing?** → Click "Show Modifier Box" in extension popup
 
-- **Device picker doesn't appear**: Ensure you're on an HTTPS page and Bluetooth is enabled
-- **Connection fails**: Try refreshing the page and reconnecting
-- **Modifier box not showing**: Check that you clicked "Show Modifier Box" in the popup
-- **Dice not found**: Ensure your Pixels dice are powered on and in range
+**For comprehensive troubleshooting, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)**
 
 ### Debug Information
 
-If you're having problems, check the DevTools Console:
+If problems persist:
+1. Press F12 in Chrome → Console tab
+2. Look for error messages or connection logs
+3. Try the test page at `tests/test.html`
 
-1. Press F12 in Chrome
-2. Select the "Console" tab
-3. Look for error messages or connection logs
+## 🛠️ Development
 
-## Development
+**For development information, see [docs/DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md)**
 
 ### Testing
-
-Open `test.html` in your browser to test modifier box functionality and Bluetooth connections without needing Roll20.
+- Open `tests/test.html` for UI and Bluetooth testing
+- Open `tests/bluetooth-test.html` for connection-specific testing
 
 ### Contributing
 
