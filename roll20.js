@@ -71,14 +71,27 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             btn.click();
             txt.value = current_msg;
         }
-    }
-
-    //
+    }    //
     // Pixels bluetooth discovery
-    //    const PIXELS_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();
-    const PIXELS_NOTIFY_CHARACTERISTIC = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();    const PIXELS_WRITE_CHARACTERISTIC = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E".toLowerCase();    async function connectToPixel() {
+    // UUIDs from the official Pixels JS SDK
+    //
+    // Modern Pixels dice UUIDs
+    const PIXELS_SERVICE_UUID = "a6b90001-7a5a-43f2-a962-350c8edc9b5b";
+    const PIXELS_NOTIFY_CHARACTERISTIC = "a6b90002-7a5a-43f2-a962-350c8edc9b5b";
+    const PIXELS_WRITE_CHARACTERISTIC = "a6b90003-7a5a-43f2-a962-350c8edc9b5b";
+    
+    // Legacy Pixels dice UUIDs (for older dice)
+    const PIXELS_LEGACY_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+    const PIXELS_LEGACY_NOTIFY_CHARACTERISTIC = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+    const PIXELS_LEGACY_WRITE_CHARACTERISTIC = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";    async function connectToPixel() {
         try {
-            const options = { filters: [{ services: [PIXELS_SERVICE_UUID] }] };
+            // Try to find both modern and legacy Pixels dice
+            const options = { 
+                filters: [
+                    { services: [PIXELS_SERVICE_UUID] },              // Modern Pixels dice
+                    { services: [PIXELS_LEGACY_SERVICE_UUID] }        // Legacy Pixels dice
+                ]
+            };
             log('Requesting Bluetooth Device with ' + JSON.stringify(options));
 
             const device = await navigator.bluetooth.requestDevice(options);
@@ -94,9 +107,28 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             const connect = async () => {
                 console.log('Connecting to ' + device.name);
                 server = await device.gatt.connect();
-                const service = await server.getPrimaryService(PIXELS_SERVICE_UUID);
-                notify = await service.getCharacteristic(PIXELS_NOTIFY_CHARACTERISTIC);
-                //const write = await service.getCharacteristic(PIXELS_WRITE_CHARACTERISTIC);
+                
+                // Try to detect which type of Pixel this is and use appropriate UUIDs
+                let serviceUuid, notifyUuid, writeUuid;
+                try {
+                    // Try modern UUIDs first
+                    await server.getPrimaryService(PIXELS_SERVICE_UUID);
+                    serviceUuid = PIXELS_SERVICE_UUID;
+                    notifyUuid = PIXELS_NOTIFY_CHARACTERISTIC;
+                    writeUuid = PIXELS_WRITE_CHARACTERISTIC;
+                    log('Connected to modern Pixels die');
+                } catch (error) {
+                    // Fall back to legacy UUIDs
+                    await server.getPrimaryService(PIXELS_LEGACY_SERVICE_UUID);
+                    serviceUuid = PIXELS_LEGACY_SERVICE_UUID;
+                    notifyUuid = PIXELS_LEGACY_NOTIFY_CHARACTERISTIC;
+                    writeUuid = PIXELS_LEGACY_WRITE_CHARACTERISTIC;
+                    log('Connected to legacy Pixels die');
+                }
+                
+                const service = await server.getPrimaryService(serviceUuid);
+                notify = await service.getCharacteristic(notifyUuid);
+                //const write = await service.getCharacteristic(writeUuid);
             };
 
         // Attempt to connect up to 3 times
@@ -158,15 +190,30 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                 attemptReconnection(device, pixel);
             }, 5000); // Wait 5 seconds before attempting reconnection
         }
-    }
-
-    async function attemptReconnection(device, pixel) {
+    }    async function attemptReconnection(device, pixel) {
         if (!device.gatt.connected) {
             log('Attempting to reconnect to ' + device.name);
             try {
                 const server = await device.gatt.connect();
-                const service = await server.getPrimaryService(PIXELS_SERVICE_UUID);
-                const notify = await service.getCharacteristic(PIXELS_NOTIFY_CHARACTERISTIC);
+                
+                // Detect which type of Pixel this is and use appropriate UUIDs
+                let serviceUuid, notifyUuid;
+                try {
+                    // Try modern UUIDs first
+                    await server.getPrimaryService(PIXELS_SERVICE_UUID);
+                    serviceUuid = PIXELS_SERVICE_UUID;
+                    notifyUuid = PIXELS_NOTIFY_CHARACTERISTIC;
+                    log('Reconnecting to modern Pixels die');
+                } catch (error) {
+                    // Fall back to legacy UUIDs
+                    await server.getPrimaryService(PIXELS_LEGACY_SERVICE_UUID);
+                    serviceUuid = PIXELS_LEGACY_SERVICE_UUID;
+                    notifyUuid = PIXELS_LEGACY_NOTIFY_CHARACTERISTIC;
+                    log('Reconnecting to legacy Pixels die');
+                }
+                
+                const service = await server.getPrimaryService(serviceUuid);
+                const notify = await service.getCharacteristic(notifyUuid);
                 
                 await notify.startNotifications();
                 notify.addEventListener('characteristicvaluechanged', ev => pixel.handleNotifications(ev));
@@ -185,7 +232,7 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                 }, 10000);
             }
         }
-    }    function startConnectionMonitoring(pixel) {
+    }function startConnectionMonitoring(pixel) {
         // Check connection status every 30 seconds
         pixel._connectionMonitor = setInterval(() => {
             if (pixel._device && !pixel._device.gatt.connected) {
