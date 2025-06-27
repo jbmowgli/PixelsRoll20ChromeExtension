@@ -47,17 +47,17 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
   // First inject the theme detector
   chrome.tabs.executeScript(
     tabs[0].id,
-    { file: "theme-detector.js" },
+    { file: "src/content/theme-detector.js" },
     _ => {
       // Then inject the modifier box module
       chrome.tabs.executeScript(
         tabs[0].id,
-        { file: "modifierBox.js" },
+        { file: "src/content/modifierBox.js" },
         _ => {
           // Finally inject the main roll20 script
           chrome.tabs.executeScript(
             tabs[0].id,
-            { file: "roll20.js" },
+            { file: "src/content/roll20.js" },
             _ => {
               sendMessage({ action: "getStatus" });
               chrome.storage.sync.get('modifier', data => sendMessage({ action: "setModifier", modifier: data.modifier || "0" }));

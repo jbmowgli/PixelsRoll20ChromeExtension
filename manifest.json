@@ -4,18 +4,18 @@
   "description": "Bring the magic of Pixels into Roll20!",
   "permissions": ["activeTab", "declarativeContent", "storage"],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["src/background/background.js"],
     "persistent": false
   },
   "page_action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup/popup.html",
     "default_icon": {
-      "64": "images/logo-64.png"
+      "64": "assets/images/logo-64.png"
     }
   },
   "icons": {
-    "64": "images/logo-64.png"
+    "64": "assets/images/logo-64.png"
   },
-  "options_page": "options.html",
+  "options_page": "src/options/options.html",
   "manifest_version": 2
 }
