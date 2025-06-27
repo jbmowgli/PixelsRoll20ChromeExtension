@@ -144,12 +144,8 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-            }
-            .remove-row-btn:hover {
+            }            .remove-row-btn:hover {
                 background: #666;
-            }
-            .modifier-row:first-child .remove-row-btn {
-                display: none;
             }
             .modifier-name:focus, .modifier-value:focus {
                 outline: none;
@@ -267,9 +263,24 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             const radio = rowElement.querySelector('.modifier-radio');
             const index = parseInt(radio.value);
             
-            // Don't remove the first row (index 0)
-            if (index === 0) {
-                log("Cannot remove the first modifier row");
+            // Count total rows
+            const totalRows = modifierBox.querySelectorAll('.modifier-row').length;
+            
+            // If this is the only row left, reset it to default values instead of removing
+            if (totalRows === 1) {
+                const nameInput = rowElement.querySelector('.modifier-name');
+                const valueInput = rowElement.querySelector('.modifier-value');
+                
+                nameInput.value = "None";
+                valueInput.value = "0";
+                
+                // Make sure it's selected
+                radio.checked = true;
+                
+                // Update the selected modifier
+                updateSelectedModifier();
+                
+                log("Reset the last remaining modifier row to default values");
                 return;
             }
             
@@ -279,9 +290,9 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             // Remove the row
             rowElement.remove();
             
-            // If the removed row was selected, select the first row
+            // If the removed row was selected, select the first remaining row
             if (wasSelected) {
-                const firstRadio = modifierBox.querySelector('.modifier-radio[value="0"]');
+                const firstRadio = modifierBox.querySelector('.modifier-radio');
                 if (firstRadio) {
                     firstRadio.checked = true;
                     updateSelectedModifier();
@@ -289,7 +300,7 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             }
             
             log(`Removed modifier row with index ${index}`);
-        }        function updateEventListeners() {
+        }function updateEventListeners() {
             // Remove existing listeners by cloning and replacing elements
             const rows = modifierBox.querySelectorAll('.modifier-row');
             
