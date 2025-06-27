@@ -64,7 +64,7 @@
                     <input type="number" class="modifier-value" value="0" min="-99" max="99" data-index="0">
                     <button class="remove-row-btn" type="button">×</button>
                 </div>
-                <button class="add-modifier-btn">+ Add Row</button>
+                <button class="add-modifier-btn" type="button">+</button>
             </div>
         `;
 
@@ -125,26 +125,32 @@
             colors = window.ThemeDetector.getThemeColors();
         }
 
-        style.textContent = `
-            #pixels-modifier-box {
+        style.textContent = `            #pixels-modifier-box {
                 position: fixed;
                 width: 280px;
                 min-width: 250px;
                 max-width: 400px;
-                background: ${colors.background};
+                background: ${colors.background} !important;
                 border: 2px solid ${colors.primary};
                 border-radius: 8px;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                 font-family: Arial, sans-serif;
                 z-index: 999999;
                 user-select: none;
-                color: ${colors.text};
+                color: ${colors.text} !important;
                 resize: both;
                 overflow: hidden;
                 transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             }
+            
+            /* Force text color inheritance for all elements inside the modifier box */
+            #pixels-modifier-box,
+            #pixels-modifier-box * {
+                color: ${colors.text} !important;
+            }
+            
             .pixels-header {
-                background: ${colors.surface};
+                background: ${colors.surface} !important;
                 padding: 8px 12px;
                 border-radius: 6px 6px 0 0;
                 display: flex;
@@ -154,20 +160,25 @@
                 border-bottom: 1px solid ${colors.border};
                 transition: background-color 0.3s ease, border-color 0.3s ease;
             }
+            
             .pixels-title {
-                color: ${colors.primary};
+                color: ${colors.primary} !important;
                 font-size: 12px;
                 font-weight: bold;
                 transition: color 0.3s ease;
+                white-space: nowrap;
             }
+            
             .pixels-controls {
                 display: flex;
                 gap: 4px;
+                flex-shrink: 0;
             }
+            
             .pixels-controls button {
                 background: none;
                 border: none;
-                color: ${colors.textSecondary};
+                color: ${colors.textSecondary} !important;
                 font-size: 14px;
                 font-weight: bold;
                 width: 20px;
@@ -178,62 +189,72 @@
                 align-items: center;
                 justify-content: center;
                 transition: background-color 0.3s ease, color 0.3s ease;
+                flex-shrink: 0;
             }
+            
             .pixels-controls button:hover {
                 background: ${colors.button};
-                color: ${colors.text};
+                color: ${colors.text} !important;
             }
+            
             .pixels-content {
                 padding: 8px;
                 box-sizing: border-box;
                 max-height: 300px;
                 overflow-y: auto;
+                overflow-x: hidden; /* Prevent horizontal scroll */
             }
+            
             .modifier-row {
                 display: flex;
                 align-items: center;
                 gap: 6px;
                 margin-bottom: 6px;
                 position: relative;
-            }
-            .modifier-radio {
+                box-sizing: border-box;
+                width: 100%;
+                min-width: 0; /* Allow flex items to shrink */
+            }            .modifier-radio {
                 width: 16px;
                 height: 16px;
                 flex-shrink: 0;
                 accent-color: ${colors.primary};
             }
+            
             .modifier-name {
                 flex: 1;
                 padding: 4px 6px;
                 border: 1px solid ${colors.inputBorder};
                 border-radius: 3px;
-                background: ${colors.input};
-                color: ${colors.text};
+                background: ${colors.input} !important;
+                color: ${colors.text} !important;
                 font-size: 12px;
                 min-width: 0;
                 box-sizing: border-box;
                 transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             }
+            
             .modifier-value {
                 width: 50px;
                 padding: 4px;
                 border: 1px solid ${colors.inputBorder};
                 border-radius: 3px;
-                background: ${colors.input};
-                color: ${colors.text};
+                background: ${colors.input} !important;
+                color: ${colors.text} !important;
                 font-size: 12px;
                 text-align: center;
                 box-sizing: border-box;
                 flex-shrink: 0;
                 transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             }
+            
             .remove-row-btn {
                 width: 20px;
                 height: 20px;
                 border: 1px solid ${colors.border};
                 border-radius: 3px;
-                background: ${colors.button};
-                color: ${colors.text};
+                background: ${colors.button} !important;
+                color: ${colors.text} !important;
                 font-size: 12px;
                 cursor: pointer;
                 flex-shrink: 0;
@@ -242,29 +263,38 @@
                 justify-content: center;
                 transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             }
+            
             .remove-row-btn:hover {
-                background: ${colors.buttonHover};
+                background: ${colors.buttonHover} !important;
             }
+            
             .modifier-name:focus, .modifier-value:focus {
                 outline: none;
                 border-color: ${colors.primary};
-                background: ${colors.theme === 'dark' ? '#3a3a3a' : '#f8f8f8'};
+                background: ${colors.theme === 'dark' ? '#3a3a3a' : '#f8f8f8'} !important;
             }
+            
             .add-modifier-btn {
-                width: 100%;
-                padding: 6px;
-                border: 1px solid ${colors.inputBorder};
-                border-radius: 4px;
-                background: ${colors.button};
-                color: ${colors.textSecondary};
-                font-size: 11px;
+                width: 20px;
+                height: 20px;
+                border: 1px solid ${colors.border};
+                border-radius: 3px;
+                background: ${colors.button} !important;
+                color: ${colors.text} !important;
+                font-size: 14px;
+                font-weight: bold;
                 cursor: pointer;
-                margin-top: 4px;
+                margin: 4px auto 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
                 transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
             }
+            
             .add-modifier-btn:hover {
-                background: ${colors.buttonHover};
-                color: ${colors.text};
+                background: ${colors.buttonHover} !important;
+                color: ${colors.text} !important;
             }
             #pixels-modifier-box.minimized .pixels-content {
                 display: none;
@@ -508,12 +538,29 @@
             console.log("Modifier box hidden");
         } else {            console.log("Cannot hide - modifierBox is null");
         }
-    }
-
-    // Theme update function
+    }    // Theme update function
     function updateTheme() {
         console.log("Updating modifier box theme...");
-        addModifierBoxStyles(); // Recreate styles with new theme colors
+        
+        // Recreate styles with new theme colors
+        addModifierBoxStyles();
+        
+        // Force style recalculation by triggering a reflow
+        if (modifierBox) {
+            // Temporarily hide and show to force style update
+            const originalDisplay = modifierBox.style.display;
+            modifierBox.style.display = 'none';
+            modifierBox.offsetHeight; // Trigger reflow
+            modifierBox.style.display = originalDisplay;
+            
+            // Force recalculation of all child elements
+            const allElements = modifierBox.querySelectorAll('*');
+            allElements.forEach(element => {
+                element.offsetHeight; // Trigger individual reflows
+            });
+            
+            console.log("Theme update completed with forced reflow");
+        }
     }
 
     // Start theme monitoring when box is created
