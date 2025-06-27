@@ -591,26 +591,23 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             sendTextToExtension("1 Pixel connected");
         else
             sendTextToExtension(pixels.length + " Pixels connected");
-    }
-
-    //
+    }    //
     // Initialize
-    //    log("Starting Pixels Roll20 extension");
+    //
 
-    var pixels = []
-    var pixelsFormula = "&{template:default} {{name=#modifier_name}} {{Dice=#face_value}}{{Mod=#modifier}} {{Result=[[#face_value + #modifier]]}}";
+    log("Starting Pixels Roll20 extension");
+
+    var pixels = [];
+    var pixelsFormula = "&{template:default} {{name=#modifier_name}} {{Pixel Die=[[#face_value]]}} {{Modifier=[[#modifier]]}} {{Total=[[#face_value + #modifier]]}}";
     var pixelsModifier = "0";
-    var pixelsModifierName = "Manual Entry";    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    var pixelsModifierName = "None";
+
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         log("Received message from extension: " + msg.action);
         if (msg.action == "getStatus") {
             sendStatusToExtension();            
         }
-        else if (msg.action == "setFormula") {
-            if (pixelsFormula != msg.formula) {
-                pixelsFormula = msg.formula;
-                log("Updated Roll20 formula: " + pixelsFormula);
-            }
-        }        else if (msg.action == "setModifier") {
+        else if (msg.action == "setModifier") {
             if (pixelsModifier != msg.modifier) {
                 pixelsModifier = msg.modifier || "0";
                 log("Updated modifier: " + pixelsModifier);                // Update floating box if it exists

@@ -25,33 +25,6 @@ function showText(txt) {
   document.getElementById('text').innerHTML = txt;
 }
 
-function initTextAreaFromStorage(textarea, storageName, dataGetter, defaultValue) {
-  chrome.storage.sync.get(storageName, data => {
-    let txt = dataGetter(data);
-    if (!txt) {
-      txt = defaultValue;
-      saveFormula(txt);
-    }
-    textarea.value = txt;
-  });
-}
-
-// Gets Roll20 formula from storage
-let textareaFormula = document.getElementById('formula');
-initTextAreaFromStorage(
-  textareaFormula, 'formula', data => data.formula,
- "Pixel #pixel_name rolled a #face_value");
-
- // Hook button that saves formula edited in popup
-let button = document.getElementById('save');
-button.addEventListener('click', () => saveFormula(textareaFormula.value));
-
-// Save formula in storage
-function saveFormula(txt) {
-  sendMessage({ action: "setFormula", formula: txt });
-  chrome.storage.sync.set({ formula: txt }, () => console.log('Formula stored: ' + txt));
-}
-
 // Send message to injected JS
 function sendMessage(data, responseCallback) {
   chrome.tabs.query({ active: true, currentWindow: true }, tabs =>
@@ -76,7 +49,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     { file: "roll20.js" },
     _ => {
       sendMessage({ action: "getStatus" });
-      chrome.storage.sync.get('formula', data => sendMessage({ action: "setFormula", formula: data.formula }));
       chrome.storage.sync.get('modifier', data => sendMessage({ action: "setModifier", modifier: data.modifier || "0" }));
     })
 });
