@@ -416,7 +416,13 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     //
 
     function sendMessageToExtension(data) {
-        chrome.runtime.sendMessage(data);
+        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+            try {
+                chrome.runtime.sendMessage(data);
+            } catch (error) {
+                console.log("Could not send message to extension:", error.message);
+            }
+        }
     }
 
     function sendTextToExtension(txt) {
@@ -444,15 +450,18 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     var pixels = [];
     var pixelsFormula = "&{template:default} {{name=#modifier_name}} {{Pixel Die=[[#face_value]]}} {{Modifier=[[#modifier]]}} {{Total=[[#face_value + #modifier]]}}";
 
-    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-        log("Received message from extension: " + msg.action);
-        if (msg.action == "getStatus") {
-            sendStatusToExtension();            
-        }
-        else if (msg.action == "setModifier") {
-            if (window.pixelsModifier != msg.modifier) {
-                window.pixelsModifier = msg.modifier || "0";
-                log("Updated modifier: " + window.pixelsModifier);
+    // Only set up message listener if in extension context
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+        try {
+            chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+                log("Received message from extension: " + msg.action);
+                if (msg.action == "getStatus") {
+                    sendStatusToExtension();            
+                }
+                else if (msg.action == "setModifier") {
+                    if (window.pixelsModifier != msg.modifier) {
+                        window.pixelsModifier = msg.modifier || "0";
+                        log("Updated modifier: " + window.pixelsModifier);
                 // Update floating box if it exists and ModifierBox is loaded
                 if (typeof window.ModifierBox !== 'undefined') {
                     const modifierBox = window.ModifierBox.getElement();
@@ -494,7 +503,11 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             pixels = [];
             sendStatusToExtension();
         }
-    });
+        });
+        } catch (error) {
+            console.log("Could not set up extension message listener:", error.message);
+        }
+    }
 
     sendStatusToExtension();
     

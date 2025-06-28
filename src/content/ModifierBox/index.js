@@ -94,10 +94,20 @@
         modifierBox.setAttribute('data-testid', 'pixels-modifier-box');
         modifierBox.className = 'PIXELS_EXTENSION_BOX_FIND_ME';
 
+        // Get logo URL safely - handle both extension and test environments
+        let logoUrl = 'assets/images/logo-128.png'; // fallback
+        try {
+            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
+                logoUrl = chrome.runtime.getURL('assets/images/logo-128.png');
+            }
+        } catch (error) {
+            console.log("Using fallback logo URL (not in extension context)");
+        }
+
         modifierBox.innerHTML = `
             <div class="pixels-header">
                 <span class="pixels-title">
-                    <img src="${chrome.runtime.getURL('assets/images/logo-128.png')}" alt="Pixels" class="pixels-logo"> Dice Modifiers
+                    <img src="${logoUrl}" alt="Pixels" class="pixels-logo"> Dice Modifiers
                 </span>
                 <div class="pixels-controls">
                     <button class="add-modifier-btn" type="button" title="Add Row">Add</button>
@@ -180,7 +190,45 @@
                 console.log("Minimize button clicked");
                 e.preventDefault();
                 e.stopPropagation();
-                modifierBox.classList.toggle('minimized');
+                
+                const isCurrentlyMinimized = modifierBox.classList.contains('minimized');
+                
+                if (!isCurrentlyMinimized) {
+                    // Store current dimensions before minimizing
+                    const rect = modifierBox.getBoundingClientRect();
+                    modifierBox.setAttribute('data-original-width', rect.width);
+                    modifierBox.setAttribute('data-original-height', rect.height);
+                    
+                    // Minimize
+                    modifierBox.classList.add('minimized');
+                    // Force the minimized width to override any inline styles
+                    modifierBox.style.setProperty('width', '160px', 'important');
+                    modifierBox.style.setProperty('min-width', '180px', 'important');
+                    modifierBox.style.setProperty('max-width', '180px', 'important');
+                    minimizeBtn.textContent = '+';
+                    minimizeBtn.title = 'Restore';
+                    console.log("Minimized - stored dimensions:", rect.width, "x", rect.height);
+                } else {
+                    // Restore original dimensions
+                    const originalWidth = modifierBox.getAttribute('data-original-width');
+                    const originalHeight = modifierBox.getAttribute('data-original-height');
+                    
+                    modifierBox.classList.remove('minimized');
+                    
+                    // Clear forced minimized styles
+                    modifierBox.style.removeProperty('min-width');
+                    modifierBox.style.removeProperty('max-width');
+                    
+                    // Restore dimensions if they were stored
+                    if (originalWidth && originalHeight) {
+                        modifierBox.style.setProperty('width', originalWidth + 'px', 'important');
+                        modifierBox.style.setProperty('height', originalHeight + 'px', 'important');
+                        console.log("Restored dimensions:", originalWidth, "x", originalHeight);
+                    }
+                    
+                    minimizeBtn.textContent = '−';
+                    minimizeBtn.title = 'Minimize';
+                }
             });
         } else {
             console.error("Minimize button not found!");

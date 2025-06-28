@@ -42,12 +42,16 @@
             <li>Test both horizontal and vertical resizing</li>
             <li>Double-click the resize handle to restore original size</li>
             <li>Try dragging the box by its header</li>
+            <li>Click the minimize button (−) to make the box very small</li>
+            <li>Click the restore button (+) to return to normal size</li>
+            <li>Try the close button (×) to hide the box completely</li>
         </ul>
         
         <button class="test-button" onclick="showModifierBox()">Show Modifier Box</button>
         <button class="test-button" onclick="hideModifierBox()">Hide Modifier Box</button>
         <button class="test-button" onclick="testResize()">Test Resize</button>
         <button class="test-button" onclick="testCloseButton()">Test Close Button</button>
+        <button class="test-button" onclick="testMinimize()">Test Minimize</button>
     </div>
 
     <!-- Include all the required modules -->
@@ -159,6 +163,46 @@
                 } else {
                     alert("❌ Close button not found in the modifier box!");
                     console.log("Available buttons:", box.querySelectorAll('button'));
+                }
+            } else {
+                alert("Please create the modifier box first!");
+            }
+        }
+
+        function testMinimize() {
+            const box = document.getElementById('pixels-modifier-box');
+            if (box) {
+                console.log("=== MINIMIZE BUTTON TEST ===");
+                const minimizeBtn = box.querySelector('.pixels-minimize');
+                if (minimizeBtn) {
+                    const currentRect = box.getBoundingClientRect();
+                    console.log("Before minimize:", {
+                        width: currentRect.width,
+                        height: currentRect.height,
+                        isMinimized: box.classList.contains('minimized')
+                    });
+                    
+                    // Click minimize button
+                    minimizeBtn.click();
+                    
+                    setTimeout(() => {
+                        const newRect = box.getBoundingClientRect();
+                        const isMinimized = box.classList.contains('minimized');
+                        console.log("After minimize:", {
+                            width: newRect.width,
+                            height: newRect.height,
+                            isMinimized: isMinimized,
+                            buttonText: minimizeBtn.textContent
+                        });
+                        
+                        if (isMinimized && newRect.width < currentRect.width) {
+                            alert("✅ Minimize working! Click minimize again to test restore.");
+                        } else {
+                            alert("❌ Minimize not working as expected. Check console.");
+                        }
+                    }, 100);
+                } else {
+                    alert("❌ Minimize button not found!");
                 }
             } else {
                 alert("Please create the modifier box first!");

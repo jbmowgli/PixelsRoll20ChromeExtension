@@ -300,9 +300,36 @@
                 display: none !important;
             }
 
+            /* Minimized State - Override base min-width */
             #pixels-modifier-box.minimized {
-                width: auto !important;
-                min-width: 200px !important;
+                width: 160px !important;
+                min-width: 180px !important;
+                max-width: 180px !important;
+                height: auto !important;
+                min-height: auto !important;
+                max-height: none !important;
+            }
+
+            #pixels-modifier-box.minimized .pixels-title {
+                font-size: 12px !important;
+            }
+
+            #pixels-modifier-box.minimized .pixels-logo {
+                width: 18px !important;
+                height: 18px !important;
+            }
+
+            #pixels-modifier-box.minimized .pixels-header {
+                padding: 6px 8px !important;
+                font-size: 12px !important;
+            }
+
+            #pixels-modifier-box.minimized .add-modifier-btn {
+                display: none !important;
+            }
+
+            #pixels-modifier-box.minimized .pixels-resize-handle {
+                display: none !important;
             }
 
             /* Resize Handle */
