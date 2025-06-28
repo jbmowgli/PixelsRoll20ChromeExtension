@@ -42,8 +42,12 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     // Message handler for extension communication
     //
     window.sendMessageToExtension = function(data) {
-        if (typeof chrome !== 'undefined' && chrome.runtime) {
-            chrome.runtime.sendMessage(data);
+        try {
+            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+                chrome.runtime.sendMessage(data);
+            }
+        } catch (error) {
+            console.log('Could not send message to extension:', error);
         }
     };
 
@@ -243,35 +247,43 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                 }, 10000);
             }
         }
-    }function startConnectionMonitoring(pixel) {
+    }    function startConnectionMonitoring(pixel) {
         // Check connection status every 30 seconds
-        pixel._connectionMonitor = setInterval(() => {
-            if (pixel._device && !pixel._device.gatt.connected) {
-                log('Connection lost detected for ' + pixel.name);
-                handleDeviceDisconnection(pixel._device);
-                clearInterval(pixel._connectionMonitor);
-            }
-        }, 30000);
+        try {
+            pixel._connectionMonitor = setInterval(() => {
+                if (pixel._device && !pixel._device.gatt.connected) {
+                    log('Connection lost detected for ' + pixel.name);
+                    handleDeviceDisconnection(pixel._device);
+                    clearInterval(pixel._connectionMonitor);
+                }
+            }, 30000);
+        } catch (error) {
+            console.log('Could not set up connection monitoring:', error);
+        }
     }
 
     // Global connection cleanup - runs every 60 seconds
-    setInterval(() => {
-        // Remove permanently disconnected pixels after 5 minutes of inactivity
-        const now = Date.now();
-        const fiveMinutes = 5 * 60 * 1000;
+    try {
+        setInterval(() => {
+            // Remove permanently disconnected pixels after 5 minutes of inactivity
+            const now = Date.now();
+            const fiveMinutes = 5 * 60 * 1000;
+            
+            pixels = pixels.filter(pixel => {
+                if (!pixel.isConnected && (now - pixel.lastActivity) > fiveMinutes) {
+                    log(`Removing stale pixel connection: ${pixel.name}`);
+                    pixel.disconnect(); // Ensure cleanup
+                    return false;
+                }
+                return true;
+            });
         
-        pixels = pixels.filter(pixel => {
-            if (!pixel.isConnected && (now - pixel.lastActivity) > fiveMinutes) {
-                log(`Removing stale pixel connection: ${pixel.name}`);
-                pixel.disconnect(); // Ensure cleanup
-                return false;
-            }
-            return true;
-        });
-        
-        // Update status if pixels were removed
-        sendStatusToExtension();
-    }, 60000);//
+            // Update status if pixels were removed
+            sendStatusToExtension();
+        }, 60000);
+    } catch (error) {
+        console.log('Could not set up global cleanup timer:', error);
+    }//
     // Holds a bluetooth connection to a pixel dice
     //
     class Pixel {
@@ -461,6 +473,12 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
         try {
             chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+                // Handle null/undefined messages gracefully
+                if (!msg || typeof msg !== 'object') {
+                    log("Received invalid message: " + JSON.stringify(msg));
+                    return;
+                }
+                
                 log("Received message from extension: " + msg.action);
                 if (msg.action == "getStatus") {
                     sendStatusToExtension();            

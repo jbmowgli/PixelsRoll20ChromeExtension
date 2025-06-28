@@ -31,7 +31,7 @@
         "src/content/ModifierBox/themeManager.js",
         "src/content/ModifierBox/dragHandler.js",
         "src/content/ModifierBox/rowManager.js",
-        "src/content/ModifierBox/index.js", 
+        "src/content/ModifierBox/modifierBox.js", 
         "src/content/roll20.js"
       ]
     }
