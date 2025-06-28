@@ -27,6 +27,7 @@
       "js": [
         "src/content/Common/themeDetector.js", 
         "src/content/Common/cssLoader.js",
+        "src/content/Common/htmlLoader.js",
         "src/content/ModifierBox/themeManager.js",
         "src/content/ModifierBox/dragHandler.js",
         "src/content/ModifierBox/rowManager.js",
@@ -39,7 +40,8 @@
     {
       "resources": [
         "assets/images/*",
-        "src/content/ModifierBox/styles/*.css"
+        "src/content/ModifierBox/styles/*.css",
+        "src/content/ModifierBox/*.html"
       ],
       "matches": ["https://roll20.net/*", "https://app.roll20.net/*"]
     }

@@ -69,8 +69,8 @@ describe('ModifierBox Main Module', () => {
   });
 
   describe('createModifierBox', () => {
-    test('should create modifier box element with correct structure', () => {
-      const element = window.ModifierBox.create();
+    test('should create modifier box element with correct structure', async () => {
+      const element = await window.ModifierBox.create();
       
       expect(element).toBeInstanceOf(HTMLElement);
       expect(element.id).toBe('pixels-modifier-box');
@@ -78,8 +78,8 @@ describe('ModifierBox Main Module', () => {
       expect(element.className).toBe('PIXELS_EXTENSION_BOX_FIND_ME');
     });
 
-    test('should create modifier box with correct HTML structure', () => {
-      const element = window.ModifierBox.create();
+    test('should create modifier box with correct HTML structure', async () => {
+      const element = await window.ModifierBox.create();
       
       // Check header
       const header = element.querySelector('.pixels-header');
@@ -119,15 +119,15 @@ describe('ModifierBox Main Module', () => {
       expect(valueInput.value).toBe('0');
     });
 
-    test('should return existing modifier box if one already exists', () => {
-      const firstElement = window.ModifierBox.create();
-      const secondElement = window.ModifierBox.create();
+    test('should return existing modifier box if one already exists', async () => {
+      const firstElement = await window.ModifierBox.create();
+      const secondElement = await window.ModifierBox.create();
       
       expect(firstElement).toBe(secondElement);
       expect(console.log).toHaveBeenCalledWith("Modifier box already exists, returning existing instance");
     });
 
-    test('should adopt existing modifier box from DOM', () => {
+    test('should adopt existing modifier box from DOM', async () => {
       // Create an existing element in the DOM
       const existingBox = document.createElement('div');
       existingBox.id = 'pixels-modifier-box';
@@ -138,7 +138,7 @@ describe('ModifierBox Main Module', () => {
       `;
       document.body.appendChild(existingBox);
       
-      const element = window.ModifierBox.create();
+      const element = await window.ModifierBox.create();
       
       expect(element).toBe(existingBox);
       expect(console.log).toHaveBeenCalledWith("Found existing modifier box in DOM, adopting it");
@@ -148,8 +148,8 @@ describe('ModifierBox Main Module', () => {
       expect(nameInput.value).toBe('Modifier 1');
     });
 
-    test('should call all component setup methods', () => {
-      window.ModifierBox.create();
+    test('should call all component setup methods', async () => {
+      await window.ModifierBox.create();
       
       expect(window.ModifierBoxThemeManager.addStyles).toHaveBeenCalled();
       expect(window.ModifierBoxDragHandler.setupDragFunctionality).toHaveBeenCalled();
@@ -157,7 +157,7 @@ describe('ModifierBox Main Module', () => {
       expect(window.ModifierBoxThemeManager.startThemeMonitoring).toHaveBeenCalled();
     });
 
-    test('should handle missing dependencies gracefully', () => {
+    test('should handle missing dependencies gracefully', async () => {
       // Remove dependencies
       delete window.ModifierBoxThemeManager;
       delete window.ModifierBoxDragHandler;
@@ -167,7 +167,7 @@ describe('ModifierBox Main Module', () => {
       delete window.ModifierBox;
       loadModule('src/content/ModifierBox/index.js');
       
-      const element = window.ModifierBox.create();
+      const element = await window.ModifierBox.create();
       
       expect(element).toBeNull();
       expect(console.error).toHaveBeenCalledWith("Required modules not loaded. Make sure all modifier box modules are included.");
@@ -175,30 +175,30 @@ describe('ModifierBox Main Module', () => {
   });
 
   describe('showModifierBox', () => {
-    test('should create and show modifier box if it does not exist', () => {
-      window.ModifierBox.show();
+    test('should create and show modifier box if it does not exist', async () => {
+      await window.ModifierBox.show();
       
       expect(window.ModifierBox.isVisible()).toBe(true);
       expect(window.ModifierBox.getElement()).toBeInstanceOf(HTMLElement);
       expect(document.body.contains(window.ModifierBox.getElement())).toBe(true);
     });
 
-    test('should show existing modifier box', () => {
+    test('should show existing modifier box', async () => {
       // Create modifier box first
-      const element = window.ModifierBox.create();
+      const element = await window.ModifierBox.create();
       element.style.display = 'none';
       
-      window.ModifierBox.show();
+      await window.ModifierBox.show();
       
       expect(element.style.display).toBe('block');
       expect(window.ModifierBox.isVisible()).toBe(true);
     });
 
-    test('should apply fixed position and update theme when showing existing box', () => {
+    test('should apply fixed position and update theme when showing existing box', async () => {
       // Create modifier box first
-      window.ModifierBox.create();
+      await window.ModifierBox.create();
       
-      window.ModifierBox.show();
+      await window.ModifierBox.show();
       
       expect(window.ModifierBoxThemeManager.updateTheme).toHaveBeenCalled();
       expect(window.ModifierBoxThemeManager.forceElementUpdates).toHaveBeenCalled();
@@ -206,8 +206,8 @@ describe('ModifierBox Main Module', () => {
   });
 
   describe('hideModifierBox', () => {
-    test('should hide modifier box if it exists', () => {
-      const element = window.ModifierBox.create();
+    test('should hide modifier box if it exists', async () => {
+      const element = await window.ModifierBox.create();
       
       window.ModifierBox.hide();
       
@@ -223,8 +223,8 @@ describe('ModifierBox Main Module', () => {
   });
 
   describe('Event Handlers', () => {
-    test('should set up close button functionality', () => {
-      const element = window.ModifierBox.create();
+    test('should set up close button functionality', async () => {
+      const element = await window.ModifierBox.create();
       const closeBtn = element.querySelector('.pixels-close');
       
       simulateEvent(closeBtn, 'click');
@@ -233,8 +233,8 @@ describe('ModifierBox Main Module', () => {
       expect(window.ModifierBox.isVisible()).toBe(false);
     });
 
-    test('should set up minimize button functionality', () => {
-      const element = window.ModifierBox.create();
+    test('should set up minimize button functionality', async () => {
+      const element = await window.ModifierBox.create();
       const minimizeBtn = element.querySelector('.pixels-minimize');
       
       expect(element.classList.contains('minimized')).toBe(false);
@@ -251,42 +251,42 @@ describe('ModifierBox Main Module', () => {
   });
 
   describe('State Management', () => {
-    test('should track visibility state correctly', () => {
+    test('should track visibility state correctly', async () => {
       expect(window.ModifierBox.isVisible()).toBe(false);
       
-      window.ModifierBox.show();
+      await window.ModifierBox.show();
       expect(window.ModifierBox.isVisible()).toBe(true);
       
       window.ModifierBox.hide();
       expect(window.ModifierBox.isVisible()).toBe(false);
     });
 
-    test('should track initialization state correctly', () => {
+    test('should track initialization state correctly', async () => {
       expect(window.ModifierBox.isInitialized()).toBe(true); // Module loads immediately
       
-      window.ModifierBox.create();
+      await window.ModifierBox.create();
       expect(window.ModifierBox.isInitialized()).toBe(true);
     });
 
-    test('should return correct element reference', () => {
+    test('should return correct element reference', async () => {
       expect(window.ModifierBox.getElement()).toBeNull();
       
-      const element = window.ModifierBox.create();
+      const element = await window.ModifierBox.create();
       expect(window.ModifierBox.getElement()).toBe(element);
     });
   });
 
   describe('Integration Methods', () => {
-    test('should call updateSelectedModifier when available', () => {
-      window.ModifierBox.create();
+    test('should call updateSelectedModifier when available', async () => {
+      await window.ModifierBox.create();
       
       window.ModifierBox.updateSelectedModifier();
       
       expect(window.ModifierBoxRowManager.updateSelectedModifier).toHaveBeenCalled();
     });
 
-    test('should call theme methods when available', () => {
-      window.ModifierBox.create();
+    test('should call theme methods when available', async () => {
+      await window.ModifierBox.create();
       
       window.ModifierBox.updateTheme();
       expect(window.ModifierBoxThemeManager.updateTheme).toHaveBeenCalled();
@@ -296,8 +296,8 @@ describe('ModifierBox Main Module', () => {
       expect(window.ModifierBoxThemeManager.forceElementUpdates).toHaveBeenCalled();
     });
 
-    test('should sync global variables', () => {
-      window.ModifierBox.create();
+    test('should sync global variables', async () => {
+      await window.ModifierBox.create();
       
       window.ModifierBox.syncGlobalVars();
       

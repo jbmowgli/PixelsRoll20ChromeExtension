@@ -48,7 +48,7 @@
         }
     };
 
-    function createModifierBox() {
+    async function createModifierBox() {
         console.log("Creating modifier box...");
         
         // Check if required modules are available
@@ -88,6 +88,58 @@
             return modifierBox;
         }
 
+        try {
+            // Load HTML template
+            if (!window.HTMLLoader) {
+                console.error("HTMLLoader module not available. Falling back to inline HTML.");
+                return createModifierBoxFallback();
+            }
+
+            // Get logo URL safely - handle both extension and test environments
+            let logoUrl = 'assets/images/logo-128.png'; // fallback
+            try {
+                if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
+                    logoUrl = chrome.runtime.getURL('assets/images/logo-128.png');
+                }
+            } catch (error) {
+                console.log("Using fallback logo URL (not in extension context)");
+            }
+
+            // Load the HTML template
+            const htmlTemplate = await window.HTMLLoader.loadTemplate(
+                'src/content/ModifierBox/modifierBox.html', 
+                'modifierBox'
+            );
+
+            // Replace logo URL placeholder
+            const processedHTML = htmlTemplate.replace('{{logoUrl}}', logoUrl);
+
+            // Create temporary container to parse HTML
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = processedHTML;
+            
+            // Get the modifier box element from the template
+            modifierBox = tempContainer.firstElementChild;
+
+            // Setup all components
+            setupModifierBoxComponents();
+
+            document.body.appendChild(modifierBox);
+            isModifierBoxVisible = true;
+            isInitialized = true;
+
+            console.log("Modifier box created from template and added to page");
+            return modifierBox;
+
+        } catch (error) {
+            console.error("Failed to load HTML template:", error);
+            console.log("Falling back to inline HTML creation");
+            return createModifierBoxFallback();
+        }
+    }
+
+    // Fallback function for inline HTML creation
+    function createModifierBoxFallback() {
         // Create the floating box
         modifierBox = document.createElement('div');
         modifierBox.id = 'pixels-modifier-box';
@@ -123,6 +175,7 @@
                     <button class="remove-row-btn" type="button">×</button>
                 </div>
             </div>
+            <div class="pixels-resize-handle"></div>
         `;
 
         // Setup all components
@@ -132,7 +185,7 @@
         isModifierBoxVisible = true;
         isInitialized = true;
 
-        console.log("Modifier box created and added to page");
+        console.log("Modifier box created with fallback method and added to page");
         return modifierBox;
     }
 
@@ -255,12 +308,12 @@
         console.log("Components setup completed");
     }
 
-    function showModifierBox() {
+    async function showModifierBox() {
         console.log("showModifierBox called");
         
         // Singleton check
         if (!modifierBox) {
-            const result = createModifierBox();
+            const result = await createModifierBox();
             if (!result) {
                 console.error("Failed to create modifier box");
                 return;

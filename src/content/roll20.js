@@ -13,7 +13,14 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             if (!window.ModifierBox.isInitialized()) {
                 log("ModifierBox module not initialized yet");
             }
-            window.ModifierBox.show();
+            // Handle async show function
+            if (window.ModifierBox.show.constructor.name === 'AsyncFunction') {
+                window.ModifierBox.show().catch(error => {
+                    console.error("Failed to show modifier box:", error);
+                });
+            } else {
+                window.ModifierBox.show();
+            }
         } else {
             log("ModifierBox module not loaded");
         }
