@@ -25,12 +25,11 @@
     {
       "matches": ["https://roll20.net/editor/*", "https://app.roll20.net/editor/*"],
       "js": [
-        "src/content/theme-detector.js", 
-        "src/content/modules/themeManager.js",
-        "src/content/modules/dragHandler.js",
-        "src/content/modules/positionManager.js",
-        "src/content/modules/rowManager.js",
-        "src/content/modifierBox.js", 
+        "src/content/Common/themeDetector.js", 
+        "src/content/ModifierBox/themeManager.js",
+        "src/content/ModifierBox/dragHandler.js",
+        "src/content/ModifierBox/rowManager.js",
+        "src/content/ModifierBox/index.js", 
         "src/content/roll20.js"
       ]
     }

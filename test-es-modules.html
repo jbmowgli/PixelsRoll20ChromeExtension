@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pixels Roll20 Extension Test - ES Modules</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        body.darkmode {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        body.lightmode {
+            background: #ffffff;
+            color: #000000;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .darkmode .container {
+            background: #2b2b2b;
+            color: #ffffff;
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background: #e7f3ff;
+            border: 1px solid #bee5eb;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .textchatcontainer {
+            position: fixed;
+            right: 20px;
+            top: 50px;
+            width: 300px;
+            height: 400px;
+            background: #f0f0f0;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .darkmode .textchatcontainer {
+            background: #333333;
+            border-color: #555555;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="darkmode">
+    <div class="container">
+        <h1>Pixels Roll20 Extension Test - ES Modules</h1>
+        <p>This page tests the refactored ES module version of the Pixels Roll20 Chrome Extension.</p>
+        
+        <div class="status" id="status">
+            Loading modules...
+        </div>
+        
+        <h2>Test Controls</h2>
+        <button class="test-button" onclick="testShowModifierBox()">Show Modifier Box</button>
+        <button class="test-button" onclick="testHideModifierBox()">Hide Modifier Box</button>
+        <button class="test-button" onclick="testThemeChange()">Toggle Theme</button>
+        <button class="test-button" onclick="testForceThemeRefresh()">Force Theme Refresh</button>
+        <button class="test-button" onclick="testCreateNewRow()">Add Modifier Row</button>
+        <button class="test-button" onclick="testConnectPixel()">Connect Pixel (Test)</button>
+        
+        <h2>Module Status</h2>
+        <div id="moduleStatus">
+            <p>Checking modules...</p>
+        </div>
+        
+        <h2>Instructions</h2>
+        <ul>
+            <li>Click "Show Modifier Box" to display the floating modifier box</li>
+            <li>Click "Toggle Theme" to switch between light and dark themes</li>
+            <li>Use the modifier box to add/remove modifiers and change values</li>
+            <li>Try dragging the modifier box around the screen</li>
+            <li>Test the "Connect Pixel" button (will show browser's Bluetooth dialog)</li>
+        </ul>
+        
+        <h2>Expected Behavior</h2>
+        <ul>
+            <li>Modifier box should appear styled according to current theme</li>
+            <li>Theme changes should automatically update the modifier box appearance</li>
+            <li>Box should be draggable by its header</li>
+            <li>Adding/removing rows should work smoothly</li>
+            <li>All functions should be accessible via ES module imports</li>
+        </ul>
+    </div>
+    
+    <!-- Simulate Roll20's chat container for positioning tests -->
+    <div class="textchatcontainer">
+        <p>Simulated Roll20 Chat Container</p>
+        <p>The modifier box should position itself relative to this element.</p>
+    </div>
+
+    <!-- Load ES modules -->
+    <script type="module">
+        import { detectTheme, getThemeColors, onThemeChange } from './src/content/Common/themeDetector.js';
+        
+        // Store module references globally for testing
+        window.ThemeDetector = {
+            detectTheme,
+            getThemeColors,
+            onThemeChange
+        };
+        
+        // Test functions
+        window.testShowModifierBox = function() {
+            if (typeof window.ModifierBox !== 'undefined') {
+                window.ModifierBox.show();
+                updateStatus('Modifier box shown', 'success');
+            } else {
+                updateStatus('ModifierBox module not loaded', 'error');
+            }
+        };
+        
+        window.testHideModifierBox = function() {
+            if (typeof window.ModifierBox !== 'undefined') {
+                window.ModifierBox.hide();
+                updateStatus('Modifier box hidden', 'success');
+            } else {
+                updateStatus('ModifierBox module not loaded', 'error');
+            }
+        };
+        
+        window.testThemeChange = function() {
+            const body = document.body;
+            if (body.classList.contains('darkmode')) {
+                body.classList.remove('darkmode');
+                body.classList.add('lightmode');
+                updateStatus('Switched to light theme', 'success');
+            } else {
+                body.classList.remove('lightmode');
+                body.classList.add('darkmode');
+                updateStatus('Switched to dark theme', 'success');
+            }
+        };
+        
+        window.testForceThemeRefresh = function() {
+            if (typeof window.ModifierBox !== 'undefined') {
+                window.ModifierBox.forceThemeRefresh();
+                updateStatus('Theme refresh forced', 'success');
+            } else {
+                updateStatus('ModifierBox module not loaded', 'error');
+            }
+        };
+        
+        window.testCreateNewRow = function() {
+            if (typeof window.ModifierBox !== 'undefined' && window.ModifierBox.getElement()) {
+                const modifierBox = window.ModifierBox.getElement();
+                const addButton = modifierBox?.querySelector('.add-modifier-btn');
+                if (addButton) {
+                    addButton.click();
+                    updateStatus('New modifier row added', 'success');
+                } else {
+                    updateStatus('Add button not found', 'error');
+                }
+            } else {
+                updateStatus('ModifierBox not available', 'error');
+            }
+        };
+        
+        window.testConnectPixel = function() {
+            if (typeof window.connectToPixel === 'function') {
+                try {
+                    window.connectToPixel();
+                    updateStatus('Bluetooth connection dialog should appear', 'success');
+                } catch (error) {
+                    updateStatus('Error connecting: ' + error.message, 'error');
+                }
+            } else {
+                updateStatus('connectToPixel function not found', 'error');
+            }
+        };
+        
+        function updateStatus(message, type = '') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+        }
+        
+        function updateModuleStatus() {
+            const statusEl = document.getElementById('moduleStatus');
+            let status = '<h3>Module Availability:</h3><ul>';
+            
+            status += `<li>ThemeDetector: ${typeof window.ThemeDetector !== 'undefined' ? '✅ Loaded' : '❌ Not loaded'}</li>`;
+            status += `<li>ModifierBox: ${typeof window.ModifierBox !== 'undefined' ? '✅ Loaded' : '❌ Not loaded'}</li>`;
+            status += `<li>Pixels Integration: ${typeof window.roll20PixelsLoaded !== 'undefined' ? '✅ Loaded' : '❌ Not loaded'}</li>`;
+            status += `<li>Chrome Extension API: ${typeof chrome !== 'undefined' ? '✅ Available' : '❌ Not available'}</li>`;
+            status += `<li>Bluetooth API: ${typeof navigator.bluetooth !== 'undefined' ? '✅ Available' : '❌ Not available'}</li>`;
+            
+            status += '</ul>';
+            statusEl.innerHTML = status;
+        }
+        
+        // Initialize
+        updateStatus('ES modules loaded successfully', 'success');
+        
+        // Wait a moment for all scripts to load, then check module status
+        setTimeout(() => {
+            updateModuleStatus();
+        }, 1000);
+        
+        // Set up theme monitoring
+        if (typeof onThemeChange === 'function') {
+            onThemeChange((newTheme, colors) => {
+                console.log('Theme changed to:', newTheme, colors);
+                updateStatus(`Theme changed to: ${newTheme}`, 'success');
+            });
+        }
+    </script>
+    
+    <!-- Load other modules that aren't ES modules yet -->
+    <script src="src/content/ModifierBox/index.js"></script>
+    <script src="src/content/Roll20Integration/index.js"></script>
+</body>
+</html>

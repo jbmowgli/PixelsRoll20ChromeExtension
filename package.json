@@ -1,0 +1,41 @@
+{
+  "name": "pixels-roll20-chrome-extension",
+  "version": "1.0.0",
+  "description": "Connect Pixels dice to Roll20 via Bluetooth with advanced modifier support and seamless integration",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "chrome-extension",
+    "roll20",
+    "pixels-dice",
+    "bluetooth",
+    "dnd"
+  ],
+  "author": "Enhanced by community contributors",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "@types/jest": "^29.5.11"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": ["<rootDir>/tests/jest/setup.js"],
+    "testMatch": [
+      "<rootDir>/tests/jest/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "src/content/**/*.js",
+      "!src/content/**/*.test.js"
+    ],
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  }
+}

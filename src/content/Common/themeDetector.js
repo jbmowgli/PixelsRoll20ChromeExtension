@@ -185,4 +185,6 @@
 
     // Export to global scope
     window.ThemeDetector = ThemeDetector;
+
+    console.log("ThemeDetector module initialized");
 })();

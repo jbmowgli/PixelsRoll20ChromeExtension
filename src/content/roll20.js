@@ -147,10 +147,17 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         }        // Subscribe to notify characteristic
         if (server && notify) {
             try {
+                // Check if this device is already connected
+                const existingPixel = pixels.find(p => p.name === device.name);
+                if (existingPixel) {
+                    log('Device ' + device.name + ' is already connected, skipping duplicate connection');
+                    return;
+                }
+                
                 const pixel = new Pixel(device.name, server, device);
                 await notify.startNotifications();
                 log('Pixels notifications started!');
-                notify.addEventListener('characteristicvaluechanged', ev => pixel.handleNotifications(ev));
+                pixel.setNotifyCharacteristic(notify);
                 sendTextToExtension('Just connected to ' + pixel.name);
                 pixels.push(pixel);
                 
@@ -214,9 +221,8 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                 const notify = await service.getCharacteristic(notifyUuid);
                 
                 await notify.startNotifications();
-                notify.addEventListener('characteristicvaluechanged', ev => pixel.handleNotifications(ev));
                 
-                pixel.reconnect(server);
+                pixel.reconnect(server, notify);
                 sendTextToExtension('Reconnected to ' + pixel.name);
                 log('Successfully reconnected to ' + device.name);
                 
@@ -266,6 +272,8 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             this._name = name;
             this._server = server;
             this._device = device;
+            this._notify = null;
+            this._notificationHandler = null;
             this._hasMoved = false;
             this._status = 'Ready';
             this._isConnected = true;
@@ -289,9 +297,31 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             return this._lastActivity;
         }
 
+        setNotifyCharacteristic(notify) {
+            // Remove old listener if it exists
+            if (this._notify && this._notificationHandler) {
+                this._notify.removeEventListener('characteristicvaluechanged', this._notificationHandler);
+            }
+            
+            this._notify = notify;
+            this._notificationHandler = (ev) => this.handleNotifications(ev);
+            
+            if (this._notify) {
+                this._notify.addEventListener('characteristicvaluechanged', this._notificationHandler);
+            }
+        }
+
         markDisconnected() {
             this._isConnected = false;
             this._server = null;
+            
+            // Clean up notification listener
+            if (this._notify && this._notificationHandler) {
+                this._notify.removeEventListener('characteristicvaluechanged', this._notificationHandler);
+                this._notify = null;
+                this._notificationHandler = null;
+            }
+            
             if (this._connectionMonitor) {
                 clearInterval(this._connectionMonitor);
                 this._connectionMonitor = null;
@@ -299,10 +329,16 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             log(`Pixel ${this._name} marked as disconnected`);
         }
 
-        reconnect(server) {
+        reconnect(server, notify) {
             this._server = server;
             this._isConnected = true;
             this._lastActivity = Date.now();
+            
+            // Set up new notification listener
+            if (notify) {
+                this.setNotifyCharacteristic(notify);
+            }
+            
             log(`Pixel ${this._name} reconnected successfully`);
         }
 
