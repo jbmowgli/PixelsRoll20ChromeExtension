@@ -1,179 +1,69 @@
 # Pixels Roll20 Integration
 
-Connect your Pixels dice to Roll20 via Bluetooth for seamless physical dice rolling in virtual tabletop sessions.
+Connect your Pixels dice to Roll20 via Bluetooth for seamless physical dice rolling.
 
-## ✨ Features
+## Features
 
-### 🎲 Bluetooth Dice Integration
-- **Modern & Legacy Support**: Compatible with all Pixels dice generations
-- **Multi-Dice Support**: Connect multiple dice simultaneously  
-- **Auto-Reconnection**: Reliable connection management with health monitoring
-- **Instant Results**: Physical rolls appear immediately in Roll20 chat
+- Connect Pixels dice via Bluetooth
+- Physical rolls appear instantly in Roll20 chat  
+- Floating modifier box with custom values
+- Drag and resize interface
+- Supports both modern and legacy Pixels dice
+- Auto theme matching (light/dark)
+- Multi-dice support
 
-### 🎯 Advanced Modifier System
-- **Floating Interface**: Draggable modifier box overlay
-- **Custom Modifiers**: Add/remove modifiers with custom names and values
-- **Quick Selection**: Radio buttons for easy modifier switching
-- **Smart Integration**: Automatic Roll20 macro formatting
+## Quick Setup
 
-### 🎨 Seamless Integration
-- **Theme Adaptation**: Automatically matches Roll20's light/dark themes
-- **Non-Intrusive**: Minimizable interface that doesn't disrupt gameplay
-- **Session Memory**: Maintains settings during browser session
-- **Zero Configuration**: Works immediately after installation
-- **Persistent UI**: Modifier box remembers position and state across page interactions
+1. Download and extract this repository
+2. Open `chrome://extensions/`
+3. Enable "Developer mode" 
+4. Click "Load unpacked" and select the folder
+5. Go to Roll20, click the extension icon
+6. Click "Connect" and select your dice
 
-### 🔄 Robust Connection Management
+## Usage
 
-- **Auto-Reconnection**: Automatically attempts to reconnect disconnected dice
-- **Connection Health Monitoring**: Periodic health checks with stale connection cleanup
-- **Enhanced Error Handling**: Better error messages and graceful failure recovery  
-- **Dual UUID Support**: Compatible with both modern and legacy Pixels dice
-- **Connection Status**: Real-time status reporting for connected/disconnected dice
+- **Connect dice**: Click extension icon → "Connect"
+- **Show modifier box**: Click "Show Modifier Box" 
+- **Add modifiers**: Click "Add" in the modifier box
+- **Roll dice**: Physical rolls automatically appear in chat
 
-### 🏗️ Improved Architecture
+## Documentation
 
-- **Modular Design**: Extracted modifier box into separate `modifierBox.js` module
-- **Singleton Pattern**: Ensures only one modifier box instance exists
-- **Clean Separation**: UI logic separated from Bluetooth connection logic
-- **Enhanced Popup**: Improved button layout and user interface
+- **[Installation Guide](docs/INSTALLATION.md)** - Setup instructions
+- **[Quick Reference](docs/QUICK_REFERENCE.md)** - Essential actions
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common problems
+- **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Technical docs
 
-### 🐛 Bug Fixes
+## Project Structure
 
-- Fixed critical syntax error that prevented Bluetooth device picker from appearing
-- Corrected Bluetooth UUIDs to use official Pixels dice specifications
-- Resolved UI alignment issues in popup interface
-- Fixed duplicate script loading and execution order issues
-
-## Foreword
-
-Pixels are full of LEDs, smarts and no larger than regular dice, they can be
-customized to light up when and how you desire.
-Check the [Pixels website](https://gamewithpixels.com/) for more information.
-
-> **Warning**
-> Before jumping into programming please make sure to read the Pixels developer's
-> [guide](https://github.com/GameWithPixels/.github/blob/main/doc/DevelopersGuide.md).
-
-## 📚 Documentation
-
-For comprehensive guides and documentation:
-
-- **[Installation Guide](docs/INSTALLATION.md)** - Complete installation instructions
-- **[User Guide](docs/USER_GUIDE.md)** - Comprehensive user manual with examples
-- **[Quick Reference](docs/QUICK_REFERENCE.md)** - Essential actions and shortcuts
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Solutions to common problems
-- **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Technical documentation for contributors
-- **[Project Structure](docs/PROJECT_STRUCTURE.md)** - Codebase organization and architecture
-
-## Quick Install
-
-1. Download the content of this repository
-2. Open Chrome extension manager (`chrome://extensions/`)
-3. Enable "Developer mode" (toggle in top right)
-4. Click "Load Unpacked" and browse to the extension folder
-
-**For detailed installation instructions, see [docs/INSTALLATION.md](docs/INSTALLATION.md)**
-
-## Quick Start
-
-1. **Install**: Load the extension in Chrome (see [Installation Guide](docs/INSTALLATION.md))
-2. **Open Roll20**: Navigate to your game session
-3. **Connect**: Click extension icon → "Connect" → Select your Pixels dice
-4. **Roll**: Physical dice rolls automatically appear in Roll20 chat
-
-**For complete usage instructions, see [docs/USER_GUIDE.md](docs/USER_GUIDE.md)**
-
-### Modifier System
-
-- **Show Box**: Click "Show Modifier Box" in extension popup
-- **Add Modifiers**: Custom names and values (e.g., "Bless: +4")
-- **Select Active**: Radio buttons to choose current modifier
-- **Auto-Integration**: Selected modifiers automatically added to rolls
-
-**For detailed modifier instructions, see [User Guide](docs/USER_GUIDE.md#using-the-modifier-box)**
-
-## 📁 Project Structure
-
-```text
-PixelsRoll20ChromeExtension/
-├── src/                    # Source code
-│   ├── content/           # Content scripts (Roll20 integration)
-│   ├── popup/             # Extension popup interface
-│   ├── options/           # Extension options page
-│   └── background/        # Background scripts
-├── assets/                # Static assets (icons, images)
-├── tests/                 # Testing and development tools
-├── docs/                  # Comprehensive documentation
-└── manifest.json          # Chrome extension manifest
+```
+src/
+├── content/         # Roll20 integration scripts
+├── popup/          # Extension popup
+├── background/     # Background scripts
+└── options/        # Settings page
 ```
 
-**For detailed structure documentation, see [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)**
+## Technical Notes
 
-## Technical Details
+- **Modern Pixels**: UUID `a6b90001-7a5a-43f2-a962-350c8edc9b5b`
+- **Legacy Pixels**: UUID `6e400001-b5a3-f393-e0a9-e50e24dcca9e`
+- Uses Roll20's macro system for dice results
+- Chrome extension with Bluetooth Web API
 
-### Bluetooth Support
+## Troubleshooting
 
-- **Modern Pixels Dice**: Service UUID `a6b90001-7a5a-43f2-a962-350c8edc9b5b`
-- **Legacy Pixels Dice**: Service UUID `6e400001-b5a3-f393-e0a9-e50e24dcca9e`
-- **Auto-Detection**: Automatically detects and uses appropriate UUIDs for your dice
+- **Not working?** → Refresh Roll20 page, reconnect dice
+- **No devices?** → Roll dice to wake them, check Bluetooth
+- **No results?** → Check connection status in popup
 
-### Roll20 Integration
+See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for more help.
 
-- Uses Roll20's macro system with proper template formatting
-- Supports complex roll expressions with modifiers
-- Preserves original roll values while adding modifier information
+## About Pixels
 
-## 🔧 Troubleshooting
+Pixels are smart dice with LEDs and sensors. Learn more at [gamewithpixels.com](https://gamewithpixels.com/).
 
-### Quick Fixes
-- **Not Working?** → Refresh Roll20 page, reconnect dice
-- **No Bluetooth Devices?** → Wake dice by rolling, check Bluetooth enabled
-- **No Chat Results?** → Verify dice connection in popup
-- **Box Missing?** → Click "Show Modifier Box" in extension popup
+## License
 
-**For comprehensive troubleshooting, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)**
-
-### Debug Information
-
-If problems persist:
-1. Press F12 in Chrome → Console tab
-2. Look for error messages or connection logs
-3. Try the test page at `tests/test.html`
-
-## 🛠️ Development
-
-**For development information, see [docs/DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md)**
-
-### Testing
-- Open `tests/test.html` for UI and Bluetooth testing
-- Open `tests/bluetooth-test.html` for connection-specific testing
-
-### Contributing
-
-This is an open-source project. Feel free to submit issues or pull requests for improvements.
-
-## 📝 Attribution & License
-
-### Original Project
-This extension is based on the original [Pixels Roll20 Chrome Extension](https://github.com/GameWithPixels/PixelsRoll20ChromeExtension) created by:
-- **Olivier Basille** ([@obasille](https://github.com/obasille))
-- **GameWithPixels Team**
-
-### License
-MIT License - See [LICENSE](LICENSE) file for details.
-
-### Enhanced Edition
-This enhanced version includes significant improvements and new features while maintaining full attribution to the original creators and preserving the MIT License terms.
-
-**Note**: This extension is not officially affiliated with Roll20 or Pixels but provides integration between the two platforms.
-
-## Support & Issues
-
-For issues with this enhanced version, please open a [GitHub issue](https://github.com/your-repo/issues).
-
-For general Pixels dice support, visit the [official Pixels support](https://github.com/GameWithPixels/PixelsRoll20ChromeExtension/issues).
-
-**Note**: This enhanced version includes significant improvements and new features while maintaining full attribution to the original creators and preserving the MIT License terms.
-
-**Disclaimer**: This extension is not officially affiliated with Roll20 or Pixels but provides integration between the two platforms.
+This project is licensed under the MIT License. Based on the original [Pixels Roll20 Chrome Extension](https://github.com/GameWithPixels/PixelsRoll20ChromeExtension) by Olivier Basille and the GameWithPixels team.

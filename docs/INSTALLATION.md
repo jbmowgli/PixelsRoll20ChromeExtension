@@ -1,102 +1,42 @@
-# Installation Guide
+# Installation
 
-## System Requirements
+## Requirements
+- Chrome browser (version 88+)
+- Bluetooth-enabled computer
+- Pixels dice
+- Roll20 account
 
-### Hardware Requirements
+## Install Steps
 
-- Computer with Bluetooth capability
-- Pixels dice (modern or legacy versions)
-- Stable internet connection
+### 1. Get the Extension
+- Download from GitHub or clone the repo
+- Extract to a folder if needed
 
-### Software Requirements
+### 2. Load in Chrome
+1. Open `chrome://extensions/`
+2. Turn on "Developer mode" (top-right)
+3. Click "Load unpacked"
+4. Select the extension folder (containing `manifest.json`)
 
-- **Google Chrome** browser (version 88 or later)
-- **Roll20** account with access to game sessions
-- **Developer Mode** enabled in Chrome
+### 3. Test It
+1. Go to a Roll20 game
+2. Click the Pixels icon in Chrome toolbar
+3. You should see "Connect" and "Show Modifier Box" buttons
 
-### Supported Operating Systems
+## First Use
 
-- Windows 10/11
-- macOS 10.15 or later  
-- Linux (Ubuntu 18.04+ or equivalent)
+### Connect Dice
+1. Wake your dice (roll them gently)
+2. Click "Connect" in the extension popup
+3. Select your dice from the list
+4. You should see "Connected" status
 
-## Installation Steps
+### Show Modifier Box
+1. Click "Show Modifier Box"
+2. A floating box should appear on your Roll20 page
+3. You can drag it around and resize it
 
-### Step 1: Prepare Your System
-
-#### Enable Bluetooth
-1. **Windows**: Settings → Bluetooth & devices → Enable Bluetooth
-2. **macOS**: System Preferences → Bluetooth → Turn Bluetooth On
-3. **Linux**: Check distribution-specific Bluetooth setup
-
-#### Update Chrome Browser
-1. Open Chrome browser
-2. Click menu (⋮) → Help → About Google Chrome
-3. Chrome will automatically update if needed
-4. Restart browser after update
-
-### Step 2: Download the Extension
-
-#### Option A: Git Clone (Recommended)
-```bash
-git clone https://github.com/[repository-url]/PixelsRoll20ChromeExtension.git
-cd PixelsRoll20ChromeExtension
-```
-
-#### Option B: Direct Download
-1. Visit the GitHub repository
-2. Click "Code" → "Download ZIP"
-3. Extract ZIP file to desired location
-4. Remember the folder path for installation
-
-### Step 3: Install in Chrome
-
-#### Enable Developer Mode
-1. Open Chrome browser
-2. Navigate to `chrome://extensions/`
-3. Toggle "Developer mode" switch (top-right corner)
-4. Page will refresh showing developer options
-
-#### Load the Extension
-1. Click "Load unpacked" button
-2. Navigate to the extension folder
-3. Select the folder containing `manifest.json`
-4. Click "Select Folder" or "Open"
-
-#### Verify Installation
-1. Extension appears in Chrome extensions list
-2. Pixels dice icon visible in Chrome toolbar
-3. Extension shows as "Enabled"
-
-### Step 4: Configure Permissions
-
-#### Required Permissions
-The extension will request these permissions:
-
-- **Active Tab**: Access to current tab content
-- **Storage**: Save extension settings
-- **Bluetooth**: Connect to Pixels dice
-
-#### Grant Permissions
-1. Chrome may prompt for permission approval
-2. Click "Allow" for all requested permissions
-3. Permissions can be managed later in Chrome settings
-
-### Step 5: Test Installation
-
-#### Basic Function Test
-1. Navigate to any Roll20 game session
-2. Click the Pixels extension icon
-3. Extension popup should appear
-4. All buttons should be visible and clickable
-
-#### Bluetooth Test
-1. Ensure Pixels dice are charged and nearby
-2. Click "Connect" in extension popup
-3. Bluetooth device picker should appear
-4. Your Pixels dice should be listed
-
-## Post-Installation Setup
+That's it! Roll your dice and they should appear in Roll20 chat.
 
 ### Prepare Your Dice
 
