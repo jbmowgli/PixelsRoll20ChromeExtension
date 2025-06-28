@@ -71,7 +71,7 @@ describe('ModifierBox Drag Handler', () => {
     test('should setup drag functionality successfully', () => {
       window.ModifierBoxDragHandler.setupDragFunctionality(mockModifierBox);
       
-      expect(console.log).toHaveBeenCalledWith("Drag and resize functionality setup completed");
+      expect(console.log).toHaveBeenCalledWith("Drag and resize functionality setup completed. Double-click resize handle to restore original size.");
     });
 
     test('should add mousedown event listener to header', () => {
@@ -239,7 +239,7 @@ describe('ModifierBox Drag Handler', () => {
       document.dispatchEvent(mouseUpEvent);
       
       // Should complete without errors
-      expect(console.log).toHaveBeenCalledWith("Drag and resize functionality setup completed");
+      expect(console.log).toHaveBeenCalledWith("Drag and resize functionality setup completed. Double-click resize handle to restore original size.");
     });
 
     test('should maintain drag state correctly', () => {

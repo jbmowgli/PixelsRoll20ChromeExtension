@@ -18,6 +18,12 @@
         let isDragging = false;
         let isResizing = false;
         let dragOffset = { x: 0, y: 0 };
+        
+        // Store original dimensions for restore functionality
+        const originalDimensions = {
+            width: 400,
+            height: null // Will be set after content is loaded
+        };
 
         const header = modifierBox.querySelector('.pixels-header');
         if (!header) {
@@ -40,8 +46,25 @@
             z-index: 10 !important;
         `;
         modifierBox.appendChild(resizeHandle);
+        
+        // Add double-click to restore original size
+        resizeHandle.addEventListener('dblclick', (e) => {
+            modifierBox.style.setProperty('width', originalDimensions.width + 'px', 'important');
+            if (originalDimensions.height) {
+                modifierBox.style.setProperty('height', originalDimensions.height + 'px', 'important');
+            } else {
+                modifierBox.style.setProperty('height', 'auto', 'important');
+            }
+            console.log("Restored to original size:", originalDimensions);
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
         // Ensure the modifier box maintains fixed positioning for dragging
         modifierBox.style.position = 'fixed';
+        
+        // Set initial dimensions and store them
+        modifierBox.style.setProperty('width', originalDimensions.width + 'px', 'important');
         
         // Set initial position if not already set
         if (!modifierBox.style.left || modifierBox.style.left === 'auto') {
@@ -52,6 +75,15 @@
         }
         modifierBox.style.right = 'auto';
         modifierBox.style.bottom = 'auto';
+        
+        // Store original height after content is rendered
+        setTimeout(() => {
+            if (!originalDimensions.height) {
+                const rect = modifierBox.getBoundingClientRect();
+                originalDimensions.height = rect.height;
+                console.log("Stored original dimensions:", originalDimensions);
+            }
+        }, 100);
 
         // Drag functionality
         header.addEventListener('mousedown', (e) => {
@@ -88,41 +120,70 @@
             if (isDragging) {
                 const newLeft = e.clientX - dragOffset.x;
                 const newTop = e.clientY - dragOffset.y;
-                modifierBox.style.left = newLeft + 'px';
-                modifierBox.style.top = newTop + 'px';
+                
+                // Keep within viewport bounds
+                const maxLeft = window.innerWidth - 100; // Keep at least 100px visible
+                const maxTop = window.innerHeight - 50; // Keep at least 50px visible
+                
+                modifierBox.style.left = Math.max(0, Math.min(newLeft, maxLeft)) + 'px';
+                modifierBox.style.top = Math.max(0, Math.min(newTop, maxTop)) + 'px';
             } else if (isResizing) {
                 // Calculate size change based on mouse movement
                 const deltaX = e.clientX - dragOffset.x;
                 const deltaY = e.clientY - dragOffset.y;
                 
-                const newWidth = dragOffset.initialWidth + deltaX;
-                const newHeight = dragOffset.initialHeight + deltaY;
+                const newWidth = Math.max(dragOffset.initialWidth + deltaX, 0);
+                const newHeight = Math.max(dragOffset.initialHeight + deltaY, 0);
                 
-                // Set minimum dimensions
-                const minWidth = 300;
-                const minHeight = 200;
+                // Set minimum and maximum dimensions
+                const minWidth = 250;
+                const minHeight = 120; // Reduced minimum height to allow smaller boxes
+                const maxWidth = Math.min(800, window.innerWidth * 0.8);
+                const maxHeight = Math.min(600, window.innerHeight * 0.8);
                 
-                // Set maximum dimensions to prevent it from becoming too large
-                const maxWidth = 600;
-                const maxHeight = 800;
+                // Apply width constraints and update
+                const constrainedWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
+                const constrainedHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
                 
-                if (newWidth >= minWidth && newWidth <= maxWidth) {
-                    modifierBox.style.width = newWidth + 'px';
+                // Debug logging for resize
+                console.log("Resize:", {
+                    delta: { x: deltaX, y: deltaY },
+                    new: { width: newWidth, height: newHeight },
+                    constrained: { width: constrainedWidth, height: constrainedHeight },
+                    constraints: { minWidth, minHeight, maxWidth, maxHeight }
+                });
+                
+                // Use setProperty with important flag to override CSS !important rules
+                modifierBox.style.setProperty('width', constrainedWidth + 'px', 'important');
+                modifierBox.style.setProperty('height', constrainedHeight + 'px', 'important');
+                
+                // Prevent the box from going off-screen during resize
+                const rect = modifierBox.getBoundingClientRect();
+                if (rect.right > window.innerWidth) {
+                    modifierBox.style.left = (window.innerWidth - rect.width - 10) + 'px';
                 }
-                if (newHeight >= minHeight && newHeight <= maxHeight) {
-                    modifierBox.style.height = newHeight + 'px';
+                if (rect.bottom > window.innerHeight) {
+                    modifierBox.style.top = (window.innerHeight - rect.height - 10) + 'px';
                 }
             }
         }
 
         function onMouseUp() {
+            if (isDragging) {
+                console.log("Drag completed");
+            }
+            if (isResizing) {
+                const rect = modifierBox.getBoundingClientRect();
+                console.log("Resize completed. New dimensions:", rect.width, "x", rect.height);
+            }
+            
             isDragging = false;
             isResizing = false;
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
         }
 
-        console.log("Drag and resize functionality setup completed");
+        console.log("Drag and resize functionality setup completed. Double-click resize handle to restore original size.");
     }
 
     console.log("ModifierBoxDragHandler module initialized");

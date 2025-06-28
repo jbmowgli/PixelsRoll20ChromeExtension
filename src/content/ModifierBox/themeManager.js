@@ -67,7 +67,9 @@
             #pixels-modifier-box {
                 position: fixed !important;
                 z-index: 1000000 !important;
-                width: 400px !important;
+                min-width: 300px !important;
+                width: 400px;
+                min-height: 120px !important;
                 border-radius: 8px !important;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
                 font-family: Arial, sans-serif !important;
@@ -75,6 +77,9 @@
                 color: #ffffff !important;
                 background-color: #2b2b2b !important;
                 border: 1px solid #555555 !important;
+                resize: none !important;
+                display: flex !important;
+                flex-direction: column !important;
             }
 
             /* Header Styles */
@@ -90,6 +95,7 @@
                 color: #ffffff !important;
                 background-color: #333333 !important;
                 border-radius: 7px 7px 0 0 !important;
+                flex-shrink: 0 !important;
             }
 
             #pixels-modifier-box .pixels-title {
@@ -142,6 +148,9 @@
                 padding: 16px !important;
                 color: #ffffff !important;
                 background-color: #2b2b2b !important;
+                overflow-y: auto !important;
+                flex: 1 !important;
+                min-height: 0 !important;
             }
 
             /* Current Roll Display */

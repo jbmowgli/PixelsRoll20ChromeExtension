@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier Box Resize Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .instructions {
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <h2>Modifier Box Resize Test</h2>
+        <p><strong>Instructions:</strong></p>
+        <ul>
+            <li>Click "Show Modifier Box" to create the modifier box</li>
+            <li>Try resizing the box by dragging the resize handle in the bottom-right corner</li>
+            <li>Test both horizontal and vertical resizing</li>
+            <li>Double-click the resize handle to restore original size</li>
+            <li>Try dragging the box by its header</li>
+        </ul>
+        
+        <button class="test-button" onclick="showModifierBox()">Show Modifier Box</button>
+        <button class="test-button" onclick="hideModifierBox()">Hide Modifier Box</button>
+        <button class="test-button" onclick="testResize()">Test Resize</button>
+    </div>
+
+    <!-- Include all the required modules -->
+    <script src="src/content/ModifierBox/themeManager.js"></script>
+    <script src="src/content/ModifierBox/dragHandler.js"></script>
+    <script src="src/content/ModifierBox/rowManager.js"></script>
+    <script src="src/content/ModifierBox/index.js"></script>
+    
+    <!-- Mock the chrome.runtime API for testing -->
+    <script>
+        // Mock chrome.runtime for testing
+        if (typeof chrome === 'undefined') {
+            window.chrome = {
+                runtime: {
+                    getURL: function(path) {
+                        return path; // Just return the path as-is for testing
+                    }
+                }
+            };
+        }
+
+        function showModifierBox() {
+            console.log("Creating modifier box...");
+            if (window.ModifierBox) {
+                const box = window.ModifierBox.create();
+                if (box) {
+                    window.ModifierBox.show();
+                    console.log("Modifier box created and shown!");
+                } else {
+                    console.error("Failed to create modifier box");
+                }
+            } else {
+                console.error("ModifierBox module not loaded");
+            }
+        }
+
+        function hideModifierBox() {
+            if (window.ModifierBox) {
+                window.ModifierBox.hide();
+                console.log("Modifier box hidden");
+            }
+        }
+
+        function testResize() {
+            const box = document.getElementById('pixels-modifier-box');
+            if (box) {
+                const rect = box.getBoundingClientRect();
+                console.log("Current box dimensions:", {
+                    width: rect.width,
+                    height: rect.height,
+                    computed: getComputedStyle(box).width + " x " + getComputedStyle(box).height
+                });
+                
+                // Test programmatic resize to verify it works
+                console.log("Testing programmatic resize...");
+                box.style.setProperty('width', '500px', 'important');
+                box.style.setProperty('height', '300px', 'important');
+                
+                setTimeout(() => {
+                    const newRect = box.getBoundingClientRect();
+                    console.log("After programmatic resize:", {
+                        width: newRect.width,
+                        height: newRect.height
+                    });
+                    
+                    if (newRect.width === 500 && newRect.height === 300) {
+                        alert("✅ Programmatic resize working! Now try manual resizing with the handle.");
+                    } else {
+                        alert("❌ Programmatic resize failed. Check console for details.");
+                    }
+                }, 100);
+            } else {
+                alert("Please create the modifier box first!");
+            }
+        }
+
+        // Log when page loads
+        window.addEventListener('load', () => {
+            console.log("Test page loaded. Available modules:", {
+                ModifierBox: !!window.ModifierBox,
+                ModifierBoxThemeManager: !!window.ModifierBoxThemeManager,
+                ModifierBoxDragHandler: !!window.ModifierBoxDragHandler,
+                ModifierBoxRowManager: !!window.ModifierBoxRowManager
+            });
+        });
+    </script>
+</body>
+</html>
