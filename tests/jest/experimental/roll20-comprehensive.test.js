@@ -14,15 +14,15 @@ const mockChrome = {
   runtime: {
     sendMessage: jest.fn(),
     onMessage: {
-      addListener: jest.fn()
-    }
-  }
+      addListener: jest.fn(),
+    },
+  },
 };
 
 // Bluetooth API mock
 const mockBluetooth = {
   requestDevice: jest.fn(),
-  getAvailability: jest.fn().mockResolvedValue(true)
+  getAvailability: jest.fn().mockResolvedValue(true),
 };
 
 describe('Roll20.js Comprehensive Test Suite', () => {
@@ -39,7 +39,7 @@ describe('Roll20.js Comprehensive Test Suite', () => {
   beforeEach(() => {
     // Clear module cache for fresh loads
     jest.resetModules();
-    
+
     // Clear any existing state
     delete window.roll20PixelsLoaded;
     delete window.pixelsModifier;
@@ -52,7 +52,7 @@ describe('Roll20.js Comprehensive Test Suite', () => {
     global.chrome = mockChrome;
     global.navigator = {
       ...originalNavigator,
-      bluetooth: mockBluetooth
+      bluetooth: mockBluetooth,
     };
 
     // Mock console methods
@@ -77,11 +77,13 @@ describe('Roll20.js Comprehensive Test Suite', () => {
       hide: jest.fn(),
       getElement: jest.fn().mockReturnValue({
         querySelector: jest.fn().mockReturnValue({ value: '0' }),
-        querySelectorAll: jest.fn().mockReturnValue([
-          { querySelector: jest.fn().mockReturnValue({ value: '0' }) }
-        ])
+        querySelectorAll: jest
+          .fn()
+          .mockReturnValue([
+            { querySelector: jest.fn().mockReturnValue({ value: '0' }) },
+          ]),
       }),
-      syncGlobalVars: jest.fn()
+      syncGlobalVars: jest.fn(),
     };
   });
 
@@ -89,11 +91,11 @@ describe('Roll20.js Comprehensive Test Suite', () => {
     // Restore global state
     global.chrome = originalChrome;
     global.navigator = originalNavigator;
-    
+
     // Restore console
     consoleLogSpy.mockRestore();
     consoleErrorSpy.mockRestore();
-    
+
     // Clean up DOM
     document.body.innerHTML = '';
   });
@@ -101,9 +103,9 @@ describe('Roll20.js Comprehensive Test Suite', () => {
   describe('Module Initialization', () => {
     test('should initialize global variables correctly', () => {
       require('../../../src/content/roll20.js');
-      
-      expect(window.pixelsModifier).toBe("0");
-      expect(window.pixelsModifierName).toBe("Modifier 1");
+
+      expect(window.pixelsModifier).toBe('0');
+      expect(window.pixelsModifierName).toBe('Modifier 1');
       expect(typeof window.showModifierBox).toBe('function');
       expect(typeof window.hideModifierBox).toBe('function');
       expect(typeof window.sendMessageToExtension).toBe('function');
@@ -111,9 +113,9 @@ describe('Roll20.js Comprehensive Test Suite', () => {
 
     test('should prevent multiple initialization', () => {
       window.roll20PixelsLoaded = true;
-      
+
       require('../../../src/content/roll20.js');
-      
+
       // Variables should not be set if already loaded
       expect(window.pixelsModifier).toBeUndefined();
       expect(window.pixelsModifierName).toBeUndefined();
@@ -121,7 +123,7 @@ describe('Roll20.js Comprehensive Test Suite', () => {
 
     test('should register Chrome message listener', () => {
       require('../../../src/content/roll20.js');
-      
+
       expect(mockChrome.runtime.onMessage.addListener).toHaveBeenCalledWith(
         expect.any(Function)
       );
@@ -129,7 +131,7 @@ describe('Roll20.js Comprehensive Test Suite', () => {
 
     test('should handle Chrome API unavailability gracefully', () => {
       delete global.chrome;
-      
+
       expect(() => {
         require('../../../src/content/roll20.js');
       }).not.toThrow();
@@ -137,10 +139,10 @@ describe('Roll20.js Comprehensive Test Suite', () => {
 
     test('should send initial status message', () => {
       require('../../../src/content/roll20.js');
-      
+
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'No Pixel connected'
+        text: 'No Pixel connected',
       });
     });
   });
@@ -152,16 +154,16 @@ describe('Roll20.js Comprehensive Test Suite', () => {
 
     test('showModifierBox should work with available ModifierBox', () => {
       window.showModifierBox();
-      
+
       expect(window.ModifierBox.show).toHaveBeenCalled();
     });
 
     test('showModifierBox should handle async ModifierBox.show', () => {
       window.ModifierBox.show = jest.fn().mockResolvedValue();
       Object.defineProperty(window.ModifierBox.show, 'constructor', {
-        value: { name: 'AsyncFunction' }
+        value: { name: 'AsyncFunction' },
       });
-      
+
       expect(() => {
         window.showModifierBox();
       }).not.toThrow();
@@ -169,32 +171,38 @@ describe('Roll20.js Comprehensive Test Suite', () => {
 
     test('showModifierBox should handle uninitialized ModifierBox', () => {
       window.ModifierBox.isInitialized.mockReturnValue(false);
-      
+
       window.showModifierBox();
-      
-      expect(consoleLogSpy).toHaveBeenCalledWith("ModifierBox module not initialized yet");
+
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        'ModifierBox module not initialized yet'
+      );
     });
 
     test('showModifierBox should handle missing ModifierBox', () => {
       delete window.ModifierBox;
-      
+
       window.showModifierBox();
-      
-      expect(consoleLogSpy).toHaveBeenCalledWith("ModifierBox module not loaded");
+
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        'ModifierBox module not loaded'
+      );
     });
 
     test('hideModifierBox should work correctly', () => {
       window.hideModifierBox();
-      
+
       expect(window.ModifierBox.hide).toHaveBeenCalled();
     });
 
     test('hideModifierBox should handle missing ModifierBox', () => {
       delete window.ModifierBox;
-      
+
       window.hideModifierBox();
-      
-      expect(consoleLogSpy).toHaveBeenCalledWith("ModifierBox module not loaded");
+
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        'ModifierBox module not loaded'
+      );
     });
   });
 
@@ -205,9 +213,9 @@ describe('Roll20.js Comprehensive Test Suite', () => {
 
     test('should send messages to extension correctly', () => {
       const testMessage = { action: 'test', data: 'value' };
-      
+
       window.sendMessageToExtension(testMessage);
-      
+
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith(testMessage);
     });
 
@@ -228,7 +236,7 @@ describe('Roll20.js Comprehensive Test Suite', () => {
 
     test('should handle missing Chrome runtime gracefully', () => {
       delete global.chrome.runtime;
-      
+
       expect(() => {
         window.sendMessageToExtension({ action: 'test' });
       }).not.toThrow();
@@ -240,47 +248,56 @@ describe('Roll20.js Comprehensive Test Suite', () => {
 
     beforeEach(() => {
       require('../../../src/content/roll20.js');
-      messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+      messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
     });
 
     test('should handle getStatus message', () => {
       mockChrome.runtime.sendMessage.mockClear();
-      
+
       messageListener({ action: 'getStatus' }, null, jest.fn());
-      
+
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'No Pixel connected'
+        text: 'No Pixel connected',
       });
     });
 
     test('should handle setModifier message', () => {
-      messageListener({ action: 'setModifier', modifier: '5' }, null, jest.fn());
-      
+      messageListener(
+        { action: 'setModifier', modifier: '5' },
+        null,
+        jest.fn()
+      );
+
       expect(window.pixelsModifier).toBe('5');
     });
 
     test('should handle setModifier with undefined value', () => {
-      messageListener({ action: 'setModifier', modifier: undefined }, null, jest.fn());
-      
+      messageListener(
+        { action: 'setModifier', modifier: undefined },
+        null,
+        jest.fn()
+      );
+
       expect(window.pixelsModifier).toBe('0');
     });
 
     test('should handle showModifier message', () => {
       messageListener({ action: 'showModifier' }, null, jest.fn());
-      
+
       expect(window.ModifierBox.show).toHaveBeenCalled();
     });
 
     test('should handle hideModifier message', () => {
       messageListener({ action: 'hideModifier' }, null, jest.fn());
-      
+
       expect(window.ModifierBox.hide).toHaveBeenCalled();
     });
 
     test('should handle disconnect message', () => {
       messageListener({ action: 'disconnect' }, null, jest.fn());
-      
+
       expect(consoleLogSpy).toHaveBeenCalledWith('Manual disconnect requested');
     });
 
@@ -323,30 +340,31 @@ describe('Roll20.js Comprehensive Test Suite', () => {
       mockCharacteristic = {
         startNotifications: jest.fn().mockResolvedValue(),
         addEventListener: jest.fn(),
-        removeEventListener: jest.fn()
+        removeEventListener: jest.fn(),
       };
 
       mockService = {
-        getCharacteristic: jest.fn().mockResolvedValue(mockCharacteristic)
+        getCharacteristic: jest.fn().mockResolvedValue(mockCharacteristic),
       };
 
       mockServer = {
         connect: jest.fn().mockResolvedValue(),
         disconnect: jest.fn(),
         getPrimaryService: jest.fn().mockResolvedValue(mockService),
-        connected: true
+        connected: true,
       };
 
       mockDevice = {
         name: 'TestPixel',
         gatt: mockServer,
-        addEventListener: jest.fn()
+        addEventListener: jest.fn(),
       };
 
       mockBluetooth.requestDevice.mockResolvedValue(mockDevice);
 
       require('../../../src/content/roll20.js');
-      messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+      messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
     });
 
     test('should request Bluetooth device with correct filters', async () => {
@@ -355,8 +373,8 @@ describe('Roll20.js Comprehensive Test Suite', () => {
       expect(mockBluetooth.requestDevice).toHaveBeenCalledWith({
         filters: [
           { services: ['a6b90001-7a5a-43f2-a962-350c8edc9b5b'] },
-          { services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] }
-        ]
+          { services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] },
+        ],
       });
     });
 
@@ -406,7 +424,9 @@ describe('Roll20.js Comprehensive Test Suite', () => {
     });
 
     test('should handle connection errors gracefully', async () => {
-      mockBluetooth.requestDevice.mockRejectedValue(new Error('Connection failed'));
+      mockBluetooth.requestDevice.mockRejectedValue(
+        new Error('Connection failed')
+      );
 
       await messageListener({ action: 'connect' }, null, jest.fn());
 
@@ -418,7 +438,7 @@ describe('Roll20.js Comprehensive Test Suite', () => {
     test('should prevent duplicate connections', async () => {
       // Connect once
       await messageListener({ action: 'connect' }, null, jest.fn());
-      
+
       // Try to connect again with same device name
       await messageListener({ action: 'connect' }, null, jest.fn());
 
@@ -439,37 +459,39 @@ describe('Roll20.js Comprehensive Test Suite', () => {
       mockCharacteristic = {
         startNotifications: jest.fn().mockResolvedValue(),
         addEventListener: jest.fn(),
-        removeEventListener: jest.fn()
+        removeEventListener: jest.fn(),
       };
 
       const mockService = {
-        getCharacteristic: jest.fn().mockResolvedValue(mockCharacteristic)
+        getCharacteristic: jest.fn().mockResolvedValue(mockCharacteristic),
       };
 
       const mockServer = {
         connect: jest.fn().mockResolvedValue(),
         disconnect: jest.fn(),
         getPrimaryService: jest.fn().mockResolvedValue(mockService),
-        connected: true
+        connected: true,
       };
 
       mockDevice = {
         name: 'TestPixel',
         gatt: mockServer,
-        addEventListener: jest.fn()
+        addEventListener: jest.fn(),
       };
 
       mockBluetooth.requestDevice.mockResolvedValue(mockDevice);
 
       require('../../../src/content/roll20.js');
-      messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+      messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
 
       // Connect to get notification handler
       await messageListener({ action: 'connect' }, null, jest.fn());
-      
+
       // Get the notification handler
-      notificationHandler = mockCharacteristic.addEventListener.mock.calls
-        .find(call => call[0] === 'characteristicvaluechanged')?.[1];
+      notificationHandler = mockCharacteristic.addEventListener.mock.calls.find(
+        call => call[0] === 'characteristicvaluechanged'
+      )?.[1];
     });
 
     test('should process face-up notifications correctly', () => {
@@ -478,22 +500,22 @@ describe('Roll20.js Comprehensive Test Suite', () => {
       }
 
       // Set modifier values
-      window.pixelsModifier = "3";
-      window.pixelsModifierName = "Test Modifier";
+      window.pixelsModifier = '3';
+      window.pixelsModifierName = 'Test Modifier';
 
       // First simulate movement to set _hasMoved flag
       const movementEvent = {
         target: {
           value: {
             byteLength: 3,
-            getUint8: jest.fn((index) => {
+            getUint8: jest.fn(index => {
               if (index === 0) return 3; // Face event
               if (index === 1) return 2; // Movement event
               if (index === 2) return 0;
               return 0;
-            })
-          }
-        }
+            }),
+          },
+        },
       };
       notificationHandler(movementEvent);
 
@@ -505,14 +527,14 @@ describe('Roll20.js Comprehensive Test Suite', () => {
         target: {
           value: {
             byteLength: 3,
-            getUint8: jest.fn((index) => {
+            getUint8: jest.fn(index => {
               if (index === 0) return 3; // Face event
               if (index === 1) return 1; // Face up event
               if (index === 2) return 4; // Face value 4 (displays as 5)
               return 0;
-            })
-          }
-        }
+            }),
+          },
+        },
       };
 
       notificationHandler(faceUpEvent);
@@ -523,7 +545,7 @@ describe('Roll20.js Comprehensive Test Suite', () => {
       // Should send result to extension
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'TestPixel: face up = 5'
+        text: 'TestPixel: face up = 5',
       });
 
       // Should log calculations
@@ -549,14 +571,14 @@ describe('Roll20.js Comprehensive Test Suite', () => {
         target: {
           value: {
             byteLength: 3,
-            getUint8: jest.fn((index) => {
+            getUint8: jest.fn(index => {
               if (index === 0) return 3;
               if (index === 1) return 2; // Movement
               if (index === 2) return 0;
               return 0;
-            })
-          }
-        }
+            }),
+          },
+        },
       };
       notificationHandler(movementEvent);
 
@@ -564,14 +586,14 @@ describe('Roll20.js Comprehensive Test Suite', () => {
         target: {
           value: {
             byteLength: 3,
-            getUint8: jest.fn((index) => {
+            getUint8: jest.fn(index => {
               if (index === 0) return 3;
               if (index === 1) return 1; // Face up
               if (index === 2) return 2; // Face 3
               return 0;
-            })
-          }
-        }
+            }),
+          },
+        },
       };
       notificationHandler(faceUpEvent);
 
@@ -595,14 +617,14 @@ describe('Roll20.js Comprehensive Test Suite', () => {
         target: {
           value: {
             byteLength: 3,
-            getUint8: jest.fn((index) => {
+            getUint8: jest.fn(index => {
               if (index === 0) return 3;
               if (index === 1) return 2;
               if (index === 2) return 0;
               return 0;
-            })
-          }
-        }
+            }),
+          },
+        },
       };
       notificationHandler(movementEvent);
 
@@ -610,14 +632,14 @@ describe('Roll20.js Comprehensive Test Suite', () => {
         target: {
           value: {
             byteLength: 3,
-            getUint8: jest.fn((index) => {
+            getUint8: jest.fn(index => {
               if (index === 0) return 3;
               if (index === 1) return 1;
               if (index === 2) return 2;
               return 0;
-            })
-          }
-        }
+            }),
+          },
+        },
       };
 
       expect(() => {
@@ -636,40 +658,43 @@ describe('Roll20.js Comprehensive Test Suite', () => {
       const mockCharacteristic = {
         startNotifications: jest.fn().mockResolvedValue(),
         addEventListener: jest.fn(),
-        removeEventListener: jest.fn()
+        removeEventListener: jest.fn(),
       };
 
       const mockService = {
-        getCharacteristic: jest.fn().mockResolvedValue(mockCharacteristic)
+        getCharacteristic: jest.fn().mockResolvedValue(mockCharacteristic),
       };
 
       const mockServer = {
         connect: jest.fn().mockResolvedValue(),
         disconnect: jest.fn(),
         getPrimaryService: jest.fn().mockResolvedValue(mockService),
-        connected: true
+        connected: true,
       };
 
       const mockDevice = {
         name: 'TestPixel',
         gatt: mockServer,
-        addEventListener: jest.fn()
+        addEventListener: jest.fn(),
       };
 
       mockBluetooth.requestDevice.mockResolvedValue(mockDevice);
 
       require('../../../src/content/roll20.js');
-      const messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+      const messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
 
       await messageListener({ action: 'connect' }, null, jest.fn());
 
-      const notificationHandler = mockCharacteristic.addEventListener.mock.calls
-        .find(call => call[0] === 'characteristicvaluechanged')?.[1];
+      const notificationHandler =
+        mockCharacteristic.addEventListener.mock.calls.find(
+          call => call[0] === 'characteristicvaluechanged'
+        )?.[1];
 
       if (notificationHandler) {
         // Test with malformed event
         const malformedEvent = {
-          target: {} // Missing value property
+          target: {}, // Missing value property
         };
 
         expect(() => {
@@ -690,7 +715,8 @@ describe('Roll20.js Comprehensive Test Suite', () => {
       delete global.navigator.bluetooth;
 
       require('../../../src/content/roll20.js');
-      const messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+      const messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
 
       expect(() => {
         messageListener({ action: 'connect' }, null, jest.fn());
@@ -718,17 +744,18 @@ describe('Roll20.js Comprehensive Test Suite', () => {
 
     beforeEach(() => {
       require('../../../src/content/roll20.js');
-      messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+      messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
     });
 
     test('should report correct status with no pixels', () => {
       mockChrome.runtime.sendMessage.mockClear();
-      
+
       messageListener({ action: 'getStatus' }, null, jest.fn());
 
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'No Pixel connected'
+        text: 'No Pixel connected',
       });
     });
 

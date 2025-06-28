@@ -10,11 +10,11 @@ PixelsRoll20ChromeExtension/
 │   ├── background/               # Background script
 │   │   └── background.js         # Extension background script
 │   ├── content/                  # Content scripts (injected into Roll20)
-│   │   ├── Common/               # Shared utilities
+│   │   ├── common/               # Shared utilities
 │   │   │   ├── themeDetector.js  # Roll20 theme detection module
 │   │   │   ├── cssLoader.js      # CSS loading utility
 │   │   │   └── htmlLoader.js     # HTML template loading utility
-│   │   ├── ModifierBox/          # Modifier box component
+│   │   ├── modifierBox/          # Modifier box component
 │   │   │   ├── modifierBox.js    # Main modifier box module
 │   │   │   ├── modifierBox.html  # HTML template
 │   │   │   ├── themeManager.js   # Theme styling and updates
@@ -59,13 +59,15 @@ PixelsRoll20ChromeExtension/
 ### Source Code (`src/`)
 
 #### Background Scripts (`src/background/`)
+
 - **background.js**: Extension background script handling extension lifecycle
 
 #### Content Scripts (`src/content/`)
 
 The content scripts are organized by component for better maintainability:
 
-##### Common Utilities (`src/content/Common/`)
+##### Common Utilities (`src/content/common/`)
+
 - **themeDetector.js**: Roll20 theme detection and monitoring
   - Automatic theme detection (light/dark)
   - Real-time theme change monitoring
@@ -77,7 +79,8 @@ The content scripts are organized by component for better maintainability:
   - External HTML template loading
   - Template caching and placeholder replacement
 
-##### ModifierBox Component (`src/content/ModifierBox/`)
+##### ModifierBox Component (`src/content/modifierBox/`)
+
 - **modifierBox.js**: Main modifier box module (singleton pattern)
   - Core modifier box functionality
   - Component coordination and initialization
@@ -104,6 +107,7 @@ The content scripts are organized by component for better maintainability:
   - **lightTheme.css**: Light theme color overrides
 
 ##### Roll20Integration Component (`src/content/Roll20Integration/`)
+
 - **index.js**: Main Roll20 integration and Bluetooth handling
   - Bluetooth connection management with Pixels dice
   - Dice roll handling and macro integration
@@ -111,25 +115,29 @@ The content scripts are organized by component for better maintainability:
   - Chat message posting to Roll20
 
 #### Popup (`src/popup/`)
+
 - **popup.html**: Extension popup interface (clean HTML structure)
 - **popup.css**: Popup styles (separated from HTML)
 - **popup.js**: Popup logic and content script injection
 
 #### Options (`src/options/`)
+
 - **options.html**: Extension options page (clean HTML structure)
 - **options.css**: Options styles (separated from HTML)
 - **options.js**: Options configuration logic
 
 ### Assets (`assets/`)
+
 - **images/**: Extension icons and images
 
 ### Tests (`tests/`)
+
 - **test.html**: Development test page for UI components
 - **bluetooth-test.html**: Bluetooth functionality testing
 - **modifier-box-test.html**: Browser-based modifier box testing
 - **jest/**: Jest unit tests directory
   - **setup.js**: Jest test environment setup and mocks
-  - **ModifierBox/**: Component-specific test suites
+  - **modifierBox/**: Component-specific test suites
     - **index.test.js**: Main modifier box module tests
     - **themeManager.test.js**: Theme management tests
     - **dragHandler.test.js**: Drag functionality tests
@@ -155,15 +163,17 @@ The extension loads files directly from their organized locations. No build step
 The project includes robust Jest test coverage:
 
 ### Working Test Suites (141 tests passing)
+
 - **ModifierBox**: 96 tests covering UI, themes, drag & drop, row management
 - **Roll20 Integration**: 45 tests covering messaging, Bluetooth, error handling
 
 ### Test Files Status
+
 ```
-✅ tests/jest/ModifierBox/index.test.js          - 31 tests passing
-✅ tests/jest/ModifierBox/dragHandler.test.js    - 26 tests passing  
-✅ tests/jest/ModifierBox/themeManager.test.js   - 24 tests passing
-✅ tests/jest/ModifierBox/rowManager.test.js     - 15 tests passing
+✅ tests/jest/modifierBox/index.test.js          - 31 tests passing
+✅ tests/jest/modifierBox/dragHandler.test.js    - 26 tests passing
+✅ tests/jest/modifierBox/themeManager.test.js   - 24 tests passing
+✅ tests/jest/modifierBox/rowManager.test.js     - 15 tests passing
 ✅ tests/jest/roll20-basic.test.js               - 21 tests passing
 ✅ tests/jest/roll20-simple.test.js              - 24 tests passing
 
@@ -176,9 +186,10 @@ The project includes robust Jest test coverage:
 ```
 
 ### Test Commands
+
 ```bash
 # Run stable tests only
-npm test -- tests/jest/roll20-basic.test.js tests/jest/roll20-simple.test.js tests/jest/ModifierBox/
+npm test -- tests/jest/roll20-basic.test.js tests/jest/roll20-simple.test.js tests/jest/modifierBox/
 
 # Run all tests (includes failing ones)
 npm test

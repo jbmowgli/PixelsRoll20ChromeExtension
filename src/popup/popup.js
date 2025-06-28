@@ -1,8 +1,8 @@
 'use strict';
 
 function hookButton(name) {
-  document.getElementById(name)
-    .onclick = element => sendMessage({ action: name })
+  document.getElementById(name).onclick = element =>
+    sendMessage({ action: name });
 }
 
 // Hooks "connect" and "showModifier" buttons to injected JS
@@ -25,9 +25,8 @@ function sendMessage(data, responseCallback) {
 
 // Listen on messages from injected JS
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action == "showText")
-    showText(request.text);
-  else if (request.action == "modifierChanged") {
+  if (request.action == 'showText') showText(request.text);
+  else if (request.action == 'modifierChanged') {
     // Store the modifier value when changed from floating box
     chrome.storage.sync.set({ modifier: request.modifier });
   }
@@ -37,11 +36,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
   if (tabs[0]?.id) {
     // Request initial status from the content script
-    sendMessage({ action: "getStatus" });
-    
+    sendMessage({ action: 'getStatus' });
+
     // Load and send stored modifier value
     chrome.storage.sync.get('modifier', data => {
-      sendMessage({ action: "setModifier", modifier: data.modifier || "0" });
+      sendMessage({ action: 'setModifier', modifier: data.modifier || '0' });
     });
   }
 });

@@ -5,16 +5,19 @@ This directory contains the stable, reliable Jest test suite for the Pixels Roll
 ## Test Structure
 
 ### Main Test Suite (Always Runs)
+
 - **roll20-basic.test.js** (21 tests) - Basic Roll20 integration and error handling
 - **roll20-simple.test.js** (39 tests) - Message handling, Bluetooth, ModifierBox, error scenarios
 
 ### ModifierBox Component Tests (81 tests)
-- **ModifierBox/index.test.js** (32 tests) - Core ModifierBox functionality
-- **ModifierBox/rowManager.test.js** (19 tests) - Row management operations  
-- **ModifierBox/themeManager.test.js** (18 tests) - Theme detection and styling
-- **ModifierBox/dragHandler.test.js** (12 tests) - Drag and drop functionality
+
+- **modifierBox/index.test.js** (32 tests) - Core ModifierBox functionality
+- **modifierBox/rowManager.test.js** (19 tests) - Row management operations
+- **modifierBox/themeManager.test.js** (18 tests) - Theme detection and styling
+- **modifierBox/dragHandler.test.js** (12 tests) - Drag and drop functionality
 
 ### Experimental Tests (Isolated)
+
 - **experimental/** - Contains legacy and experimental tests (not run by default)
 
 ## Current Status
@@ -45,13 +48,16 @@ npm run test:coverage
 ## Test Architecture
 
 ### Setup (`setup.js`)
+
 - Mock Chrome extension APIs (`chrome.runtime`, `chrome.storage`, etc.)
 - Mock browser dependencies (Bluetooth API, console methods)
 - Global test utilities and helpers
 - Automatic cleanup between tests
 
 ### Test Structure
+
 Each test file follows consistent patterns:
+
 - **Module Initialization**: Tests for proper global object setup
 - **Core Functionality**: Tests for main features and API methods
 - **Error Handling**: Tests for graceful failure modes
@@ -59,6 +65,7 @@ Each test file follows consistent patterns:
 - **Integration**: Tests for inter-module communication
 
 ### Mock Strategy
+
 - **Lightweight Mocks**: Minimal mocking to focus on unit behavior
 - **Isolated Testing**: Each module tested independently
 - **Realistic Scenarios**: Test cases based on real-world usage patterns
@@ -66,6 +73,7 @@ Each test file follows consistent patterns:
 ## Coverage Areas
 
 ### ✅ Well Tested
+
 - Module initialization and API exposure
 - Core business logic and state management
 - Error handling and parameter validation
@@ -74,6 +82,7 @@ Each test file follows consistent patterns:
 - Position calculations and window interaction
 
 ### ⚠️ Known Limitations
+
 - Some DOM style property behavior differences in jsdom
 - Complex browser event simulation edge cases
 - Timing-dependent operations (handled with manual testing)
@@ -81,6 +90,7 @@ Each test file follows consistent patterns:
 ## Integration with Manual Testing
 
 These unit tests complement the existing browser-based test files:
+
 - `tests/test.html` - Manual UI testing
 - `tests/modifier-box-test.html` - Interactive component testing
 - `tests/bluetooth-test.html` - Bluetooth functionality testing

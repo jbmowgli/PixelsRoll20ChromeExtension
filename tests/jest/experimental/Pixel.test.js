@@ -7,7 +7,7 @@
 describe('Pixel Class', () => {
   let mockDevice, mockServer, mockNotify;
   let PixelClass;
-  
+
   // Since Pixel class is internal to roll20.js, we need to test it through the module
   beforeEach(() => {
     // Mock DOM for chat functionality
@@ -22,8 +22,8 @@ describe('Pixel Class', () => {
     global.chrome = {
       runtime: {
         sendMessage: jest.fn(),
-        onMessage: { addListener: jest.fn() }
-      }
+        onMessage: { addListener: jest.fn() },
+      },
     };
 
     // Mock console to reduce noise
@@ -34,7 +34,7 @@ describe('Pixel Class', () => {
     window.ModifierBox = {
       isInitialized: jest.fn().mockReturnValue(true),
       syncGlobalVars: jest.fn(),
-      getElement: jest.fn()
+      getElement: jest.fn(),
     };
 
     // Set up mock Bluetooth objects
@@ -42,21 +42,21 @@ describe('Pixel Class', () => {
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
       startNotifications: jest.fn().mockResolvedValue(),
-      stopNotifications: jest.fn().mockResolvedValue()
+      stopNotifications: jest.fn().mockResolvedValue(),
     };
 
     mockServer = {
       connect: jest.fn().mockResolvedValue(),
       disconnect: jest.fn(),
       getPrimaryService: jest.fn().mockResolvedValue({
-        getCharacteristic: jest.fn().mockResolvedValue(mockNotify)
-      })
+        getCharacteristic: jest.fn().mockResolvedValue(mockNotify),
+      }),
     };
 
     mockDevice = {
       name: 'TestPixel',
       gatt: mockServer,
-      addEventListener: jest.fn()
+      addEventListener: jest.fn(),
     };
 
     // Load the module
@@ -85,15 +85,16 @@ describe('Pixel Class', () => {
       // Mock successful connection
       global.navigator = {
         bluetooth: {
-          requestDevice: jest.fn().mockResolvedValue(mockDevice)
-        }
+          requestDevice: jest.fn().mockResolvedValue(mockDevice),
+        },
       };
 
       // Simulate connection through message handler
-      const messageListener = global.chrome.runtime.onMessage.addListener.mock.calls[0][0];
-      
+      const messageListener =
+        global.chrome.runtime.onMessage.addListener.mock.calls[0][0];
+
       await messageListener({ action: 'connect' }, null, jest.fn());
-      
+
       expect(mockDevice.addEventListener).toHaveBeenCalledWith(
         'gattserverdisconnected',
         expect.any(Function)
@@ -102,10 +103,11 @@ describe('Pixel Class', () => {
 
     test('should handle disconnection properly', () => {
       // Test disconnection handling through the disconnect message
-      const messageListener = global.chrome.runtime.onMessage.addListener.mock.calls[0][0];
-      
+      const messageListener =
+        global.chrome.runtime.onMessage.addListener.mock.calls[0][0];
+
       messageListener({ action: 'disconnect' }, null, jest.fn());
-      
+
       expect(console.log).toHaveBeenCalledWith('Manual disconnect requested');
     });
   });
@@ -117,21 +119,23 @@ describe('Pixel Class', () => {
         target: {
           value: {
             byteLength: 3,
-            getUint8: jest.fn()
-              .mockReturnValueOnce(3)  // message type
-              .mockReturnValueOnce(1)  // face up event
-              .mockReturnValueOnce(5)  // face 6 (0-indexed)
-          }
-        }
+            getUint8: jest
+              .fn()
+              .mockReturnValueOnce(3) // message type
+              .mockReturnValueOnce(1) // face up event
+              .mockReturnValueOnce(5), // face 6 (0-indexed)
+          },
+        },
       };
 
       // Set up global state
-      window.pixelsModifier = "2";
-      window.pixelsModifierName = "Test Modifier";
+      window.pixelsModifier = '2';
+      window.pixelsModifierName = 'Test Modifier';
 
       // Get the notification handler through the mock
-      const notificationHandler = mockNotify.addEventListener.mock.calls
-        .find(call => call[0] === 'characteristicvaluechanged')?.[1];
+      const notificationHandler = mockNotify.addEventListener.mock.calls.find(
+        call => call[0] === 'characteristicvaluechanged'
+      )?.[1];
 
       if (notificationHandler) {
         notificationHandler(mockEvent);
@@ -147,16 +151,18 @@ describe('Pixel Class', () => {
         target: {
           value: {
             byteLength: 3,
-            getUint8: jest.fn()
-              .mockReturnValueOnce(3)  // message type
-              .mockReturnValueOnce(2)  // movement event
-              .mockReturnValueOnce(0)  // face (irrelevant for movement)
-          }
-        }
+            getUint8: jest
+              .fn()
+              .mockReturnValueOnce(3) // message type
+              .mockReturnValueOnce(2) // movement event
+              .mockReturnValueOnce(0), // face (irrelevant for movement)
+          },
+        },
       };
 
-      const notificationHandler = mockNotify.addEventListener.mock.calls
-        .find(call => call[0] === 'characteristicvaluechanged')?.[1];
+      const notificationHandler = mockNotify.addEventListener.mock.calls.find(
+        call => call[0] === 'characteristicvaluechanged'
+      )?.[1];
 
       if (notificationHandler) {
         notificationHandler(mockMoveEvent);
@@ -165,19 +171,20 @@ describe('Pixel Class', () => {
     });
 
     test('should calculate roll results correctly', () => {
-      window.pixelsModifier = "3";
-      window.pixelsModifierName = "Attack Bonus";
+      window.pixelsModifier = '3';
+      window.pixelsModifierName = 'Attack Bonus';
 
       const mockFaceEvent = {
         target: {
           value: {
             byteLength: 3,
-            getUint8: jest.fn()
-              .mockReturnValueOnce(3)  // message type
-              .mockReturnValueOnce(1)  // face up event
-              .mockReturnValueOnce(19) // face 20 (0-indexed)
-          }
-        }
+            getUint8: jest
+              .fn()
+              .mockReturnValueOnce(3) // message type
+              .mockReturnValueOnce(1) // face up event
+              .mockReturnValueOnce(19), // face 20 (0-indexed)
+          },
+        },
       };
 
       // Mock the chat elements
@@ -185,8 +192,9 @@ describe('Pixel Class', () => {
       const button = document.querySelector('button');
       const clickSpy = jest.spyOn(button, 'click');
 
-      const notificationHandler = mockNotify.addEventListener.mock.calls
-        .find(call => call[0] === 'characteristicvaluechanged')?.[1];
+      const notificationHandler = mockNotify.addEventListener.mock.calls.find(
+        call => call[0] === 'characteristicvaluechanged'
+      )?.[1];
 
       if (notificationHandler) {
         // Simulate movement first
@@ -194,12 +202,13 @@ describe('Pixel Class', () => {
           target: {
             value: {
               byteLength: 3,
-              getUint8: jest.fn()
+              getUint8: jest
+                .fn()
                 .mockReturnValueOnce(3)
                 .mockReturnValueOnce(2)
-                .mockReturnValueOnce(0)
-            }
-          }
+                .mockReturnValueOnce(0),
+            },
+          },
         });
 
         // Then face up
@@ -214,14 +223,14 @@ describe('Pixel Class', () => {
   describe('Formula Processing', () => {
     test('should replace formula placeholders correctly', () => {
       // Test formula replacement logic
-      window.pixelsModifier = "5";
-      window.pixelsModifierName = "Strength Bonus";
+      window.pixelsModifier = '5';
+      window.pixelsModifierName = 'Strength Bonus';
 
       // The formula processing happens in the face event handler
       // We test this indirectly by checking the chat message content
       const textarea = document.querySelector('textarea');
       const button = document.querySelector('button');
-      
+
       expect(textarea).toBeTruthy();
       expect(button).toBeTruthy();
     });
@@ -238,13 +247,14 @@ describe('Pixel Class', () => {
         target: {
           value: {
             byteLength: 1,
-            getUint8: jest.fn().mockReturnValue(999) // Invalid message type
-          }
-        }
+            getUint8: jest.fn().mockReturnValue(999), // Invalid message type
+          },
+        },
       };
 
-      const notificationHandler = mockNotify.addEventListener.mock.calls
-        .find(call => call[0] === 'characteristicvaluechanged')?.[1];
+      const notificationHandler = mockNotify.addEventListener.mock.calls.find(
+        call => call[0] === 'characteristicvaluechanged'
+      )?.[1];
 
       if (notificationHandler) {
         expect(() => {
@@ -260,16 +270,18 @@ describe('Pixel Class', () => {
         target: {
           value: {
             byteLength: 3,
-            getUint8: jest.fn()
+            getUint8: jest
+              .fn()
               .mockReturnValueOnce(3)
               .mockReturnValueOnce(1)
-              .mockReturnValueOnce(5)
-          }
-        }
+              .mockReturnValueOnce(5),
+          },
+        },
       };
 
-      const notificationHandler = mockNotify.addEventListener.mock.calls
-        .find(call => call[0] === 'characteristicvaluechanged')?.[1];
+      const notificationHandler = mockNotify.addEventListener.mock.calls.find(
+        call => call[0] === 'characteristicvaluechanged'
+      )?.[1];
 
       if (notificationHandler) {
         expect(() => {
@@ -282,12 +294,13 @@ describe('Pixel Class', () => {
   describe('Cleanup and Resource Management', () => {
     test('should clean up event listeners on disconnect', () => {
       // Test that event listeners are properly removed
-      const disconnectHandler = mockDevice.addEventListener.mock.calls
-        .find(call => call[0] === 'gattserverdisconnected')?.[1];
+      const disconnectHandler = mockDevice.addEventListener.mock.calls.find(
+        call => call[0] === 'gattserverdisconnected'
+      )?.[1];
 
       if (disconnectHandler) {
         disconnectHandler({ target: mockDevice });
-        
+
         expect(mockNotify.removeEventListener).toHaveBeenCalledWith(
           'characteristicvaluechanged',
           expect.any(Function)
@@ -299,15 +312,16 @@ describe('Pixel Class', () => {
       // Test automatic reconnection logic
       jest.useFakeTimers();
 
-      const disconnectHandler = mockDevice.addEventListener.mock.calls
-        .find(call => call[0] === 'gattserverdisconnected')?.[1];
+      const disconnectHandler = mockDevice.addEventListener.mock.calls.find(
+        call => call[0] === 'gattserverdisconnected'
+      )?.[1];
 
       if (disconnectHandler) {
         disconnectHandler({ target: mockDevice });
-        
+
         // Advance timer to trigger reconnection attempt
         jest.advanceTimersByTime(5000);
-        
+
         expect(mockServer.connect).toHaveBeenCalled();
       }
 

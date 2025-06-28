@@ -5,7 +5,7 @@ Connect your Pixels dice to Roll20 via Bluetooth for seamless physical dice roll
 ## Features
 
 - Connect Pixels dice via Bluetooth
-- Physical rolls appear instantly in Roll20 chat  
+- Physical rolls appear instantly in Roll20 chat
 - Floating modifier box with custom values
 - Drag and resize interface
 - Supports both modern and legacy Pixels dice
@@ -16,7 +16,7 @@ Connect your Pixels dice to Roll20 via Bluetooth for seamless physical dice roll
 
 1. Download and extract this repository
 2. Open `chrome://extensions/`
-3. Enable "Developer mode" 
+3. Enable "Developer mode"
 4. Click "Load unpacked" and select the folder
 5. Go to Roll20, click the extension icon
 6. Click "Connect" and select your dice
@@ -24,7 +24,7 @@ Connect your Pixels dice to Roll20 via Bluetooth for seamless physical dice roll
 ## Usage
 
 - **Connect dice**: Click extension icon → "Connect"
-- **Show modifier box**: Click "Show Modifier Box" 
+- **Show modifier box**: Click "Show Modifier Box"
 - **Add modifiers**: Click "Add" in the modifier box
 - **Roll dice**: Physical rolls automatically appear in chat
 

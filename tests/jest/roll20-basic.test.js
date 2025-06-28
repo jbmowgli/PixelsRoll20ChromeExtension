@@ -7,7 +7,7 @@
 global.console = {
   log: jest.fn(),
   error: jest.fn(),
-  warn: jest.fn()
+  warn: jest.fn(),
 };
 
 describe('Roll20.js - Basic Functionality', () => {
@@ -26,14 +26,14 @@ describe('Roll20.js - Basic Functionality', () => {
       runtime: {
         sendMessage: jest.fn(),
         onMessage: {
-          addListener: jest.fn()
-        }
-      }
+          addListener: jest.fn(),
+        },
+      },
     };
 
     // Create simple Bluetooth mock
     mockBluetooth = {
-      requestDevice: jest.fn()
+      requestDevice: jest.fn(),
     };
 
     // Store originals
@@ -43,7 +43,7 @@ describe('Roll20.js - Basic Functionality', () => {
     // Set mocks
     global.chrome = mockChrome;
     global.navigator = {
-      bluetooth: mockBluetooth
+      bluetooth: mockBluetooth,
     };
 
     // Mock DOM
@@ -51,16 +51,16 @@ describe('Roll20.js - Basic Functionality', () => {
       createElement: jest.fn(() => ({
         setAttribute: jest.fn(),
         style: {},
-        appendChild: jest.fn()
+        appendChild: jest.fn(),
       })),
       head: {
-        appendChild: jest.fn()
+        appendChild: jest.fn(),
       },
       body: {
-        appendChild: jest.fn()
+        appendChild: jest.fn(),
       },
       querySelector: jest.fn(() => null),
-      querySelectorAll: jest.fn(() => [])
+      querySelectorAll: jest.fn(() => []),
     };
 
     // Mock window
@@ -69,7 +69,7 @@ describe('Roll20.js - Basic Functionality', () => {
       navigator: { bluetooth: mockBluetooth },
       ModifierBox: undefined,
       pixelsModifier: undefined,
-      pixelsModifierName: undefined
+      pixelsModifierName: undefined,
     };
 
     // Mock setInterval and setTimeout
@@ -96,7 +96,7 @@ describe('Roll20.js - Basic Functionality', () => {
 
     test('should set up Chrome message listener', () => {
       require('../../src/content/roll20.js');
-      
+
       expect(mockChrome.runtime.onMessage.addListener).toHaveBeenCalledWith(
         expect.any(Function)
       );
@@ -104,7 +104,7 @@ describe('Roll20.js - Basic Functionality', () => {
 
     test('should set up status monitoring timer', () => {
       require('../../src/content/roll20.js');
-      
+
       expect(global.setInterval).toHaveBeenCalled();
     });
   });
@@ -133,7 +133,7 @@ describe('Roll20.js - Basic Functionality', () => {
       });
 
       require('../../src/content/roll20.js');
-      
+
       // Try to access the global sendMessage function
       if (global.window.sendMessageToExtension) {
         expect(() => {
@@ -146,17 +146,19 @@ describe('Roll20.js - Basic Functionality', () => {
   describe('Basic Message Handling', () => {
     test('should handle message listener setup', () => {
       require('../../src/content/roll20.js');
-      
-      const addListenerCalls = mockChrome.runtime.onMessage.addListener.mock.calls;
+
+      const addListenerCalls =
+        mockChrome.runtime.onMessage.addListener.mock.calls;
       expect(addListenerCalls.length).toBe(1);
       expect(typeof addListenerCalls[0][0]).toBe('function');
     });
 
     test('should handle status messages', () => {
       require('../../src/content/roll20.js');
-      
-      const messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
-      
+
+      const messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+
       expect(() => {
         messageListener({ action: 'getStatus' }, null, jest.fn());
       }).not.toThrow();
@@ -164,9 +166,10 @@ describe('Roll20.js - Basic Functionality', () => {
 
     test('should handle invalid messages gracefully', () => {
       require('../../src/content/roll20.js');
-      
-      const messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
-      
+
+      const messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+
       expect(() => {
         messageListener(null, null, jest.fn());
       }).not.toThrow();
@@ -184,14 +187,14 @@ describe('Roll20.js - Basic Functionality', () => {
   describe('Status System', () => {
     test('should have initial status setup', () => {
       require('../../src/content/roll20.js');
-      
+
       // Verify timer was set up for status monitoring
       expect(global.setInterval).toHaveBeenCalled();
     });
 
     test('should handle status updates without errors', () => {
       require('../../src/content/roll20.js');
-      
+
       // Status updates happen automatically via timer
       // Just verify no errors are thrown during setup
       expect(console.error).not.toHaveBeenCalled();
@@ -201,13 +204,13 @@ describe('Roll20.js - Basic Functionality', () => {
   describe('Global Functions', () => {
     test('should create sendMessageToExtension function', () => {
       require('../../src/content/roll20.js');
-      
+
       expect(typeof global.window.sendMessageToExtension).toBe('function');
     });
 
     test('should handle sendMessage function calls', () => {
       require('../../src/content/roll20.js');
-      
+
       const sendMessage = global.window.sendMessageToExtension;
       if (sendMessage) {
         expect(() => {
@@ -223,21 +226,25 @@ describe('Roll20.js - Basic Functionality', () => {
       global.window.navigator.bluetooth = undefined;
 
       require('../../src/content/roll20.js');
-      
-      const messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
-      
+
+      const messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+
       expect(() => {
         messageListener({ action: 'connect' }, null, jest.fn());
       }).not.toThrow();
     });
 
     test('should handle Bluetooth request device errors', () => {
-      mockBluetooth.requestDevice.mockRejectedValue(new Error('Bluetooth unavailable'));
+      mockBluetooth.requestDevice.mockRejectedValue(
+        new Error('Bluetooth unavailable')
+      );
 
       require('../../src/content/roll20.js');
-      
-      const messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
-      
+
+      const messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+
       expect(() => {
         messageListener({ action: 'connect' }, null, jest.fn());
       }).not.toThrow();
@@ -250,11 +257,16 @@ describe('Roll20.js - Basic Functionality', () => {
       global.document.querySelectorAll = jest.fn(() => []);
 
       require('../../src/content/roll20.js');
-      
-      const messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
-      
+
+      const messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+
       expect(() => {
-        messageListener({ action: 'setModifier', modifier: '5' }, null, jest.fn());
+        messageListener(
+          { action: 'setModifier', modifier: '5' },
+          null,
+          jest.fn()
+        );
       }).not.toThrow();
     });
 
@@ -262,13 +274,14 @@ describe('Roll20.js - Basic Functionality', () => {
       global.window.ModifierBox = {
         show: jest.fn(),
         hide: jest.fn(),
-        isInitialized: jest.fn(() => true)
+        isInitialized: jest.fn(() => true),
       };
 
       require('../../src/content/roll20.js');
-      
-      const messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
-      
+
+      const messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+
       expect(() => {
         messageListener({ action: 'showModifier' }, null, jest.fn());
       }).not.toThrow();
@@ -282,22 +295,22 @@ describe('Roll20.js - Basic Functionality', () => {
   describe('Memory Management', () => {
     test('should not create memory leaks', () => {
       const initialMemory = process.memoryUsage();
-      
+
       // Load and unload module multiple times
       for (let i = 0; i < 10; i++) {
         jest.resetModules();
         require('../../src/content/roll20.js');
       }
-      
+
       const finalMemory = process.memoryUsage();
-      
+
       // This is a basic check - in real scenarios we'd need more sophisticated leak detection
       expect(finalMemory.heapUsed).toBeLessThan(initialMemory.heapUsed * 2);
     });
 
     test('should clean up timers properly', () => {
       require('../../src/content/roll20.js');
-      
+
       // Verify timer cleanup functions exist and are callable
       expect(global.clearInterval).toBeDefined();
       expect(global.clearTimeout).toBeDefined();
@@ -317,12 +330,17 @@ describe('Roll20.js - Basic Functionality', () => {
 
     test('should maintain state correctly', () => {
       require('../../src/content/roll20.js');
-      
-      const messageListener = mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
-      
+
+      const messageListener =
+        mockChrome.runtime.onMessage.addListener.mock.calls[0][0];
+
       // Set a modifier value
-      messageListener({ action: 'setModifier', modifier: '3' }, null, jest.fn());
-      
+      messageListener(
+        { action: 'setModifier', modifier: '3' },
+        null,
+        jest.fn()
+      );
+
       // Verify it's stored (even if undefined is acceptable for missing elements)
       expect(global.window.pixelsModifier).toBeDefined();
     });

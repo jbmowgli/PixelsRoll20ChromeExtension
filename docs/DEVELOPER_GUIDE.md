@@ -3,11 +3,13 @@
 ## Setup
 
 ### Requirements
+
 - Chrome browser
 - Code editor
 - Basic JavaScript knowledge
 
 ### Getting Started
+
 1. Clone the repo
 2. Open chrome://extensions/
 3. Enable Developer Mode
@@ -24,21 +26,25 @@ src/
 ```
 
 ### Key Files
+
 - `src/content/roll20.js` - Main Roll20 integration
-- `src/content/ModifierBox/` - Modifier box UI components
-- `src/content/Common/themeDetector.js` - Theme detection
+- `src/content/modifierBox/` - Modifier box UI components
+- `src/content/common/themeDetector.js` - Theme detection
 - `manifest.json` - Extension configuration
 
 ## Development
 
 ### Testing
+
 Use `test.html` to test the modifier box without Roll20:
+
 ```html
-<script src="src/content/Common/themeDetector.js"></script>
-<script src="src/content/ModifierBox/modifierBox.js"></script>
+<script src="src/content/common/themeDetector.js"></script>
+<script src="src/content/modifierBox/modifierBox.js"></script>
 ```
 
 ### Debugging
+
 - Background script: chrome://extensions/ → "Inspect views"
 - Content scripts: F12 on Roll20 page
 - Popup: Right-click extension icon → "Inspect popup"
@@ -46,6 +52,7 @@ Use `test.html` to test the modifier box without Roll20:
 ## Code Guidelines
 
 ### JavaScript
+
 ```javascript
 'use strict';
 
@@ -60,21 +67,23 @@ const PIXELS_SERVICE_UUID = 'service-uuid';
 ```
 
 ### CSS
+
 ```css
 /* Use specific selectors to avoid conflicts */
 #pixels-modifier-box .modifier-row {
-    /* styles */
+  /* styles */
 }
 
 /* Use !important sparingly, only for Roll20 overrides */
 .pixels-element {
-    color: #ffffff !important;
+  color: #ffffff !important;
 }
 ```
 
 ## API Reference
 
 ### ModifierBox
+
 ```javascript
 // Basic usage
 window.ModifierBoxManager.createModifierBox();
@@ -83,50 +92,54 @@ window.ModifierBoxManager.showModifierBox();
 ```
 
 ### Theme Detection
+
 ```javascript
 // Get current theme
 const colors = window.ThemeDetector.getThemeColors();
 
-// Listen for theme changes  
-window.ThemeDetector.onThemeChange((newTheme) => {
-    console.log('Theme changed:', newTheme);
+// Listen for theme changes
+window.ThemeDetector.onThemeChange(newTheme => {
+  console.log('Theme changed:', newTheme);
 });
 ```
 
 ### Bluetooth
+
 ```javascript
 // Connect to Pixels dice
 async function connectPixel() {
-    try {
-        const device = await navigator.bluetooth.requestDevice({
-            filters: [{ services: [PIXELS_SERVICE_UUID] }]
-        });
-        // handle connection
-    } catch (error) {
-        console.error('Connection failed:', error);
-    }
+  try {
+    const device = await navigator.bluetooth.requestDevice({
+      filters: [{ services: [PIXELS_SERVICE_UUID] }],
+    });
+    // handle connection
+  } catch (error) {
+    console.error('Connection failed:', error);
+  }
 }
 ```
 
 ## Storage & Messaging
 
 ### Chrome Storage
+
 ```javascript
 // Save settings
 chrome.storage.sync.set({ modifier: 5 });
 
 // Load settings
-chrome.storage.sync.get(['modifier'], (result) => {
-    console.log('Modifier:', result.modifier);
+chrome.storage.sync.get(['modifier'], result => {
+  console.log('Modifier:', result.modifier);
 });
 ```
 
 ### Message Passing
+
 ```javascript
 // Popup to content script
 chrome.tabs.sendMessage(tabId, {
-    action: 'connect',
-    data: { deviceId: 'pixels-001' }
+  action: 'connect',
+  data: { deviceId: 'pixels-001' },
 });
 ```
 
@@ -137,12 +150,14 @@ The project includes comprehensive Jest test coverage for all major components:
 ### Working Tests (141 tests passing)
 
 **ModifierBox Tests (96 tests)**
-- `tests/jest/ModifierBox/index.test.js` - Core ModifierBox functionality
-- `tests/jest/ModifierBox/dragHandler.test.js` - Drag and drop behavior
-- `tests/jest/ModifierBox/themeManager.test.js` - Theme switching and detection
-- `tests/jest/ModifierBox/rowManager.test.js` - Row management and validation
+
+- `tests/jest/modifierBox/index.test.js` - Core ModifierBox functionality
+- `tests/jest/modifierBox/dragHandler.test.js` - Drag and drop behavior
+- `tests/jest/modifierBox/themeManager.test.js` - Theme switching and detection
+- `tests/jest/modifierBox/rowManager.test.js` - Row management and validation
 
 **Roll20 Integration Tests (45 tests)**
+
 - `tests/jest/roll20-basic.test.js` - Basic module loading and error handling
 - `tests/jest/roll20-simple.test.js` - Message handling, Bluetooth, and ModifierBox integration
 
@@ -150,10 +165,10 @@ The project includes comprehensive Jest test coverage for all major components:
 
 ```bash
 # Run all working tests
-npm test -- tests/jest/roll20-basic.test.js tests/jest/roll20-simple.test.js tests/jest/ModifierBox/
+npm test -- tests/jest/roll20-basic.test.js tests/jest/roll20-simple.test.js tests/jest/modifierBox/
 
 # Run specific test suites
-npm test -- tests/jest/ModifierBox/        # ModifierBox tests only
+npm test -- tests/jest/modifierBox/        # ModifierBox tests only
 npm test -- tests/jest/roll20-basic.test.js # Basic roll20 tests only
 npm test -- tests/jest/roll20-simple.test.js # Simple integration tests only
 
@@ -164,6 +179,7 @@ npm test
 ### Test Coverage
 
 Current test coverage focuses on:
+
 - ✅ ModifierBox UI components and interactions
 - ✅ Roll20 message handling and Chrome extension communication
 - ✅ Error handling and edge cases
@@ -172,6 +188,7 @@ Current test coverage focuses on:
 - ✅ Extension lifecycle management
 
 Advanced test suites are available but may have some failures due to complex mocking requirements:
+
 - `tests/jest/roll20.test.js` - Comprehensive Roll20 integration tests
 - `tests/jest/BluetoothConnection.test.js` - Detailed Bluetooth connection tests
 - `tests/jest/ExtensionMessaging.test.js` - Extension messaging system tests
@@ -181,6 +198,7 @@ Advanced test suites are available but may have some failures due to complex moc
 ### Test Architecture
 
 The tests use a robust mocking strategy:
+
 - Chrome extension APIs are mocked with proper error handling
 - Bluetooth APIs are mocked to simulate connection scenarios
 - DOM interactions are safely mocked to prevent errors
@@ -189,6 +207,7 @@ The tests use a robust mocking strategy:
 ## Contributing
 
 ### Process
+
 1. Fork the repo
 2. Create a feature branch
 3. Make your changes
@@ -196,6 +215,7 @@ The tests use a robust mocking strategy:
 5. Submit a pull request
 
 ### Testing Checklist
+
 - [ ] Extension loads without errors
 - [ ] Modifier box works in light/dark themes
 - [ ] Bluetooth connection works

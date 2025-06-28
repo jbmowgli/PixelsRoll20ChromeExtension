@@ -16,51 +16,51 @@ describe('Bluetooth Connection Management', () => {
       stopNotifications: jest.fn().mockResolvedValue(),
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
-      writeValue: jest.fn().mockResolvedValue()
+      writeValue: jest.fn().mockResolvedValue(),
     };
 
     mockService = {
-      getCharacteristic: jest.fn().mockResolvedValue(mockCharacteristic)
+      getCharacteristic: jest.fn().mockResolvedValue(mockCharacteristic),
     };
 
     mockServer = {
       connect: jest.fn().mockResolvedValue(),
       disconnect: jest.fn(),
       getPrimaryService: jest.fn().mockResolvedValue(mockService),
-      connected: true
+      connected: true,
     };
 
     mockDevice = {
       name: 'TestPixel',
       gatt: mockServer,
-      addEventListener: jest.fn()
+      addEventListener: jest.fn(),
     };
 
     mockBluetooth = {
       requestDevice: jest.fn().mockResolvedValue(mockDevice),
-      getAvailability: jest.fn().mockResolvedValue(true)
+      getAvailability: jest.fn().mockResolvedValue(true),
     };
 
     // Set up global environment
     global.navigator = {
-      bluetooth: mockBluetooth
+      bluetooth: mockBluetooth,
     };
 
     global.chrome = {
       runtime: {
         sendMessage: jest.fn(),
         onMessage: {
-          addListener: jest.fn((listener) => {
+          addListener: jest.fn(listener => {
             messageListener = listener;
-          })
-        }
-      }
+          }),
+        },
+      },
     };
 
     // Mock ModifierBox
     window.ModifierBox = {
       isInitialized: jest.fn().mockReturnValue(true),
-      syncGlobalVars: jest.fn()
+      syncGlobalVars: jest.fn(),
     };
 
     // Mock console
@@ -86,13 +86,15 @@ describe('Bluetooth Connection Management', () => {
       expect(mockBluetooth.requestDevice).toHaveBeenCalledWith({
         filters: [
           { services: ['a6b90001-7a5a-43f2-a962-350c8edc9b5b'] }, // Modern Pixels
-          { services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] }  // Legacy Pixels
-        ]
+          { services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] }, // Legacy Pixels
+        ],
       });
     });
 
     test('should handle user cancellation gracefully', async () => {
-      mockBluetooth.requestDevice.mockRejectedValue(new Error('User cancelled'));
+      mockBluetooth.requestDevice.mockRejectedValue(
+        new Error('User cancelled')
+      );
 
       await messageListener({ action: 'connect' }, null, jest.fn());
 
@@ -198,8 +200,9 @@ describe('Bluetooth Connection Management', () => {
       await messageListener({ action: 'connect' }, null, jest.fn());
 
       // Get the disconnect handler
-      const disconnectHandler = mockDevice.addEventListener.mock.calls
-        .find(call => call[0] === 'gattserverdisconnected')?.[1];
+      const disconnectHandler = mockDevice.addEventListener.mock.calls.find(
+        call => call[0] === 'gattserverdisconnected'
+      )?.[1];
 
       expect(disconnectHandler).toBeDefined();
 
@@ -216,8 +219,9 @@ describe('Bluetooth Connection Management', () => {
 
       await messageListener({ action: 'connect' }, null, jest.fn());
 
-      const disconnectHandler = mockDevice.addEventListener.mock.calls
-        .find(call => call[0] === 'gattserverdisconnected')?.[1];
+      const disconnectHandler = mockDevice.addEventListener.mock.calls.find(
+        call => call[0] === 'gattserverdisconnected'
+      )?.[1];
 
       // Simulate disconnection
       disconnectHandler({ target: mockDevice });
@@ -233,8 +237,9 @@ describe('Bluetooth Connection Management', () => {
     test('should clean up resources on disconnection', async () => {
       await messageListener({ action: 'connect' }, null, jest.fn());
 
-      const disconnectHandler = mockDevice.addEventListener.mock.calls
-        .find(call => call[0] === 'gattserverdisconnected')?.[1];
+      const disconnectHandler = mockDevice.addEventListener.mock.calls.find(
+        call => call[0] === 'gattserverdisconnected'
+      )?.[1];
 
       disconnectHandler({ target: mockDevice });
 
@@ -309,7 +314,9 @@ describe('Bluetooth Connection Management', () => {
 
       await messageListener({ action: 'connect' }, null, jest.fn());
 
-      expect(console.log).toHaveBeenCalledWith('Connected to modern Pixels die');
+      expect(console.log).toHaveBeenCalledWith(
+        'Connected to modern Pixels die'
+      );
     });
 
     test('should properly detect legacy Pixels service', async () => {
@@ -319,11 +326,15 @@ describe('Bluetooth Connection Management', () => {
 
       await messageListener({ action: 'connect' }, null, jest.fn());
 
-      expect(console.log).toHaveBeenCalledWith('Connected to legacy Pixels die');
+      expect(console.log).toHaveBeenCalledWith(
+        'Connected to legacy Pixels die'
+      );
     });
 
     test('should handle service detection failure', async () => {
-      mockServer.getPrimaryService.mockRejectedValue(new Error('No services found'));
+      mockServer.getPrimaryService.mockRejectedValue(
+        new Error('No services found')
+      );
 
       await messageListener({ action: 'connect' }, null, jest.fn());
 
@@ -400,8 +411,9 @@ describe('Bluetooth Connection Management', () => {
 
       await messageListener({ action: 'connect' }, null, jest.fn());
 
-      const disconnectHandler = mockDevice.addEventListener.mock.calls
-        .find(call => call[0] === 'gattserverdisconnected')?.[1];
+      const disconnectHandler = mockDevice.addEventListener.mock.calls.find(
+        call => call[0] === 'gattserverdisconnected'
+      )?.[1];
 
       // Simulate disconnection
       disconnectHandler({ target: mockDevice });
@@ -424,8 +436,9 @@ describe('Bluetooth Connection Management', () => {
 
       await messageListener({ action: 'connect' }, null, jest.fn());
 
-      const disconnectHandler = mockDevice.addEventListener.mock.calls
-        .find(call => call[0] === 'gattserverdisconnected')?.[1];
+      const disconnectHandler = mockDevice.addEventListener.mock.calls.find(
+        call => call[0] === 'gattserverdisconnected'
+      )?.[1];
 
       disconnectHandler({ target: mockDevice });
 
@@ -436,7 +449,9 @@ describe('Bluetooth Connection Management', () => {
 
       jest.advanceTimersByTime(5000);
 
-      expect(console.log).toHaveBeenCalledWith('Reconnecting to legacy Pixels die');
+      expect(console.log).toHaveBeenCalledWith(
+        'Reconnecting to legacy Pixels die'
+      );
 
       jest.useRealTimers();
     });

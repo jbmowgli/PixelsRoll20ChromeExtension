@@ -14,17 +14,17 @@ function loadModule(modulePath) {
 describe('ModifierBox Row Manager', () => {
   beforeEach(() => {
     resetMocks();
-    
+
     // Mock theme manager for force updates
     window.ModifierBoxThemeManager = {
-      forceElementUpdates: jest.fn()
+      forceElementUpdates: jest.fn(),
     };
-    
+
     // Set up global variables
     window.pixelsModifierName = 'Test Modifier';
     window.pixelsModifier = '5';
-    
-    loadModule('src/content/ModifierBox/rowManager.js');
+
+    loadModule('src/content/modifierBox/rowManager.js');
   });
 
   describe('Module Initialization', () => {
@@ -34,13 +34,27 @@ describe('ModifierBox Row Manager', () => {
     });
 
     test('should expose correct API methods', () => {
-      expect(window.ModifierBoxRowManager.setupModifierRowLogic).toBeInstanceOf(Function);
-      expect(window.ModifierBoxRowManager.addModifierRow).toBeInstanceOf(Function);
-      expect(window.ModifierBoxRowManager.removeModifierRow).toBeInstanceOf(Function);
-      expect(window.ModifierBoxRowManager.updateEventListeners).toBeInstanceOf(Function);
-      expect(window.ModifierBoxRowManager.updateSelectedModifier).toBeInstanceOf(Function);
-      expect(window.ModifierBoxRowManager.getRowCounter).toBeInstanceOf(Function);
-      expect(window.ModifierBoxRowManager.setRowCounter).toBeInstanceOf(Function);
+      expect(window.ModifierBoxRowManager.setupModifierRowLogic).toBeInstanceOf(
+        Function
+      );
+      expect(window.ModifierBoxRowManager.addModifierRow).toBeInstanceOf(
+        Function
+      );
+      expect(window.ModifierBoxRowManager.removeModifierRow).toBeInstanceOf(
+        Function
+      );
+      expect(window.ModifierBoxRowManager.updateEventListeners).toBeInstanceOf(
+        Function
+      );
+      expect(
+        window.ModifierBoxRowManager.updateSelectedModifier
+      ).toBeInstanceOf(Function);
+      expect(window.ModifierBoxRowManager.getRowCounter).toBeInstanceOf(
+        Function
+      );
+      expect(window.ModifierBoxRowManager.setRowCounter).toBeInstanceOf(
+        Function
+      );
     });
 
     test('should initialize with correct row counter', () => {
@@ -59,42 +73,56 @@ describe('ModifierBox Row Manager', () => {
 
     test('should handle null modifierBox parameter', () => {
       window.ModifierBoxRowManager.setupModifierRowLogic(null, mockCallback);
-      
-      expect(console.error).toHaveBeenCalledWith("setupModifierRowLogic: modifierBox is required");
+
+      expect(console.error).toHaveBeenCalledWith(
+        'setupModifierRowLogic: modifierBox is required'
+      );
     });
 
     test('should setup add button event listener', () => {
       const addButton = mockModifierBox.querySelector('.add-modifier-btn');
       const addEventListenerSpy = jest.spyOn(addButton, 'addEventListener');
-      
-      window.ModifierBoxRowManager.setupModifierRowLogic(mockModifierBox, mockCallback);
-      
-      expect(addEventListenerSpy).toHaveBeenCalledWith('click', expect.any(Function));
+
+      window.ModifierBoxRowManager.setupModifierRowLogic(
+        mockModifierBox,
+        mockCallback
+      );
+
+      expect(addEventListenerSpy).toHaveBeenCalledWith(
+        'click',
+        expect.any(Function)
+      );
       expect(addButton.getAttribute('data-listener-added')).toBe('true');
     });
 
     test('should not add duplicate event listeners to add button', () => {
       const addButton = mockModifierBox.querySelector('.add-modifier-btn');
       addButton.setAttribute('data-listener-added', 'true');
-      
+
       const addEventListenerSpy = jest.spyOn(addButton, 'addEventListener');
-      
-      window.ModifierBoxRowManager.setupModifierRowLogic(mockModifierBox, mockCallback);
-      
+
+      window.ModifierBoxRowManager.setupModifierRowLogic(
+        mockModifierBox,
+        mockCallback
+      );
+
       expect(addEventListenerSpy).not.toHaveBeenCalled();
     });
 
     test('should call updateEventListeners', () => {
       const mockModifierBox = createMockModifierBox();
       const mockCallback = jest.fn();
-      
+
       // Test that the function executes without errors
       // and that the add button gets the listener attribute
       const addButton = mockModifierBox.querySelector('.add-modifier-btn');
       expect(addButton.hasAttribute('data-listener-added')).toBe(false);
-      
-      window.ModifierBoxRowManager.setupModifierRowLogic(mockModifierBox, mockCallback);
-      
+
+      window.ModifierBoxRowManager.setupModifierRowLogic(
+        mockModifierBox,
+        mockCallback
+      );
+
       // Verify the add button now has the listener attribute
       expect(addButton.hasAttribute('data-listener-added')).toBe(true);
       expect(addButton.getAttribute('data-listener-added')).toBe('true');
@@ -112,24 +140,34 @@ describe('ModifierBox Row Manager', () => {
 
     test('should handle null modifierBox parameter', () => {
       window.ModifierBoxRowManager.addModifierRow(null, mockCallback);
-      
-      expect(console.error).toHaveBeenCalledWith("addModifierRow: modifierBox is required");
+
+      expect(console.error).toHaveBeenCalledWith(
+        'addModifierRow: modifierBox is required'
+      );
     });
 
     test('should handle missing content area', () => {
       const boxWithoutContent = document.createElement('div');
-      
-      window.ModifierBoxRowManager.addModifierRow(boxWithoutContent, mockCallback);
-      
-      expect(console.error).toHaveBeenCalledWith("addModifierRow: content area not found");
+
+      window.ModifierBoxRowManager.addModifierRow(
+        boxWithoutContent,
+        mockCallback
+      );
+
+      expect(console.error).toHaveBeenCalledWith(
+        'addModifierRow: content area not found'
+      );
     });
 
     test('should add new modifier row successfully', () => {
       const content = mockModifierBox.querySelector('.pixels-content');
       const initialRowCount = content.querySelectorAll('.modifier-row').length;
-      
-      window.ModifierBoxRowManager.addModifierRow(mockModifierBox, mockCallback);
-      
+
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+
       const newRowCount = content.querySelectorAll('.modifier-row').length;
       expect(newRowCount).toBe(initialRowCount + 1);
     });
@@ -137,15 +175,18 @@ describe('ModifierBox Row Manager', () => {
     test('should create row with correct structure and values', () => {
       const content = mockModifierBox.querySelector('.pixels-content');
       const initialCounter = window.ModifierBoxRowManager.getRowCounter();
-      
-      window.ModifierBoxRowManager.addModifierRow(mockModifierBox, mockCallback);
-      
+
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+
       const newRow = content.lastElementChild;
       const radio = newRow.querySelector('.modifier-radio');
       const nameInput = newRow.querySelector('.modifier-name');
       const valueInput = newRow.querySelector('.modifier-value');
       const removeBtn = newRow.querySelector('.remove-row-btn');
-      
+
       expect(radio.value).toBe(initialCounter.toString());
       expect(radio.id).toBe(`mod-${initialCounter}`);
       expect(nameInput.value).toBe(`Modifier ${initialCounter + 1}`);
@@ -156,24 +197,34 @@ describe('ModifierBox Row Manager', () => {
 
     test('should increment row counter', () => {
       const initialCounter = window.ModifierBoxRowManager.getRowCounter();
-      
-      window.ModifierBoxRowManager.addModifierRow(mockModifierBox, mockCallback);
-      
-      expect(window.ModifierBoxRowManager.getRowCounter()).toBe(initialCounter + 1);
+
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+
+      expect(window.ModifierBoxRowManager.getRowCounter()).toBe(
+        initialCounter + 1
+      );
     });
 
     test('should call updateEventListeners after adding row', () => {
-      const initialRows = mockModifierBox.querySelectorAll('.modifier-row').length;
-      
-      window.ModifierBoxRowManager.addModifierRow(mockModifierBox, mockCallback);
-      
+      const initialRows =
+        mockModifierBox.querySelectorAll('.modifier-row').length;
+
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+
       const newRows = mockModifierBox.querySelectorAll('.modifier-row').length;
-      
+
       // Verify a new row was added (which means updateEventListeners was called successfully)
       expect(newRows).toBe(initialRows + 1);
-      
+
       // Verify the new row has the expected structure
-      const newRow = mockModifierBox.querySelectorAll('.modifier-row')[newRows - 1];
+      const newRow =
+        mockModifierBox.querySelectorAll('.modifier-row')[newRows - 1];
       expect(newRow.querySelector('.modifier-radio')).toBeTruthy();
       expect(newRow.querySelector('.modifier-name')).toBeTruthy();
       expect(newRow.querySelector('.modifier-value')).toBeTruthy();
@@ -181,9 +232,14 @@ describe('ModifierBox Row Manager', () => {
     });
 
     test('should call theme manager forceElementUpdates', () => {
-      window.ModifierBoxRowManager.addModifierRow(mockModifierBox, mockCallback);
-      
-      expect(window.ModifierBoxThemeManager.forceElementUpdates).toHaveBeenCalledWith(mockModifierBox);
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+
+      expect(
+        window.ModifierBoxThemeManager.forceElementUpdates
+      ).toHaveBeenCalledWith(mockModifierBox);
     });
   });
 
@@ -194,41 +250,62 @@ describe('ModifierBox Row Manager', () => {
     beforeEach(() => {
       mockModifierBox = createMockModifierBox();
       mockCallback = jest.fn();
-      
+
       // Add a second row for testing
-      window.ModifierBoxRowManager.addModifierRow(mockModifierBox, mockCallback);
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
     });
 
     test('should handle null rowElement parameter', () => {
-      window.ModifierBoxRowManager.removeModifierRow(null, mockModifierBox, mockCallback);
-      
-      expect(console.error).toHaveBeenCalledWith('removeModifierRow: rowElement is null or undefined');
+      window.ModifierBoxRowManager.removeModifierRow(
+        null,
+        mockModifierBox,
+        mockCallback
+      );
+
+      expect(console.error).toHaveBeenCalledWith(
+        'removeModifierRow: rowElement is null or undefined'
+      );
     });
 
     test('should handle null modifierBox parameter', () => {
       const row = mockModifierBox.querySelector('.modifier-row');
-      
+
       window.ModifierBoxRowManager.removeModifierRow(row, null, mockCallback);
-      
-      expect(console.error).toHaveBeenCalledWith('removeModifierRow: modifierBox is required');
+
+      expect(console.error).toHaveBeenCalledWith(
+        'removeModifierRow: modifierBox is required'
+      );
     });
 
     test('should handle row without radio button', () => {
       const invalidRow = document.createElement('div');
       invalidRow.className = 'modifier-row';
-      
-      window.ModifierBoxRowManager.removeModifierRow(invalidRow, mockModifierBox, mockCallback);
-      
-      expect(console.error).toHaveBeenCalledWith('removeModifierRow: radio button not found in row');
+
+      window.ModifierBoxRowManager.removeModifierRow(
+        invalidRow,
+        mockModifierBox,
+        mockCallback
+      );
+
+      expect(console.error).toHaveBeenCalledWith(
+        'removeModifierRow: radio button not found in row'
+      );
     });
 
     test('should remove row when multiple rows exist', () => {
       const rows = mockModifierBox.querySelectorAll('.modifier-row');
       const initialCount = rows.length;
       const rowToRemove = rows[1]; // Remove second row
-      
-      window.ModifierBoxRowManager.removeModifierRow(rowToRemove, mockModifierBox, mockCallback);
-      
+
+      window.ModifierBoxRowManager.removeModifierRow(
+        rowToRemove,
+        mockModifierBox,
+        mockCallback
+      );
+
       const newCount = mockModifierBox.querySelectorAll('.modifier-row').length;
       expect(newCount).toBe(initialCount - 1);
       expect(mockModifierBox.contains(rowToRemove)).toBe(false);
@@ -240,19 +317,23 @@ describe('ModifierBox Row Manager', () => {
       for (let i = 1; i < rows.length; i++) {
         rows[i].remove();
       }
-      
+
       const lastRow = mockModifierBox.querySelector('.modifier-row');
       const nameInput = lastRow.querySelector('.modifier-name');
       const valueInput = lastRow.querySelector('.modifier-value');
       const radio = lastRow.querySelector('.modifier-radio');
-      
+
       // Set some values first
       nameInput.value = 'Custom Name';
       valueInput.value = '10';
       radio.checked = false;
-      
-      window.ModifierBoxRowManager.removeModifierRow(lastRow, mockModifierBox, mockCallback);
-      
+
+      window.ModifierBoxRowManager.removeModifierRow(
+        lastRow,
+        mockModifierBox,
+        mockCallback
+      );
+
       // Row should still exist but be reset
       expect(mockModifierBox.contains(lastRow)).toBe(true);
       expect(nameInput.value).toBe('Modifier 1');
@@ -265,14 +346,18 @@ describe('ModifierBox Row Manager', () => {
       const rows = mockModifierBox.querySelectorAll('.modifier-row');
       const firstRow = rows[0];
       const secondRow = rows[1];
-      
+
       // Select the second row
       const secondRadio = secondRow.querySelector('.modifier-radio');
       secondRadio.checked = true;
-      
+
       // Remove the selected row
-      window.ModifierBoxRowManager.removeModifierRow(secondRow, mockModifierBox, mockCallback);
-      
+      window.ModifierBoxRowManager.removeModifierRow(
+        secondRow,
+        mockModifierBox,
+        mockCallback
+      );
+
       // First row should be selected
       const firstRadio = firstRow.querySelector('.modifier-radio');
       expect(firstRadio.checked).toBe(true);
@@ -283,14 +368,18 @@ describe('ModifierBox Row Manager', () => {
       const rows = mockModifierBox.querySelectorAll('.modifier-row');
       const firstRow = rows[0];
       const secondRow = rows[1];
-      
+
       // Ensure first row is selected
       const firstRadio = firstRow.querySelector('.modifier-radio');
       firstRadio.checked = true;
-      
+
       // Remove the non-selected row
-      window.ModifierBoxRowManager.removeModifierRow(secondRow, mockModifierBox, mockCallback);
-      
+      window.ModifierBoxRowManager.removeModifierRow(
+        secondRow,
+        mockModifierBox,
+        mockCallback
+      );
+
       // First row should still be selected
       expect(firstRadio.checked).toBe(true);
     });
@@ -307,38 +396,52 @@ describe('ModifierBox Row Manager', () => {
 
     test('should handle null modifierBox parameter', () => {
       window.ModifierBoxRowManager.updateEventListeners(null, mockCallback);
-      
-      expect(console.error).toHaveBeenCalledWith("updateEventListeners: modifierBox is required");
+
+      expect(console.error).toHaveBeenCalledWith(
+        'updateEventListeners: modifierBox is required'
+      );
     });
 
     test('should add event listeners to all row elements', () => {
       // Add another row for testing
-      window.ModifierBoxRowManager.addModifierRow(mockModifierBox, mockCallback);
-      
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+
       const rows = mockModifierBox.querySelectorAll('.modifier-row');
-      
+
       // Spy on event listeners for first row
       const firstRadio = rows[0].querySelector('.modifier-radio');
       const firstName = rows[0].querySelector('.modifier-name');
       const firstValue = rows[0].querySelector('.modifier-value');
-      
+
       const radioSpy = jest.spyOn(firstRadio, 'addEventListener');
       const nameSpy = jest.spyOn(firstName, 'addEventListener');
       const valueSpy = jest.spyOn(firstValue, 'addEventListener');
-      
-      window.ModifierBoxRowManager.updateEventListeners(mockModifierBox, mockCallback);
-      
+
+      window.ModifierBoxRowManager.updateEventListeners(
+        mockModifierBox,
+        mockCallback
+      );
+
       expect(radioSpy).toHaveBeenCalledWith('change', mockCallback);
       expect(nameSpy).toHaveBeenCalledWith('input', mockCallback);
       expect(valueSpy).toHaveBeenCalledWith('input', mockCallback);
     });
 
     test('should setup remove button onclick handlers', () => {
-      window.ModifierBoxRowManager.addModifierRow(mockModifierBox, mockCallback);
-      window.ModifierBoxRowManager.updateEventListeners(mockModifierBox, mockCallback);
-      
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+      window.ModifierBoxRowManager.updateEventListeners(
+        mockModifierBox,
+        mockCallback
+      );
+
       const removeButtons = mockModifierBox.querySelectorAll('.remove-row-btn');
-      
+
       removeButtons.forEach(button => {
         expect(button.onclick).toBeInstanceOf(Function);
       });
@@ -348,12 +451,15 @@ describe('ModifierBox Row Manager', () => {
       const incompleteRow = document.createElement('div');
       incompleteRow.className = 'modifier-row';
       // Missing radio, inputs, and button
-      
+
       const content = mockModifierBox.querySelector('.pixels-content');
       content.appendChild(incompleteRow);
-      
+
       expect(() => {
-        window.ModifierBoxRowManager.updateEventListeners(mockModifierBox, mockCallback);
+        window.ModifierBoxRowManager.updateEventListeners(
+          mockModifierBox,
+          mockCallback
+        );
       }).not.toThrow();
     });
   });
@@ -363,11 +469,14 @@ describe('ModifierBox Row Manager', () => {
 
     beforeEach(() => {
       mockModifierBox = createMockModifierBox();
-      
+
       // Setup header with logo
-      const header = mockModifierBox.querySelector('.pixels-header') || document.createElement('div');
+      const header =
+        mockModifierBox.querySelector('.pixels-header') ||
+        document.createElement('div');
       header.className = 'pixels-header';
-      header.innerHTML = '<span class="pixels-title"><img src="logo.png" alt="Pixels" class="pixels-logo"> Original Title</span>';
+      header.innerHTML =
+        '<span class="pixels-title"><img src="logo.png" alt="Pixels" class="pixels-logo"> Original Title</span>';
       if (!mockModifierBox.contains(header)) {
         mockModifierBox.appendChild(header);
       }
@@ -375,8 +484,10 @@ describe('ModifierBox Row Manager', () => {
 
     test('should handle null modifierBox parameter', () => {
       window.ModifierBoxRowManager.updateSelectedModifier(null);
-      
-      expect(console.error).toHaveBeenCalledWith("updateSelectedModifier: modifierBox is required");
+
+      expect(console.error).toHaveBeenCalledWith(
+        'updateSelectedModifier: modifierBox is required'
+      );
     });
 
     test('should update global variables with selected row values', () => {
@@ -384,13 +495,13 @@ describe('ModifierBox Row Manager', () => {
       const nameInput = row.querySelector('.modifier-name');
       const valueInput = row.querySelector('.modifier-value');
       const radio = row.querySelector('.modifier-radio');
-      
+
       nameInput.value = 'Test Modifier';
       valueInput.value = '5';
       radio.checked = true;
-      
+
       window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
-      
+
       expect(window.pixelsModifierName).toBe('Test Modifier');
       expect(window.pixelsModifier).toBe('5');
     });
@@ -400,13 +511,13 @@ describe('ModifierBox Row Manager', () => {
       const nameInput = row.querySelector('.modifier-name');
       const valueInput = row.querySelector('.modifier-value');
       const radio = row.querySelector('.modifier-radio');
-      
+
       nameInput.value = '';
       valueInput.value = '3';
       radio.checked = true;
-      
+
       window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
-      
+
       expect(window.pixelsModifierName).toBe('Unnamed');
       expect(window.pixelsModifier).toBe('3');
     });
@@ -416,13 +527,13 @@ describe('ModifierBox Row Manager', () => {
       const nameInput = row.querySelector('.modifier-name');
       const valueInput = row.querySelector('.modifier-value');
       const radio = row.querySelector('.modifier-radio');
-      
+
       nameInput.value = 'Test';
       valueInput.value = '';
       radio.checked = true;
-      
+
       window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
-      
+
       expect(window.pixelsModifierName).toBe('Test');
       expect(window.pixelsModifier).toBe('0');
     });
@@ -432,13 +543,13 @@ describe('ModifierBox Row Manager', () => {
       const nameInput = row.querySelector('.modifier-name');
       const valueInput = row.querySelector('.modifier-value');
       const radio = row.querySelector('.modifier-radio');
-      
+
       nameInput.value = 'Strength Bonus';
       valueInput.value = '3';
       radio.checked = true;
-      
+
       window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
-      
+
       const headerTitle = mockModifierBox.querySelector('.pixels-title');
       expect(headerTitle.innerHTML).toContain('Strength Bonus (+3)');
       expect(headerTitle.innerHTML).toContain('pixels-logo');
@@ -448,21 +559,21 @@ describe('ModifierBox Row Manager', () => {
       const testCases = [
         { value: '0', expected: '±0' },
         { value: '5', expected: '+5' },
-        { value: '-3', expected: '-3' }
+        { value: '-3', expected: '-3' },
       ];
-      
+
       testCases.forEach(({ value, expected }) => {
         const row = mockModifierBox.querySelector('.modifier-row');
         const nameInput = row.querySelector('.modifier-name');
         const valueInput = row.querySelector('.modifier-value');
         const radio = row.querySelector('.modifier-radio');
-        
+
         nameInput.value = 'Test';
         valueInput.value = value;
         radio.checked = true;
-        
+
         window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
-        
+
         const headerTitle = mockModifierBox.querySelector('.pixels-title');
         expect(headerTitle.innerHTML).toContain(`Test (${expected})`);
       });
@@ -471,47 +582,47 @@ describe('ModifierBox Row Manager', () => {
     test('should handle missing header logo gracefully', () => {
       const headerTitle = mockModifierBox.querySelector('.pixels-title');
       headerTitle.innerHTML = 'No Logo Title';
-      
+
       const row = mockModifierBox.querySelector('.modifier-row');
       const nameInput = row.querySelector('.modifier-name');
       const valueInput = row.querySelector('.modifier-value');
       const radio = row.querySelector('.modifier-radio');
-      
+
       nameInput.value = 'Test';
       valueInput.value = '2';
       radio.checked = true;
-      
+
       window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
-      
+
       expect(headerTitle.textContent).toBe('Test (+2)');
     });
 
     test('should call sendMessageToExtension if available', () => {
       window.sendMessageToExtension = jest.fn();
-      
+
       const row = mockModifierBox.querySelector('.modifier-row');
       const nameInput = row.querySelector('.modifier-name');
       const valueInput = row.querySelector('.modifier-value');
       const radio = row.querySelector('.modifier-radio');
-      
+
       nameInput.value = 'Test';
       valueInput.value = '4';
       radio.checked = true;
-      
+
       window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
-      
+
       expect(window.sendMessageToExtension).toHaveBeenCalledWith({
-        action: "modifierChanged",
+        action: 'modifierChanged',
         modifier: '4',
-        name: 'Test'
+        name: 'Test',
       });
     });
 
     test('should handle no selected radio button', () => {
       // Uncheck all radio buttons
       const radios = mockModifierBox.querySelectorAll('.modifier-radio');
-      radios.forEach(radio => radio.checked = false);
-      
+      radios.forEach(radio => (radio.checked = false));
+
       expect(() => {
         window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
       }).not.toThrow();
@@ -521,10 +632,10 @@ describe('ModifierBox Row Manager', () => {
   describe('Row Counter Management', () => {
     test('should get and set row counter correctly', () => {
       expect(window.ModifierBoxRowManager.getRowCounter()).toBe(1);
-      
+
       window.ModifierBoxRowManager.setRowCounter(5);
       expect(window.ModifierBoxRowManager.getRowCounter()).toBe(5);
-      
+
       window.ModifierBoxRowManager.setRowCounter(0);
       expect(window.ModifierBoxRowManager.getRowCounter()).toBe(0);
     });

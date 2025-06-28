@@ -9,50 +9,27 @@ const mockChrome = {
   runtime: {
     sendMessage: jest.fn(),
     onMessage: {
-      addListener: jest.fn()
-    }
-  }
+      addListener: jest.fn(),
+    },
+  },
 };
 
 // Mock Bluetooth API
 const mockBluetooth = {
   requestDevice: jest.fn(),
-  getAvailability: jest.fn()
+  getAvailability: jest.fn(),
 };
 
 // Mock GATT Server and Services
-const create    test('should request Bluetooth device with correct filters', async () => {
-      const mockDevice = createMockDevice();
-      const mockServer = createMockGattServer();
-      const mockService = createMockService();
-      const mockCharacteristic = createMockCharacteristic();
-
-      mockBluetooth.requestDevice.mockResolvedValue(mockDevice);
-      mockDevice.gatt.connect.mockResolvedValue(mockServer);
-      mockServer.getPrimaryService.mockResolvedValue(mockService);
-      mockService.getCharacteristic.mockResolvedValue(mockCharacteristic);
-
-      // Call the connect action and wait for async operations
-      mockMessageListener({ action: 'connect' }, null, jest.fn());
-      
-      // Wait for async operations to complete
-      await new Promise(resolve => setTimeout(resolve, 50));
-
-      expect(mockBluetooth.requestDevice).toHaveBeenCalledWith({
-        filters: [
-          { services: ['a6b90001-7a5a-43f2-a962-350c8edc9b5b'] },
-          { services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] }
-        ]
-      });
-    });=> ({
+const createMockGattServer = () => ({
   connect: jest.fn(),
   disconnect: jest.fn(),
   getPrimaryService: jest.fn(),
-  connected: true
+  connected: true,
 });
 
 const createMockService = () => ({
-  getCharacteristic: jest.fn()
+  getCharacteristic: jest.fn(),
 });
 
 const createMockCharacteristic = () => ({
@@ -60,13 +37,13 @@ const createMockCharacteristic = () => ({
   stopNotifications: jest.fn(),
   addEventListener: jest.fn(),
   removeEventListener: jest.fn(),
-  writeValue: jest.fn()
+  writeValue: jest.fn(),
 });
 
 const createMockDevice = (name = 'TestPixel') => ({
   name,
   gatt: createMockGattServer(),
-  addEventListener: jest.fn()
+  addEventListener: jest.fn(),
 });
 
 describe('Roll20 Integration Module', () => {
@@ -91,7 +68,7 @@ describe('Roll20 Integration Module', () => {
     global.chrome = mockChrome;
     global.navigator = {
       ...global.navigator,
-      bluetooth: mockBluetooth
+      bluetooth: mockBluetooth,
     };
 
     // Reset all mocks
@@ -111,7 +88,7 @@ describe('Roll20 Integration Module', () => {
 
     // Mock ModifierBox for integration tests
     const mockModifierBoxElement = {
-      querySelector: jest.fn((selector) => {
+      querySelector: jest.fn(selector => {
         if (selector === 'input[name="modifier-select"]:checked') {
           return { value: '0' };
         }
@@ -120,12 +97,12 @@ describe('Roll20 Integration Module', () => {
         }
         return null;
       }),
-      querySelectorAll: jest.fn((selector) => {
+      querySelectorAll: jest.fn(selector => {
         if (selector === '.modifier-row') {
           return [{ querySelector: jest.fn().mockReturnValue({ value: '0' }) }];
         }
         return [];
-      })
+      }),
     };
 
     window.ModifierBox = {
@@ -133,14 +110,14 @@ describe('Roll20 Integration Module', () => {
       show: jest.fn(),
       hide: jest.fn(),
       getElement: jest.fn().mockReturnValue(mockModifierBoxElement),
-      syncGlobalVars: jest.fn()
+      syncGlobalVars: jest.fn(),
     };
 
     // Capture message listener for testing
-    mockChrome.runtime.onMessage.addListener.mockImplementation((listener) => {
+    mockChrome.runtime.onMessage.addListener.mockImplementation(listener => {
       mockMessageListener = listener;
     });
-    
+
     // Load the module once mocks are set up
     require('../../../src/content/roll20.js');
   });
@@ -149,10 +126,10 @@ describe('Roll20 Integration Module', () => {
     // Restore originals
     global.chrome = originalChrome;
     global.navigator = originalNavigator;
-    
+
     // Clean up DOM
     document.body.innerHTML = '';
-    
+
     // Restore console
     console.log.mockRestore();
     console.error.mockRestore();
@@ -160,8 +137,8 @@ describe('Roll20 Integration Module', () => {
 
   describe('Module Initialization', () => {
     test('should initialize global variables', () => {
-      expect(window.pixelsModifier).toBe("0");
-      expect(window.pixelsModifierName).toBe("Modifier 1");
+      expect(window.pixelsModifier).toBe('0');
+      expect(window.pixelsModifierName).toBe('Modifier 1');
       expect(window.showModifierBox).toBeInstanceOf(Function);
       expect(window.hideModifierBox).toBeInstanceOf(Function);
       expect(window.sendMessageToExtension).toBeInstanceOf(Function);
@@ -170,11 +147,11 @@ describe('Roll20 Integration Module', () => {
     test('should prevent multiple initialization', () => {
       window.roll20PixelsLoaded = true;
       const consoleSpy = jest.spyOn(console, 'log');
-      
+
       // Clear the require cache and require again
       delete require.cache[require.resolve('../../../src/content/roll20.js')];
       require('../../../src/content/roll20.js');
-      
+
       // Should not reinitialize functions since roll20PixelsLoaded is true
       // (the guard prevents reinitialization)
     });
@@ -190,51 +167,59 @@ describe('Roll20 Integration Module', () => {
     describe('showModifierBox', () => {
       test('should call ModifierBox.show when ModifierBox is available', () => {
         window.showModifierBox();
-        
+
         expect(window.ModifierBox.show).toHaveBeenCalled();
       });
 
       test('should handle async ModifierBox.show function', () => {
-        window.ModifierBox.show = jest.fn().mockRejectedValue(new Error('Test error'));
+        window.ModifierBox.show = jest
+          .fn()
+          .mockRejectedValue(new Error('Test error'));
         Object.defineProperty(window.ModifierBox.show, 'constructor', {
-          value: { name: 'AsyncFunction' }
+          value: { name: 'AsyncFunction' },
         });
 
         window.showModifierBox();
-        
+
         expect(window.ModifierBox.show).toHaveBeenCalled();
       });
 
       test('should log error when ModifierBox is not available', () => {
         delete window.ModifierBox;
-        
+
         window.showModifierBox();
-        
-        expect(console.log).toHaveBeenCalledWith("ModifierBox module not loaded");
+
+        expect(console.log).toHaveBeenCalledWith(
+          'ModifierBox module not loaded'
+        );
       });
 
       test('should log warning when ModifierBox is not initialized', () => {
         window.ModifierBox.isInitialized.mockReturnValue(false);
-        
+
         window.showModifierBox();
-        
-        expect(console.log).toHaveBeenCalledWith("ModifierBox module not initialized yet");
+
+        expect(console.log).toHaveBeenCalledWith(
+          'ModifierBox module not initialized yet'
+        );
       });
     });
 
     describe('hideModifierBox', () => {
       test('should call ModifierBox.hide when available', () => {
         window.hideModifierBox();
-        
+
         expect(window.ModifierBox.hide).toHaveBeenCalled();
       });
 
       test('should log error when ModifierBox is not available', () => {
         delete window.ModifierBox;
-        
+
         window.hideModifierBox();
-        
-        expect(console.log).toHaveBeenCalledWith("ModifierBox module not loaded");
+
+        expect(console.log).toHaveBeenCalledWith(
+          'ModifierBox module not loaded'
+        );
       });
     });
   });
@@ -248,17 +233,17 @@ describe('Roll20 Integration Module', () => {
       const textarea = document.querySelector('textarea');
       const button = document.querySelector('button');
       const clickSpy = jest.spyOn(button, 'click');
-      
+
       // Access the postChatMessage function through the module's internal scope
       // We'll test this indirectly through the Pixel roll functionality
-      
+
       expect(textarea).toBeTruthy();
       expect(button).toBeTruthy();
     });
 
     test('should handle missing chat elements gracefully', () => {
       document.body.innerHTML = '';
-      
+
       // This would be tested indirectly through Pixel roll functionality
       // The function should log an error when chat elements are missing
     });
@@ -271,9 +256,9 @@ describe('Roll20 Integration Module', () => {
 
     test('should send message to extension', () => {
       const testData = { action: 'test', data: 'value' };
-      
+
       window.sendMessageToExtension(testData);
-      
+
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith(testData);
     });
 
@@ -281,7 +266,7 @@ describe('Roll20 Integration Module', () => {
       mockChrome.runtime.sendMessage.mockImplementation(() => {
         throw new Error('Extension not available');
       });
-      
+
       expect(() => {
         window.sendMessageToExtension({ action: 'test' });
       }).not.toThrow();
@@ -289,7 +274,7 @@ describe('Roll20 Integration Module', () => {
 
     test('should handle missing Chrome API gracefully', () => {
       delete global.chrome;
-      
+
       expect(() => {
         window.sendMessageToExtension({ action: 'test' });
       }).not.toThrow();
@@ -303,50 +288,54 @@ describe('Roll20 Integration Module', () => {
 
     test('should handle getStatus message', () => {
       const sendResponse = jest.fn();
-      
+
       mockMessageListener({ action: 'getStatus' }, null, sendResponse);
-      
+
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'No Pixel connected'
+        text: 'No Pixel connected',
       });
     });
 
     test('should handle setModifier message', () => {
       const sendResponse = jest.fn();
-      
-      mockMessageListener({ 
-        action: 'setModifier', 
-        modifier: '5' 
-      }, null, sendResponse);
-      
+
+      mockMessageListener(
+        {
+          action: 'setModifier',
+          modifier: '5',
+        },
+        null,
+        sendResponse
+      );
+
       expect(window.pixelsModifier).toBe('5');
     });
 
     test('should handle showModifier message', () => {
       const sendResponse = jest.fn();
-      
+
       mockMessageListener({ action: 'showModifier' }, null, sendResponse);
-      
+
       expect(window.ModifierBox.show).toHaveBeenCalled();
     });
 
     test('should handle hideModifier message', () => {
       const sendResponse = jest.fn();
-      
+
       mockMessageListener({ action: 'hideModifier' }, null, sendResponse);
-      
+
       expect(window.ModifierBox.hide).toHaveBeenCalled();
     });
 
     test('should handle connect message', () => {
       const sendResponse = jest.fn();
-      
+
       // Mock successful connection
       mockBluetooth.requestDevice.mockResolvedValue(createMockDevice());
-      
+
       mockMessageListener({ action: 'connect' }, null, sendResponse);
-      
+
       expect(console.log).toHaveBeenCalledWith(
         'Connect button clicked, attempting to connect to Pixel'
       );
@@ -354,9 +343,9 @@ describe('Roll20 Integration Module', () => {
 
     test('should handle disconnect message', () => {
       const sendResponse = jest.fn();
-      
+
       mockMessageListener({ action: 'disconnect' }, null, sendResponse);
-      
+
       expect(console.log).toHaveBeenCalledWith('Manual disconnect requested');
     });
   });
@@ -382,13 +371,15 @@ describe('Roll20 Integration Module', () => {
       expect(mockBluetooth.requestDevice).toHaveBeenCalledWith({
         filters: [
           { services: ['a6b90001-7a5a-43f2-a962-350c8edc9b5b'] },
-          { services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] }
-        ]
+          { services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] },
+        ],
       });
     });
 
     test('should handle connection errors gracefully', async () => {
-      mockBluetooth.requestDevice.mockRejectedValue(new Error('User cancelled'));
+      mockBluetooth.requestDevice.mockRejectedValue(
+        new Error('User cancelled')
+      );
 
       mockMessageListener({ action: 'connect' }, null, jest.fn());
 
@@ -420,7 +411,7 @@ describe('Roll20 Integration Module', () => {
     beforeEach(() => {
       // Load the module to get access to the Pixel class
       require('../../../src/content/roll20.js');
-      
+
       // We need to extract the Pixel class from the module
       // Since it's not exported, we'll test it indirectly through connection
     });
@@ -467,8 +458,8 @@ describe('Roll20 Integration Module', () => {
   describe('Formula Processing', () => {
     beforeEach(() => {
       require('../../../src/content/roll20.js');
-      window.pixelsModifier = "3";
-      window.pixelsModifierName = "Test Modifier";
+      window.pixelsModifier = '3';
+      window.pixelsModifierName = 'Test Modifier';
     });
 
     test('should replace formula placeholders correctly', () => {
@@ -521,7 +512,7 @@ describe('Roll20 Integration Module', () => {
 
     test('should handle Bluetooth API not available', () => {
       delete global.navigator.bluetooth;
-      
+
       expect(() => {
         mockMessageListener({ action: 'connect' }, null, jest.fn());
       }).not.toThrow();
@@ -529,7 +520,7 @@ describe('Roll20 Integration Module', () => {
 
     test('should handle Chrome extension API not available', () => {
       delete global.chrome;
-      
+
       expect(() => {
         require('../../../src/content/roll20.js');
       }).not.toThrow();
@@ -537,7 +528,7 @@ describe('Roll20 Integration Module', () => {
 
     test('should handle missing DOM elements gracefully', () => {
       document.body.innerHTML = '';
-      
+
       // Should not throw when trying to post chat messages
       // This would be tested through the Pixel roll functionality
     });
@@ -554,10 +545,10 @@ describe('Roll20 Integration Module', () => {
 
     test('should send correct status for no pixels', () => {
       mockMessageListener({ action: 'getStatus' }, null, jest.fn());
-      
+
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'No Pixel connected'
+        text: 'No Pixel connected',
       });
     });
 
@@ -577,11 +568,11 @@ describe('Roll20 Integration Module', () => {
 
     test('should automatically show modifier box on load', () => {
       jest.useFakeTimers();
-      
+
       jest.advanceTimersByTime(1000);
-      
+
       expect(window.ModifierBox.show).toHaveBeenCalled();
-      
+
       jest.useRealTimers();
     });
 
@@ -594,17 +585,23 @@ describe('Roll20 Integration Module', () => {
       const mockElement = {
         querySelector: jest.fn().mockReturnValue({
           value: '0',
-          querySelectorAll: jest.fn().mockReturnValue([{
-            querySelector: jest.fn().mockReturnValue({ value: '3' })
-          }])
-        })
+          querySelectorAll: jest.fn().mockReturnValue([
+            {
+              querySelector: jest.fn().mockReturnValue({ value: '3' }),
+            },
+          ]),
+        }),
       };
       window.ModifierBox.getElement.mockReturnValue(mockElement);
 
-      mockMessageListener({ 
-        action: 'setModifier', 
-        modifier: '5' 
-      }, null, jest.fn());
+      mockMessageListener(
+        {
+          action: 'setModifier',
+          modifier: '5',
+        },
+        null,
+        jest.fn()
+      );
 
       expect(window.pixelsModifier).toBe('5');
     });

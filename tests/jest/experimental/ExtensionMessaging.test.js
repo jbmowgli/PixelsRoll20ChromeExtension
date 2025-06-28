@@ -14,11 +14,11 @@ describe('Extension Messaging System', () => {
       runtime: {
         sendMessage: jest.fn(),
         onMessage: {
-          addListener: jest.fn((listener) => {
+          addListener: jest.fn(listener => {
             messageListener = listener;
-          })
-        }
-      }
+          }),
+        },
+      },
     };
 
     global.chrome = mockChrome;
@@ -31,12 +31,14 @@ describe('Extension Messaging System', () => {
       getElement: jest.fn().mockReturnValue({
         querySelector: jest.fn().mockReturnValue({
           value: '0',
-          querySelectorAll: jest.fn().mockReturnValue([{
-            querySelector: jest.fn().mockReturnValue({ value: '0' })
-          }])
-        })
+          querySelectorAll: jest.fn().mockReturnValue([
+            {
+              querySelector: jest.fn().mockReturnValue({ value: '0' }),
+            },
+          ]),
+        }),
       }),
-      syncGlobalVars: jest.fn()
+      syncGlobalVars: jest.fn(),
     };
 
     // Mock console
@@ -64,7 +66,7 @@ describe('Extension Messaging System', () => {
 
     test('should handle Chrome API not available', () => {
       delete global.chrome;
-      
+
       // Should not throw when Chrome API is missing
       expect(() => {
         delete window.roll20PixelsLoaded;
@@ -74,7 +76,7 @@ describe('Extension Messaging System', () => {
 
     test('should handle partial Chrome API availability', () => {
       global.chrome = { runtime: {} }; // Missing onMessage
-      
+
       expect(() => {
         delete window.roll20PixelsLoaded;
         require('../../../src/content/roll20.js');
@@ -89,13 +91,13 @@ describe('Extension Messaging System', () => {
 
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'No Pixel connected'
+        text: 'No Pixel connected',
       });
     });
 
     test('should send arbitrary data messages', () => {
       const testData = { action: 'test', value: 123 };
-      
+
       window.sendMessageToExtension(testData);
 
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith(testData);
@@ -140,7 +142,7 @@ describe('Extension Messaging System', () => {
 
         expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
           action: 'showText',
-          text: 'No Pixel connected'
+          text: 'No Pixel connected',
         });
       });
 
@@ -151,7 +153,7 @@ describe('Extension Messaging System', () => {
 
         expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
           action: 'showText',
-          text: 'No Pixel connected'
+          text: 'No Pixel connected',
         });
       });
     });
@@ -159,29 +161,41 @@ describe('Extension Messaging System', () => {
     describe('setModifier action', () => {
       test('should update modifier value', () => {
         const testModifier = '7';
-        messageListener({ 
-          action: 'setModifier', 
-          modifier: testModifier 
-        }, null, jest.fn());
+        messageListener(
+          {
+            action: 'setModifier',
+            modifier: testModifier,
+          },
+          null,
+          jest.fn()
+        );
 
         expect(window.pixelsModifier).toBe(testModifier);
         expect(console.log).toHaveBeenCalledWith('Updated modifier: 7');
       });
 
       test('should handle undefined modifier', () => {
-        messageListener({ 
-          action: 'setModifier', 
-          modifier: undefined 
-        }, null, jest.fn());
+        messageListener(
+          {
+            action: 'setModifier',
+            modifier: undefined,
+          },
+          null,
+          jest.fn()
+        );
 
         expect(window.pixelsModifier).toBe('0'); // Default fallback
       });
 
       test('should handle null modifier', () => {
-        messageListener({ 
-          action: 'setModifier', 
-          modifier: null 
-        }, null, jest.fn());
+        messageListener(
+          {
+            action: 'setModifier',
+            modifier: null,
+          },
+          null,
+          jest.fn()
+        );
 
         expect(window.pixelsModifier).toBe('0'); // Default fallback
       });
@@ -189,25 +203,33 @@ describe('Extension Messaging System', () => {
       test('should update modifier box when value changes', () => {
         const previousModifier = window.pixelsModifier;
         const newModifier = '5';
-        
-        messageListener({ 
-          action: 'setModifier', 
-          modifier: newModifier 
-        }, null, jest.fn());
+
+        messageListener(
+          {
+            action: 'setModifier',
+            modifier: newModifier,
+          },
+          null,
+          jest.fn()
+        );
 
         expect(window.pixelsModifier).toBe(newModifier);
-        
+
         // Should attempt to update the modifier box UI
         expect(window.ModifierBox.getElement).toHaveBeenCalled();
       });
 
       test('should not update modifier box if value unchanged', () => {
         const currentModifier = window.pixelsModifier;
-        
-        messageListener({ 
-          action: 'setModifier', 
-          modifier: currentModifier 
-        }, null, jest.fn());
+
+        messageListener(
+          {
+            action: 'setModifier',
+            modifier: currentModifier,
+          },
+          null,
+          jest.fn()
+        );
 
         // Should not call getElement if value didn't change
         expect(window.ModifierBox.getElement).not.toHaveBeenCalled();
@@ -218,13 +240,15 @@ describe('Extension Messaging System', () => {
       test('should call showModifierBox function', () => {
         messageListener({ action: 'showModifier' }, null, jest.fn());
 
-        expect(console.log).toHaveBeenCalledWith('Received showModifier message');
+        expect(console.log).toHaveBeenCalledWith(
+          'Received showModifier message'
+        );
         expect(window.ModifierBox.show).toHaveBeenCalled();
       });
 
       test('should handle showModifier when ModifierBox not available', () => {
         delete window.ModifierBox;
-        
+
         expect(() => {
           messageListener({ action: 'showModifier' }, null, jest.fn());
         }).not.toThrow();
@@ -235,13 +259,15 @@ describe('Extension Messaging System', () => {
       test('should call hideModifierBox function', () => {
         messageListener({ action: 'hideModifier' }, null, jest.fn());
 
-        expect(console.log).toHaveBeenCalledWith('Received hideModifier message');
+        expect(console.log).toHaveBeenCalledWith(
+          'Received hideModifier message'
+        );
         expect(window.ModifierBox.hide).toHaveBeenCalled();
       });
 
       test('should handle hideModifier when ModifierBox not available', () => {
         delete window.ModifierBox;
-        
+
         expect(() => {
           messageListener({ action: 'hideModifier' }, null, jest.fn());
         }).not.toThrow();
@@ -279,7 +305,7 @@ describe('Extension Messaging System', () => {
         // Should send updated status after disconnection
         expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
           action: 'showText',
-          text: 'No Pixel connected'
+          text: 'No Pixel connected',
         });
       });
     });
@@ -316,7 +342,7 @@ describe('Extension Messaging System', () => {
       // Status is sent automatically on module load
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'No Pixel connected'
+        text: 'No Pixel connected',
       });
     });
 
@@ -325,7 +351,7 @@ describe('Extension Messaging System', () => {
 
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'No Pixel connected'
+        text: 'No Pixel connected',
       });
     });
   });
@@ -336,22 +362,14 @@ describe('Extension Messaging System', () => {
       const mockSendResponse = jest.fn();
 
       expect(() => {
-        messageListener(
-          { action: 'getStatus' }, 
-          mockSender, 
-          mockSendResponse
-        );
+        messageListener({ action: 'getStatus' }, mockSender, mockSendResponse);
       }).not.toThrow();
     });
 
     test('should handle sendResponse callback', () => {
       const mockSendResponse = jest.fn();
 
-      messageListener(
-        { action: 'getStatus' }, 
-        null, 
-        mockSendResponse
-      );
+      messageListener({ action: 'getStatus' }, null, mockSendResponse);
 
       // The message handler doesn't explicitly call sendResponse
       // but it should handle it being provided
@@ -396,8 +414,13 @@ describe('Extension Messaging System', () => {
       // Process multiple messages simultaneously
       const promises = [
         () => messageListener({ action: 'getStatus' }, null, jest.fn()),
-        () => messageListener({ action: 'setModifier', modifier: '3' }, null, jest.fn()),
-        () => messageListener({ action: 'showModifier' }, null, jest.fn())
+        () =>
+          messageListener(
+            { action: 'setModifier', modifier: '3' },
+            null,
+            jest.fn()
+          ),
+        () => messageListener({ action: 'showModifier' }, null, jest.fn()),
       ];
 
       expect(() => {
@@ -411,18 +434,24 @@ describe('Extension Messaging System', () => {
       const mockElement = {
         querySelector: jest.fn().mockReturnValue({
           value: '0',
-          querySelectorAll: jest.fn().mockReturnValue([{
-            querySelector: jest.fn().mockReturnValue({ value: '0' })
-          }])
-        })
+          querySelectorAll: jest.fn().mockReturnValue([
+            {
+              querySelector: jest.fn().mockReturnValue({ value: '0' }),
+            },
+          ]),
+        }),
       };
-      
+
       window.ModifierBox.getElement.mockReturnValue(mockElement);
 
-      messageListener({ 
-        action: 'setModifier', 
-        modifier: '8' 
-      }, null, jest.fn());
+      messageListener(
+        {
+          action: 'setModifier',
+          modifier: '8',
+        },
+        null,
+        jest.fn()
+      );
 
       expect(window.ModifierBox.getElement).toHaveBeenCalled();
     });
@@ -433,7 +462,7 @@ describe('Extension Messaging System', () => {
 
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'No Pixel connected'
+        text: 'No Pixel connected',
       });
     });
   });

@@ -11,12 +11,14 @@ The Pixels Roll20 Integration extension ("the Extension") is designed to connect
 **The Extension does NOT collect, store, or transmit any personal data.**
 
 ### What the Extension Does:
+
 - Connects to Pixels dice via Bluetooth (local connection only)
 - Reads dice roll results from connected devices
 - Injects roll results into Roll20 chat
 - Stores modifier settings locally in your browser session
 
 ### What the Extension Does NOT Do:
+
 - Collect personal information
 - Track user behavior
 - Store data on external servers
@@ -26,12 +28,14 @@ The Pixels Roll20 Integration extension ("the Extension") is designed to connect
 ## Data Storage
 
 ### Local Storage Only
+
 - Modifier box settings are stored locally in your browser
 - No data is synchronized across devices
 - No data is sent to external servers
 - All data is cleared when you close your browser
 
 ### Bluetooth Data
+
 - Dice roll data is processed locally and immediately injected into Roll20
 - No dice data is stored or logged
 - Bluetooth connections are direct between your device and the dice
@@ -41,16 +45,19 @@ The Pixels Roll20 Integration extension ("the Extension") is designed to connect
 The Extension requests the following permissions:
 
 ### activeTab
+
 - **Purpose**: Interact with Roll20 pages
 - **Scope**: Only active Roll20 tabs
 - **Usage**: Inject dice roll results into Roll20 chat
 
 ### scripting
+
 - **Purpose**: Execute content scripts on Roll20 pages
 - **Scope**: Roll20 domains only
 - **Usage**: Enable modifier box and dice integration
 
 ### bluetooth
+
 - **Purpose**: Connect to Pixels dice
 - **Scope**: Pixels dice devices only
 - **Usage**: Receive dice roll data via Bluetooth
@@ -58,11 +65,13 @@ The Extension requests the following permissions:
 ## Third-Party Services
 
 ### Roll20
+
 - The Extension interacts with Roll20's interface to display dice results
 - No data is sent to Roll20 beyond normal chat messages
 - Extension follows Roll20's existing privacy practices
 
 ### Pixels Dice
+
 - Direct Bluetooth connection to dice hardware
 - No data is sent to Pixels servers
 - Connection is local and temporary
@@ -81,6 +90,7 @@ We may update this privacy policy to reflect changes in the Extension. Any chang
 ## Contact
 
 For questions about this privacy policy or the Extension's data practices, please:
+
 - Open an issue on the project's GitHub repository
 - Review the source code (fully open source)
 

@@ -7,7 +7,7 @@
 global.console = {
   log: jest.fn(),
   error: jest.fn(),
-  warn: jest.fn()
+  warn: jest.fn(),
 };
 
 describe('Roll20.js - Simple Integration Tests', () => {
@@ -25,22 +25,22 @@ describe('Roll20.js - Simple Integration Tests', () => {
       runtime: {
         sendMessage: jest.fn(),
         onMessage: {
-          addListener: jest.fn((listener) => {
+          addListener: jest.fn(listener => {
             mockMessageListener = listener;
-          })
-        }
-      }
+          }),
+        },
+      },
     };
 
     // Create Bluetooth mock
     mockBluetooth = {
-      requestDevice: jest.fn()
+      requestDevice: jest.fn(),
     };
 
     // Set global mocks
     global.chrome = mockChrome;
     global.navigator = {
-      bluetooth: mockBluetooth
+      bluetooth: mockBluetooth,
     };
 
     // Mock DOM with proper jest functions
@@ -48,12 +48,12 @@ describe('Roll20.js - Simple Integration Tests', () => {
       createElement: jest.fn(() => ({
         setAttribute: jest.fn(),
         style: {},
-        appendChild: jest.fn()
+        appendChild: jest.fn(),
       })),
       head: { appendChild: jest.fn() },
       body: { appendChild: jest.fn() },
       querySelector: jest.fn(() => null),
-      querySelectorAll: jest.fn(() => [])
+      querySelectorAll: jest.fn(() => []),
     };
 
     // Mock window
@@ -62,7 +62,7 @@ describe('Roll20.js - Simple Integration Tests', () => {
       navigator: { bluetooth: mockBluetooth },
       ModifierBox: undefined,
       pixelsModifier: undefined,
-      pixelsModifierName: undefined
+      pixelsModifierName: undefined,
     };
 
     // Mock timers
@@ -92,24 +92,32 @@ describe('Roll20.js - Simple Integration Tests', () => {
 
     test('should handle setModifier message', () => {
       expect(() => {
-        mockMessageListener({ action: 'setModifier', modifier: '5' }, null, jest.fn());
+        mockMessageListener(
+          { action: 'setModifier', modifier: '5' },
+          null,
+          jest.fn()
+        );
       }).not.toThrow();
-      
+
       expect(global.window.pixelsModifier).toBe('5');
     });
 
     test('should handle setModifier with undefined value', () => {
       expect(() => {
-        mockMessageListener({ action: 'setModifier', modifier: undefined }, null, jest.fn());
+        mockMessageListener(
+          { action: 'setModifier', modifier: undefined },
+          null,
+          jest.fn()
+        );
       }).not.toThrow();
-      
+
       expect(global.window.pixelsModifier).toBe('0'); // Default fallback
     });
 
     test('should handle showModifier message', () => {
       global.window.ModifierBox = {
         show: jest.fn(),
-        isInitialized: jest.fn(() => true)
+        isInitialized: jest.fn(() => true),
       };
 
       expect(() => {
@@ -121,7 +129,7 @@ describe('Roll20.js - Simple Integration Tests', () => {
 
     test('should handle hideModifier message', () => {
       global.window.ModifierBox = {
-        hide: jest.fn()
+        hide: jest.fn(),
       };
 
       expect(() => {
@@ -166,15 +174,15 @@ describe('Roll20.js - Simple Integration Tests', () => {
             getPrimaryService: jest.fn().mockResolvedValue({
               getCharacteristic: jest.fn().mockResolvedValue({
                 startNotifications: jest.fn().mockResolvedValue(undefined),
-                addEventListener: jest.fn()
-              })
-            })
-          })
-        }
+                addEventListener: jest.fn(),
+              }),
+            }),
+          }),
+        },
       };
 
       mockBluetooth.requestDevice.mockResolvedValue(mockDevice);
-      
+
       require('../../src/content/roll20.js');
     });
 
@@ -188,7 +196,9 @@ describe('Roll20.js - Simple Integration Tests', () => {
     });
 
     test('should handle Bluetooth errors gracefully', () => {
-      mockBluetooth.requestDevice.mockRejectedValue(new Error('Bluetooth unavailable'));
+      mockBluetooth.requestDevice.mockRejectedValue(
+        new Error('Bluetooth unavailable')
+      );
 
       expect(() => {
         mockMessageListener({ action: 'connect' }, null, jest.fn());
@@ -226,7 +236,7 @@ describe('Roll20.js - Simple Integration Tests', () => {
       global.window.ModifierBox = {
         show: jest.fn(),
         hide: jest.fn(),
-        isInitialized: jest.fn(() => false)
+        isInitialized: jest.fn(() => false),
       };
 
       expect(() => {
@@ -238,7 +248,7 @@ describe('Roll20.js - Simple Integration Tests', () => {
       global.window.ModifierBox = {
         show: jest.fn(),
         hide: jest.fn(),
-        isInitialized: jest.fn(() => true)
+        isInitialized: jest.fn(() => true),
       };
 
       mockMessageListener({ action: 'showModifier' }, null, jest.fn());
@@ -256,10 +266,10 @@ describe('Roll20.js - Simple Integration Tests', () => {
 
     test('should send messages to extension', () => {
       global.window.sendMessageToExtension({ action: 'test', data: 'value' });
-      
+
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'test',
-        data: 'value'
+        data: 'value',
       });
     });
 
@@ -301,7 +311,7 @@ describe('Roll20.js - Simple Integration Tests', () => {
       // Status is sent automatically on module load
       expect(mockChrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'showText',
-        text: 'No Pixel connected'
+        text: 'No Pixel connected',
       });
     });
   });
@@ -350,7 +360,11 @@ describe('Roll20.js - Simple Integration Tests', () => {
     test('should handle missing DOM elements', () => {
       // Mock the DOM functions to return null (already set up in beforeEach)
       expect(() => {
-        mockMessageListener({ action: 'setModifier', modifier: '3' }, null, jest.fn());
+        mockMessageListener(
+          { action: 'setModifier', modifier: '3' },
+          null,
+          jest.fn()
+        );
       }).not.toThrow();
     });
 
@@ -362,7 +376,11 @@ describe('Roll20.js - Simple Integration Tests', () => {
       });
 
       expect(() => {
-        mockMessageListener({ action: 'setModifier', modifier: '3' }, null, jest.fn());
+        mockMessageListener(
+          { action: 'setModifier', modifier: '3' },
+          null,
+          jest.fn()
+        );
       }).not.toThrow();
 
       // Restore original

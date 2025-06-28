@@ -4,12 +4,12 @@
 // Mock Chrome Extension APIs
 global.chrome = {
   runtime: {
-    getURL: jest.fn((path) => `chrome-extension://mock-id/${path}`),
+    getURL: jest.fn(path => `chrome-extension://mock-id/${path}`),
     sendMessage: jest.fn(),
     onMessage: {
-      addListener: jest.fn()
-    }
-  }
+      addListener: jest.fn(),
+    },
+  },
 };
 
 // Mock window.ModifierBox and related globals that would be set by other modules
@@ -18,7 +18,7 @@ global.window = global.window || {};
 // Helper function to reset all mocks between tests
 global.resetMocks = () => {
   jest.clearAllMocks();
-  
+
   // Reset global state
   delete window.ModifierBox;
   delete window.ModifierBoxThemeManager;
@@ -27,7 +27,7 @@ global.resetMocks = () => {
   delete window.ThemeDetector;
   delete window.pixelsModifier;
   delete window.pixelsModifierName;
-  
+
   // Clear the DOM
   document.body.innerHTML = '';
   document.head.innerHTML = '';
@@ -38,7 +38,7 @@ global.console = {
   ...console,
   log: jest.fn(),
   warn: jest.fn(),
-  error: jest.fn()
+  error: jest.fn(),
 };
 
 // Helper to create mock elements
@@ -69,8 +69,8 @@ global.navigator = {
   ...global.navigator,
   bluetooth: {
     requestDevice: jest.fn(),
-    getAvailability: jest.fn(() => Promise.resolve(true))
-  }
+    getAvailability: jest.fn(() => Promise.resolve(true)),
+  },
 };
 
 // Run before each test

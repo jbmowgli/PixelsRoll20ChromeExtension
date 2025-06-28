@@ -14,7 +14,7 @@ function loadModule(modulePath) {
 describe('ModifierBox Theme Manager', () => {
   beforeEach(() => {
     resetMocks();
-    
+
     // Mock ThemeDetector
     window.ThemeDetector = {
       getThemeColors: jest.fn(() => ({
@@ -25,15 +25,15 @@ describe('ModifierBox Theme Manager', () => {
         input: '#333333',
         inputBorder: '#555555',
         button: '#444444',
-        border: '#555555'
+        border: '#555555',
       })),
       onThemeChange: jest.fn(() => ({
-        disconnect: jest.fn()
-      }))
+        disconnect: jest.fn(),
+      })),
     };
-    
+
     // Load the theme manager module
-    loadModule('src/content/ModifierBox/themeManager.js');
+    loadModule('src/content/modifierBox/themeManager.js');
   });
 
   describe('Module Initialization', () => {
@@ -44,11 +44,21 @@ describe('ModifierBox Theme Manager', () => {
 
     test('should expose correct API methods', () => {
       expect(window.ModifierBoxThemeManager.addStyles).toBeInstanceOf(Function);
-      expect(window.ModifierBoxThemeManager.updateTheme).toBeInstanceOf(Function);
-      expect(window.ModifierBoxThemeManager.startThemeMonitoring).toBeInstanceOf(Function);
-      expect(window.ModifierBoxThemeManager.stopThemeMonitoring).toBeInstanceOf(Function);
-      expect(window.ModifierBoxThemeManager.forceThemeRefresh).toBeInstanceOf(Function);
-      expect(window.ModifierBoxThemeManager.forceElementUpdates).toBeInstanceOf(Function);
+      expect(window.ModifierBoxThemeManager.updateTheme).toBeInstanceOf(
+        Function
+      );
+      expect(
+        window.ModifierBoxThemeManager.startThemeMonitoring
+      ).toBeInstanceOf(Function);
+      expect(window.ModifierBoxThemeManager.stopThemeMonitoring).toBeInstanceOf(
+        Function
+      );
+      expect(window.ModifierBoxThemeManager.forceThemeRefresh).toBeInstanceOf(
+        Function
+      );
+      expect(window.ModifierBoxThemeManager.forceElementUpdates).toBeInstanceOf(
+        Function
+      );
     });
   });
 
@@ -59,72 +69,84 @@ describe('ModifierBox Theme Manager', () => {
         loadMultipleCSS: jest.fn(() => Promise.resolve()),
         loadCSS: jest.fn(() => Promise.resolve()),
         removeCSS: jest.fn(),
-        isLoaded: jest.fn(() => false)
+        isLoaded: jest.fn(() => false),
       };
     });
 
     test('should attempt to load external CSS files when CSSLoader is available', async () => {
       window.ModifierBoxThemeManager.addStyles();
-      
+
       // Should attempt to load CSS files
       expect(window.CSSLoader.loadMultipleCSS).toHaveBeenCalledWith([
         expect.objectContaining({
-          path: 'src/content/ModifierBox/styles/modifierBox.css',
-          id: 'pixels-modifier-box-base-styles'
+          path: 'src/content/modifierBox/styles/modifierBox.css',
+          id: 'pixels-modifier-box-base-styles',
         }),
         expect.objectContaining({
-          path: 'src/content/ModifierBox/styles/minimized.css',
-          id: 'pixels-modifier-box-minimized-styles'
+          path: 'src/content/modifierBox/styles/minimized.css',
+          id: 'pixels-modifier-box-minimized-styles',
         }),
         expect.objectContaining({
-          path: 'src/content/ModifierBox/styles/lightTheme.css',
-          id: 'pixels-modifier-box-light-theme-styles'
-        })
+          path: 'src/content/modifierBox/styles/lightTheme.css',
+          id: 'pixels-modifier-box-light-theme-styles',
+        }),
       ]);
     });
 
     test('should fall back to inline styles when CSSLoader is not available', () => {
       delete window.CSSLoader;
-      
+
       window.ModifierBoxThemeManager.addStyles();
-      
-      const styleElement = document.getElementById('pixels-modifier-box-styles-fallback');
+
+      const styleElement = document.getElementById(
+        'pixels-modifier-box-styles-fallback'
+      );
       expect(styleElement).toBeTruthy();
       expect(styleElement.tagName).toBe('STYLE');
       expect(styleElement.textContent).toContain('#pixels-modifier-box');
     });
 
     test('should fall back to inline styles when CSS loading fails', async () => {
-      window.CSSLoader.loadMultipleCSS = jest.fn(() => Promise.reject(new Error('CSS load failed')));
-      
+      window.CSSLoader.loadMultipleCSS = jest.fn(() =>
+        Promise.reject(new Error('CSS load failed'))
+      );
+
       window.ModifierBoxThemeManager.addStyles();
-      
+
       // Wait for promise to reject and fallback to execute
       await new Promise(resolve => setTimeout(resolve, 10));
-      
-      const styleElement = document.getElementById('pixels-modifier-box-styles-fallback');
+
+      const styleElement = document.getElementById(
+        'pixels-modifier-box-styles-fallback'
+      );
       expect(styleElement).toBeTruthy();
     });
 
     test('should not add fallback styles twice', () => {
       delete window.CSSLoader;
-      
+
       window.ModifierBoxThemeManager.addStyles();
       window.ModifierBoxThemeManager.addStyles();
-      
-      const styleElements = document.querySelectorAll('#pixels-modifier-box-styles-fallback');
+
+      const styleElements = document.querySelectorAll(
+        '#pixels-modifier-box-styles-fallback'
+      );
       expect(styleElements.length).toBe(1);
-      expect(console.log).toHaveBeenCalledWith("Fallback modifier box styles already added, skipping");
+      expect(console.log).toHaveBeenCalledWith(
+        'Fallback modifier box styles already added, skipping'
+      );
     });
 
     test('should include comprehensive CSS rules in fallback', () => {
       delete window.CSSLoader;
-      
+
       window.ModifierBoxThemeManager.addStyles();
-      
-      const styleElement = document.getElementById('pixels-modifier-box-styles-fallback');
+
+      const styleElement = document.getElementById(
+        'pixels-modifier-box-styles-fallback'
+      );
       const css = styleElement.textContent;
-      
+
       // Check for key CSS selectors
       expect(css).toContain('#pixels-modifier-box');
     });
@@ -132,7 +154,7 @@ describe('ModifierBox Theme Manager', () => {
 
   describe('updateTheme', () => {
     let mockModifierBox;
-    
+
     beforeEach(() => {
       mockModifierBox = document.createElement('div');
       mockModifierBox.id = 'pixels-modifier-box';
@@ -153,45 +175,55 @@ describe('ModifierBox Theme Manager', () => {
 
     test('should apply theme colors to modifier box elements', () => {
       window.ModifierBoxThemeManager.updateTheme(mockModifierBox);
-      
+
       // Check that styles were applied (we can't easily test the exact values due to browser differences)
       expect(window.ThemeDetector.getThemeColors).toHaveBeenCalled();
-      
+
       // Verify the theme update process was called
-      expect(console.log).toHaveBeenCalledWith("Updating modifier box theme...");
-      expect(console.log).toHaveBeenCalledWith("Theme update completed with immediate style application");
+      expect(console.log).toHaveBeenCalledWith(
+        'Updating modifier box theme...'
+      );
+      expect(console.log).toHaveBeenCalledWith(
+        'Theme update completed with immediate style application'
+      );
     });
 
     test('should handle null modifier box gracefully', () => {
       window.ModifierBoxThemeManager.updateTheme(null);
-      
-      expect(console.log).toHaveBeenCalledWith("updateTheme called but modifierBox is null");
+
+      expect(console.log).toHaveBeenCalledWith(
+        'updateTheme called but modifierBox is null'
+      );
     });
 
     test('should use fallback colors when ThemeDetector is not available', () => {
       delete window.ThemeDetector;
-      
+
       window.ModifierBoxThemeManager.updateTheme(mockModifierBox);
-      
+
       // Should still complete without error
-      expect(console.log).toHaveBeenCalledWith("Theme update completed with immediate style application");
+      expect(console.log).toHaveBeenCalledWith(
+        'Theme update completed with immediate style application'
+      );
     });
 
     test('should force reflow on elements', () => {
-      const offsetHeightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(100);
-      
+      const offsetHeightSpy = jest
+        .spyOn(HTMLElement.prototype, 'offsetHeight', 'get')
+        .mockReturnValue(100);
+
       window.ModifierBoxThemeManager.updateTheme(mockModifierBox);
-      
+
       // Should trigger reflow
       expect(offsetHeightSpy).toHaveBeenCalled();
-      
+
       offsetHeightSpy.mockRestore();
     });
   });
 
   describe('forceElementUpdates', () => {
     let mockModifierBox;
-    
+
     beforeEach(() => {
       mockModifierBox = document.createElement('div');
       mockModifierBox.innerHTML = `
@@ -204,24 +236,26 @@ describe('ModifierBox Theme Manager', () => {
 
     test('should force style updates on input elements', () => {
       window.ModifierBoxThemeManager.forceElementUpdates(mockModifierBox);
-      
-      const inputs = mockModifierBox.querySelectorAll('input[type="text"], input[type="number"]');
+
+      const inputs = mockModifierBox.querySelectorAll(
+        'input[type="text"], input[type="number"]'
+      );
       expect(inputs.length).toBeGreaterThan(0);
-      
+
       // Verify the function completes without error
       expect(window.ThemeDetector.getThemeColors).toHaveBeenCalled();
     });
 
     test('should force style updates on remove buttons', () => {
       window.ModifierBoxThemeManager.forceElementUpdates(mockModifierBox);
-      
+
       const buttons = mockModifierBox.querySelectorAll('.remove-row-btn');
       expect(buttons.length).toBeGreaterThan(0);
     });
 
     test('should handle empty modifier box', () => {
       const emptyBox = document.createElement('div');
-      
+
       expect(() => {
         window.ModifierBoxThemeManager.forceElementUpdates(emptyBox);
       }).not.toThrow();
@@ -237,29 +271,33 @@ describe('ModifierBox Theme Manager', () => {
   describe('Theme Monitoring', () => {
     test('should start theme monitoring when ThemeDetector is available', () => {
       const mockCallback = jest.fn();
-      
+
       window.ModifierBoxThemeManager.startThemeMonitoring(mockCallback);
-      
+
       expect(window.ThemeDetector.onThemeChange).toHaveBeenCalled();
-      expect(console.log).toHaveBeenCalledWith("Starting theme monitoring for modifier box...");
+      expect(console.log).toHaveBeenCalledWith(
+        'Starting theme monitoring for modifier box...'
+      );
     });
 
     test('should not start monitoring if ThemeDetector is unavailable', () => {
       delete window.ThemeDetector;
       const mockCallback = jest.fn();
-      
+
       window.ModifierBoxThemeManager.startThemeMonitoring(mockCallback);
-      
+
       // Should not throw error or log starting message
-      expect(console.log).not.toHaveBeenCalledWith("Starting theme monitoring for modifier box...");
+      expect(console.log).not.toHaveBeenCalledWith(
+        'Starting theme monitoring for modifier box...'
+      );
     });
 
     test('should not start multiple observers', () => {
       const mockCallback = jest.fn();
-      
+
       window.ModifierBoxThemeManager.startThemeMonitoring(mockCallback);
       window.ModifierBoxThemeManager.startThemeMonitoring(mockCallback);
-      
+
       // Should only call onThemeChange once
       expect(window.ThemeDetector.onThemeChange).toHaveBeenCalledTimes(1);
     });
@@ -267,13 +305,15 @@ describe('ModifierBox Theme Manager', () => {
     test('should stop theme monitoring', () => {
       const mockObserver = { disconnect: jest.fn() };
       window.ThemeDetector.onThemeChange.mockReturnValue(mockObserver);
-      
+
       const mockCallback = jest.fn();
       window.ModifierBoxThemeManager.startThemeMonitoring(mockCallback);
       window.ModifierBoxThemeManager.stopThemeMonitoring();
-      
+
       expect(mockObserver.disconnect).toHaveBeenCalled();
-      expect(console.log).toHaveBeenCalledWith("Stopping theme monitoring for modifier box...");
+      expect(console.log).toHaveBeenCalledWith(
+        'Stopping theme monitoring for modifier box...'
+      );
     });
 
     test('should handle stopping monitoring when no observer exists', () => {
@@ -285,7 +325,7 @@ describe('ModifierBox Theme Manager', () => {
 
   describe('Force Theme Refresh', () => {
     let mockModifierBox;
-    
+
     beforeEach(() => {
       mockModifierBox = document.createElement('div');
       document.body.appendChild(mockModifierBox);
@@ -297,19 +337,19 @@ describe('ModifierBox Theme Manager', () => {
         <input type="text" class="test-input" />
         <button class="remove-row-btn test-button">×</button>
       `;
-      
+
       const testInput = mockModifierBox.querySelector('.test-input');
       const testButton = mockModifierBox.querySelector('.test-button');
-      
+
       // Store original styles
       const originalInputColor = testInput.style.color;
       const originalButtonColor = testButton.style.color;
-      
+
       window.ModifierBoxThemeManager.forceThemeRefresh(mockModifierBox);
-      
+
       // Verify the console message was logged
-      expect(console.log).toHaveBeenCalledWith("Forcing theme refresh...");
-      
+      expect(console.log).toHaveBeenCalledWith('Forcing theme refresh...');
+
       // The function should run without errors
       expect(mockModifierBox).toBeTruthy();
     });
@@ -317,7 +357,9 @@ describe('ModifierBox Theme Manager', () => {
 
   describe('Integration', () => {
     test('should log initialization message', () => {
-      expect(console.log).toHaveBeenCalledWith("ModifierBoxThemeManager module initialized");
+      expect(console.log).toHaveBeenCalledWith(
+        'ModifierBoxThemeManager module initialized'
+      );
     });
 
     test('should work with different theme color schemes', () => {
@@ -329,20 +371,23 @@ describe('ModifierBox Theme Manager', () => {
         input: '#ffffff',
         inputBorder: '#cccccc',
         button: '#f8f9fa',
-        border: '#dddddd'
+        border: '#dddddd',
       };
-      
+
       window.ThemeDetector.getThemeColors.mockReturnValue(lightTheme);
-      
+
       const mockBox = document.createElement('div');
       mockBox.innerHTML = '<input type="text">';
       document.body.appendChild(mockBox);
-      
+
       expect(() => {
         window.ModifierBoxThemeManager.updateTheme(mockBox);
       }).not.toThrow();
-      
-      expect(console.log).toHaveBeenCalledWith("Using theme colors:", lightTheme);
+
+      expect(console.log).toHaveBeenCalledWith(
+        'Using theme colors:',
+        lightTheme
+      );
     });
   });
 });
