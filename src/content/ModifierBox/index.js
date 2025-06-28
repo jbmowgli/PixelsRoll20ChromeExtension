@@ -132,15 +132,21 @@
             return;
         }
 
+        // Check if already setup to prevent duplicate event listeners
+        if (modifierBox.hasAttribute('data-components-setup')) {
+            console.log("Components already setup, skipping");
+            return;
+        }
+
         // Add CSS styles using theme manager
         window.ModifierBoxThemeManager.addStyles();
 
         // Setup drag functionality
         window.ModifierBoxDragHandler.setupDragFunctionality(modifierBox);
 
-        // Set fixed position
-        modifierBox.style.top = '100px';
-        modifierBox.style.left = (window.innerWidth - 420) + 'px'; // 400px width + 20px margin
+        // Set fixed position - top left corner
+        modifierBox.style.top = '20px';
+        modifierBox.style.left = '60px'; 
         modifierBox.style.right = 'auto';
 
         // Add close and minimize functionality
@@ -148,15 +154,36 @@
         const minimizeBtn = modifierBox.querySelector('.pixels-minimize');
         
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
+            console.log("Close button found, adding event listener");
+            closeBtn.addEventListener('click', (e) => {
+                console.log("Close button clicked - hiding modifier box");
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Debug: log current state before hiding
+                console.log("Before hide - display:", modifierBox.style.display, "isVisible:", isModifierBoxVisible);
+                
                 hideModifierBox();
+                
+                // Debug: log state after hiding
+                setTimeout(() => {
+                    console.log("After hide - display:", modifierBox.style.display, "isVisible:", isModifierBoxVisible);
+                }, 10);
             });
+        } else {
+            console.error("Close button not found!");
         }
 
         if (minimizeBtn) {
-            minimizeBtn.addEventListener('click', () => {
+            console.log("Minimize button found, adding event listener");
+            minimizeBtn.addEventListener('click', (e) => {
+                console.log("Minimize button clicked");
+                e.preventDefault();
+                e.stopPropagation();
                 modifierBox.classList.toggle('minimized');
             });
+        } else {
+            console.error("Minimize button not found!");
         }
 
         // Setup row management with callback
@@ -171,6 +198,10 @@
 
         // Update header to show initial modifier
         window.ModifierBoxRowManager.updateSelectedModifier(modifierBox);
+        
+        // Mark as setup
+        modifierBox.setAttribute('data-components-setup', 'true');
+        console.log("Components setup completed");
     }
 
     function showModifierBox() {
@@ -185,12 +216,24 @@
             }
         } else {
             console.log("Modifier box already exists, showing it");
-            modifierBox.style.display = 'block';
+            modifierBox.style.setProperty('display', 'block', 'important');
             isModifierBoxVisible = true;
-            // Ensure fixed position
-            modifierBox.style.top = '100px';
-            modifierBox.style.left = (window.innerWidth - 420) + 'px'; // 400px width + 20px margin
+            
+            // Only reset position if it's not been set or if it's at 0,0 (which means lost)
+            const currentTop = parseInt(modifierBox.style.top) || 0;
+            const currentLeft = parseInt(modifierBox.style.left) || 0;
+            
+            if (currentTop <= 0 || currentLeft <= 0 || 
+                currentLeft > window.innerWidth || currentTop > window.innerHeight) {
+                console.log("Resetting position - current position invalid");
+                modifierBox.style.top = '20px';
+                modifierBox.style.left = '20px';
+            } else {
+                console.log("Keeping existing position:", currentLeft, currentTop);
+            }
             modifierBox.style.right = 'auto';
+            modifierBox.style.bottom = 'auto';
+            
             // Force theme update to ensure correct colors are applied
             if (window.ModifierBoxThemeManager) {
                 window.ModifierBoxThemeManager.updateTheme(modifierBox);
@@ -219,11 +262,13 @@
     function hideModifierBox() {
         console.log("hideModifierBox called");
         if (modifierBox) {
-            modifierBox.style.display = 'none';
+            console.log("Hiding modifier box");
+            // Use setProperty with important to ensure it overrides any CSS
+            modifierBox.style.setProperty('display', 'none', 'important');
             isModifierBoxVisible = false;
-            console.log("Modifier box hidden");
+            console.log("Modifier box hidden successfully - display set to:", modifierBox.style.display);
         } else {
-            console.log("Cannot hide - modifierBox is null");
+            console.error("Cannot hide - modifierBox is null");
         }
     }
 

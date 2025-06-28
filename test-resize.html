@@ -47,6 +47,7 @@
         <button class="test-button" onclick="showModifierBox()">Show Modifier Box</button>
         <button class="test-button" onclick="hideModifierBox()">Hide Modifier Box</button>
         <button class="test-button" onclick="testResize()">Test Resize</button>
+        <button class="test-button" onclick="testCloseButton()">Test Close Button</button>
     </div>
 
     <!-- Include all the required modules -->
@@ -118,6 +119,47 @@
                         alert("❌ Programmatic resize failed. Check console for details.");
                     }
                 }, 100);
+            } else {
+                alert("Please create the modifier box first!");
+            }
+        }
+
+        function testCloseButton() {
+            const box = document.getElementById('pixels-modifier-box');
+            if (box) {
+                console.log("=== CLOSE BUTTON TEST ===");
+                console.log("Box current state:");
+                console.log("- display:", box.style.display);
+                console.log("- computed display:", getComputedStyle(box).display);
+                console.log("- isVisible via API:", window.ModifierBox.isVisible());
+                
+                const closeBtn = box.querySelector('.pixels-close');
+                if (closeBtn) {
+                    console.log("Close button found:", closeBtn);
+                    console.log("Simulating close button click...");
+                    
+                    // Test manual close first
+                    closeBtn.click();
+                    
+                    // Check if box is hidden after a short delay
+                    setTimeout(() => {
+                        console.log("After click:");
+                        console.log("- display:", box.style.display);
+                        console.log("- computed display:", getComputedStyle(box).display);
+                        console.log("- isVisible via API:", window.ModifierBox.isVisible());
+                        
+                        const isHidden = box.style.display === 'none' || getComputedStyle(box).display === 'none';
+                        if (isHidden) {
+                            alert("✅ Close button working correctly!");
+                        } else {
+                            alert("❌ Close button not working. Check console for details.");
+                            console.log("FAILED: Box should be hidden but isn't");
+                        }
+                    }, 100);
+                } else {
+                    alert("❌ Close button not found in the modifier box!");
+                    console.log("Available buttons:", box.querySelectorAll('button'));
+                }
             } else {
                 alert("Please create the modifier box first!");
             }

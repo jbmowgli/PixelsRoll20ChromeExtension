@@ -68,10 +68,10 @@
         
         // Set initial position if not already set
         if (!modifierBox.style.left || modifierBox.style.left === 'auto') {
-            modifierBox.style.left = (window.innerWidth - 420) + 'px';
+            modifierBox.style.left = '20px';
         }
         if (!modifierBox.style.top || modifierBox.style.top === 'auto') {
-            modifierBox.style.top = '100px';
+            modifierBox.style.top = '20px';
         }
         modifierBox.style.right = 'auto';
         modifierBox.style.bottom = 'auto';
@@ -88,7 +88,14 @@
         // Drag functionality
         header.addEventListener('mousedown', (e) => {
             // Skip if clicking on buttons or other interactive elements
-            if (e.target.tagName === 'BUTTON' || e.target === resizeHandle) return;
+            if (e.target.tagName === 'BUTTON' || 
+                e.target.classList.contains('pixels-close') ||
+                e.target.classList.contains('pixels-minimize') ||
+                e.target.classList.contains('add-modifier-btn') ||
+                e.target === resizeHandle ||
+                e.target.closest('button')) {
+                return;
+            }
             
             isDragging = true;
             const rect = modifierBox.getBoundingClientRect();
@@ -145,14 +152,6 @@
                 const constrainedWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
                 const constrainedHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
                 
-                // Debug logging for resize
-                console.log("Resize:", {
-                    delta: { x: deltaX, y: deltaY },
-                    new: { width: newWidth, height: newHeight },
-                    constrained: { width: constrainedWidth, height: constrainedHeight },
-                    constraints: { minWidth, minHeight, maxWidth, maxHeight }
-                });
-                
                 // Use setProperty with important flag to override CSS !important rules
                 modifierBox.style.setProperty('width', constrainedWidth + 'px', 'important');
                 modifierBox.style.setProperty('height', constrainedHeight + 'px', 'important');
@@ -169,14 +168,6 @@
         }
 
         function onMouseUp() {
-            if (isDragging) {
-                console.log("Drag completed");
-            }
-            if (isResizing) {
-                const rect = modifierBox.getBoundingClientRect();
-                console.log("Resize completed. New dimensions:", rect.width, "x", rect.height);
-            }
-            
             isDragging = false;
             isResizing = false;
             document.removeEventListener('mousemove', onMouseMove);
