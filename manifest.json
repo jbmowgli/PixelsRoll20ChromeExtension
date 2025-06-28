@@ -24,7 +24,21 @@
   "content_scripts": [
     {
       "matches": ["https://roll20.net/editor/*", "https://app.roll20.net/editor/*"],
-      "js": ["src/content/theme-detector.js", "src/content/modifierBox.js", "src/content/roll20.js"]
+      "js": [
+        "src/content/theme-detector.js", 
+        "src/content/modules/themeManager.js",
+        "src/content/modules/dragHandler.js",
+        "src/content/modules/positionManager.js",
+        "src/content/modules/rowManager.js",
+        "src/content/modifierBox.js", 
+        "src/content/roll20.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/images/*"],
+      "matches": ["https://roll20.net/*", "https://app.roll20.net/*"]
     }
   ],
   "manifest_version": 3,
