@@ -26,6 +26,7 @@
       "matches": ["https://roll20.net/editor/*", "https://app.roll20.net/editor/*"],
       "js": [
         "src/content/Common/themeDetector.js", 
+        "src/content/Common/cssLoader.js",
         "src/content/ModifierBox/themeManager.js",
         "src/content/ModifierBox/dragHandler.js",
         "src/content/ModifierBox/rowManager.js",
@@ -36,7 +37,10 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["assets/images/*"],
+      "resources": [
+        "assets/images/*",
+        "src/content/ModifierBox/styles/*.css"
+      ],
       "matches": ["https://roll20.net/*", "https://app.roll20.net/*"]
     }
   ],

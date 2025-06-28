@@ -201,10 +201,12 @@
                     
                     // Minimize
                     modifierBox.classList.add('minimized');
-                    // Force the minimized width to override any inline styles
-                    modifierBox.style.setProperty('width', '160px', 'important');
-                    modifierBox.style.setProperty('min-width', '180px', 'important');
-                    modifierBox.style.setProperty('max-width', '180px', 'important');
+                    // Force the minimized dimensions to override any inline styles
+                    modifierBox.style.setProperty('width', '200px', 'important');
+                    modifierBox.style.setProperty('min-width', '200px', 'important');
+                    modifierBox.style.setProperty('max-width', '200px', 'important');
+                    modifierBox.style.setProperty('height', 'auto', 'important');
+                    modifierBox.style.setProperty('min-height', 'auto', 'important');
                     minimizeBtn.textContent = '+';
                     minimizeBtn.title = 'Restore';
                     console.log("Minimized - stored dimensions:", rect.width, "x", rect.height);
@@ -218,6 +220,7 @@
                     // Clear forced minimized styles
                     modifierBox.style.removeProperty('min-width');
                     modifierBox.style.removeProperty('max-width');
+                    modifierBox.style.removeProperty('min-height');
                     
                     // Restore dimensions if they were stored
                     if (originalWidth && originalHeight) {

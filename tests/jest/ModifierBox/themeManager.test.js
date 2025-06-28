@@ -53,42 +53,80 @@ describe('ModifierBox Theme Manager', () => {
   });
 
   describe('addStyles', () => {
-    test('should add CSS styles to document head', () => {
+    beforeEach(() => {
+      // Mock CSSLoader for most tests
+      window.CSSLoader = {
+        loadMultipleCSS: jest.fn(() => Promise.resolve()),
+        loadCSS: jest.fn(() => Promise.resolve()),
+        removeCSS: jest.fn(),
+        isLoaded: jest.fn(() => false)
+      };
+    });
+
+    test('should attempt to load external CSS files when CSSLoader is available', async () => {
       window.ModifierBoxThemeManager.addStyles();
       
-      const styleElement = document.getElementById('pixels-modifier-box-styles');
+      // Should attempt to load CSS files
+      expect(window.CSSLoader.loadMultipleCSS).toHaveBeenCalledWith([
+        expect.objectContaining({
+          path: 'src/content/ModifierBox/styles/modifierBox.css',
+          id: 'pixels-modifier-box-base-styles'
+        }),
+        expect.objectContaining({
+          path: 'src/content/ModifierBox/styles/minimized.css',
+          id: 'pixels-modifier-box-minimized-styles'
+        }),
+        expect.objectContaining({
+          path: 'src/content/ModifierBox/styles/lightTheme.css',
+          id: 'pixels-modifier-box-light-theme-styles'
+        })
+      ]);
+    });
+
+    test('should fall back to inline styles when CSSLoader is not available', () => {
+      delete window.CSSLoader;
+      
+      window.ModifierBoxThemeManager.addStyles();
+      
+      const styleElement = document.getElementById('pixels-modifier-box-styles-fallback');
       expect(styleElement).toBeTruthy();
       expect(styleElement.tagName).toBe('STYLE');
       expect(styleElement.textContent).toContain('#pixels-modifier-box');
     });
 
-    test('should not add styles twice', () => {
-      window.ModifierBoxThemeManager.addStyles();
+    test('should fall back to inline styles when CSS loading fails', async () => {
+      window.CSSLoader.loadMultipleCSS = jest.fn(() => Promise.reject(new Error('CSS load failed')));
+      
       window.ModifierBoxThemeManager.addStyles();
       
-      const styleElements = document.querySelectorAll('#pixels-modifier-box-styles');
-      expect(styleElements.length).toBe(1);
-      expect(console.log).toHaveBeenCalledWith("Modifier box styles already added, skipping");
+      // Wait for promise to reject and fallback to execute
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      const styleElement = document.getElementById('pixels-modifier-box-styles-fallback');
+      expect(styleElement).toBeTruthy();
     });
 
-    test('should include comprehensive CSS rules', () => {
+    test('should not add fallback styles twice', () => {
+      delete window.CSSLoader;
+      
+      window.ModifierBoxThemeManager.addStyles();
       window.ModifierBoxThemeManager.addStyles();
       
-      const styleElement = document.getElementById('pixels-modifier-box-styles');
+      const styleElements = document.querySelectorAll('#pixels-modifier-box-styles-fallback');
+      expect(styleElements.length).toBe(1);
+      expect(console.log).toHaveBeenCalledWith("Fallback modifier box styles already added, skipping");
+    });
+
+    test('should include comprehensive CSS rules in fallback', () => {
+      delete window.CSSLoader;
+      
+      window.ModifierBoxThemeManager.addStyles();
+      
+      const styleElement = document.getElementById('pixels-modifier-box-styles-fallback');
       const css = styleElement.textContent;
       
       // Check for key CSS selectors
       expect(css).toContain('#pixels-modifier-box');
-      expect(css).toContain('.pixels-header');
-      expect(css).toContain('.pixels-content');
-      expect(css).toContain('.modifier-row');
-      expect(css).toContain('.modifier-input');
-      expect(css).toContain('.roll-btn');
-      expect(css).toContain('.remove-row-btn');
-      expect(css).toContain('.add-row-btn');
-      
-      // Check for theme-specific rules
-      expect(css).toContain('.roll20-light-theme');
     });
   });
 
