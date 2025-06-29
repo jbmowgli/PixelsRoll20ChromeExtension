@@ -15,7 +15,10 @@ NC='\033[0m' # No Color
 # Create package directory
 PACKAGE_DIR="chrome-store-package"
 SOURCE_DIR=$(pwd)
-ZIP_PATH="$SOURCE_DIR/PixelsRoll20Extension-v1.0.1.zip"
+
+# Extract version from manifest.json
+VERSION=$(node -p "require('./manifest.json').version")
+ZIP_PATH="$SOURCE_DIR/PixelsRoll20Extension-v${VERSION}.zip"
 
 echo -e "${GREEN}Creating Chrome Web Store package...${NC}"
 
