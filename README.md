@@ -12,41 +12,49 @@ Connect your Pixels dice to Roll20 via Bluetooth for seamless physical dice roll
 - Auto theme matching (light/dark)
 - Multi-dice support
 
-## Quick Setup
+## Quick Start
 
-1. Download and extract this repository
-2. Open `chrome://extensions/`
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select the folder
-5. Go to Roll20, click the extension icon
-6. Click "Connect" and select your dice
+For detailed setup instructions, see **[Installation Guide](docs/INSTALLATION.md)**.
 
-## Usage
+**TL;DR**: Load extension in Chrome, go to Roll20, click extension icon, connect dice, roll!
+
+## Usage Overview
 
 - **Connect dice**: Click extension icon → "Connect"
-- **Show modifier box**: Click "Show Modifier Box"
+- **Show/hide modifier box**: Use popup buttons (only way to fully close)
 - **Add modifiers**: Click "Add" in the modifier box
+- **Minimize box**: Click "−" button to temporarily hide
 - **Roll dice**: Physical rolls automatically appear in chat
+
+### Chat Display Behavior
+
+- **Modifier box visible**: Shows detailed breakdown (die + modifier = total)
+- **Modifier box hidden**: Shows simplified result (just final value)
+- **Header adapts**: "Modifier Name" when visible, "Result" when hidden
 
 ## Documentation
 
-- **[Installation Guide](docs/INSTALLATION.md)** - Setup instructions
-- **[Quick Reference](docs/QUICK_REFERENCE.md)** - Essential actions
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common problems
-- **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Technical docs
+- **[Installation Guide](docs/INSTALLATION.md)** - Complete setup instructions
+- **[User Guide](docs/USER_GUIDE.md)** - Comprehensive usage documentation
+- **[Quick Reference](docs/QUICK_REFERENCE.md)** - Essential actions and troubleshooting
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common problems and solutions
+- **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Technical documentation
 
 ## Technical Notes
 
 - Uses Roll20's macro system for dice results
 - Chrome extension with Bluetooth Web API
+- Chrome Extension Manifest V3 compliant
 
-## Troubleshooting
+## License
 
-- **Not working?** → Refresh Roll20 page, reconnect dice
-- **No devices?** → Roll dice to wake them, check Bluetooth
-- **No results?** → Check connection status in popup
+MIT License - see LICENSE file for details.
 
-See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for more help.
+## Quick Troubleshooting
+
+For detailed help, see **[Troubleshooting Guide](docs/TROUBLESHOOTING.md)**.
+
+**Quick fixes:** Refresh Roll20 page → Reconnect dice → Check Bluetooth
 
 ## About Pixels
 

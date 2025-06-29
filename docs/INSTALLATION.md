@@ -36,11 +36,19 @@
 3. Select your dice from the list
 4. You should see "Connected" status
 
-### Show Modifier Box
+### Test Modifier Box
 
-1. Click "Show Modifier Box"
+1. Click "Show Modifier Box" in popup
 2. A floating box should appear on your Roll20 page
 3. You can drag it around and resize it
+4. Click "Hide Modifier Box" in popup to close it
+5. Use "−" button to minimize (temporary hide)
+
+### Test Chat Display
+
+1. **With modifier box visible**: Roll dice → See detailed breakdown
+2. **With modifier box hidden**: Roll dice → See simple result
+3. Chat format automatically adapts to box visibility
 
 That's it! Roll your dice and they should appear in Roll20 chat.
 

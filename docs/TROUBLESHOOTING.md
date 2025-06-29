@@ -27,6 +27,9 @@ Try these first:
 - **Rolls not showing?** → Check connection status in popup
 - **Wrong chat format?** → Verify game settings and permissions
 - **Modifier box missing?** → Click "Show Modifier Box" in popup
+- **Can't close modifier box?** → Use "Hide Modifier Box" button in popup
+- **Box disappeared?** → It may be minimized (click "−" again) or hidden via popup
+- **Wrong display format?** → Box visibility affects chat format (detailed vs simple)
 
 ### Dice Issues
 

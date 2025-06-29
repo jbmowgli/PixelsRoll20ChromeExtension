@@ -4,16 +4,20 @@
 
 ### Requirements
 
-- Chrome(ium) browser
-- Code editor
+- Chrome(ium) browser with Developer Mode
+- Code editor (VS Code, Sublime, etc.)
 - Basic JavaScript knowledge
 
-### Getting Started
+### Development Installation
 
-1. Clone the repo
-2. Open chrome://extensions/
-3. Enable Developer Mode
-4. Click "Load unpacked" and select the project folder
+For complete setup instructions, see the **[Installation Guide](INSTALLATION.md)**.
+
+**Quick developer setup:**
+
+1. Clone/download the repository
+2. Follow INSTALLATION.md steps to load the extension
+3. Enable Developer Mode in chrome://extensions/
+4. Use "Reload" button when making changes
 
 ### Key Files
 
@@ -181,6 +185,39 @@ The tests use a robust mocking strategy:
 - Bluetooth APIs are mocked to simulate connection scenarios
 - DOM interactions are safely mocked to prevent errors
 - ModifierBox components are tested with realistic HTML structures
+
+## Packaging for Distribution
+
+### Chrome Web Store Package
+
+To create a clean package for Chrome Web Store submission:
+
+```bash
+# Unix/macOS/Linux
+./package-for-store.sh
+
+# Windows PowerShell
+./package-for-store.ps1
+```
+
+This creates `PixelsRoll20Extension-v1.0.0.zip` with only the necessary files for store submission.
+
+### Manual Package
+
+For manual distribution or testing:
+
+1. Create a zip file with these folders/files:
+   - `src/` (all source code)
+   - `assets/` (icons and images)
+   - `manifest.json`
+   - `LICENSE`
+   - Essential docs: `docs/USER_GUIDE.md`, `docs/INSTALLATION.md`, etc.
+
+2. Exclude development files:
+   - `node_modules/`
+   - `tests/`
+   - `.git/`
+   - Development config files
 
 ## Contributing
 
