@@ -428,8 +428,15 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         let txt = this._name + ': face up = ' + (face + 1);
         log(txt);
 
-        // Sync modifier values from the modifier box before processing roll
+        // Check if modifier box is visible to determine modifier application
+        const isModifierBoxVisible =
+          window.ModifierBox &&
+          window.ModifierBox.isVisible &&
+          window.ModifierBox.isVisible();
+
+        // Sync modifier values from the modifier box before processing roll (only if visible)
         if (
+          isModifierBoxVisible &&
           typeof window.ModifierBox !== 'undefined' &&
           window.ModifierBox.syncGlobalVars
         ) {
@@ -437,7 +444,9 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         }
 
         const diceValue = face + 1;
-        const modifier = parseInt(window.pixelsModifier) || 0;
+        const modifier = isModifierBoxVisible
+          ? parseInt(window.pixelsModifier) || 0
+          : 0;
         const result = diceValue + modifier;
 
         log(
@@ -449,17 +458,13 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             result
         );
         log('pixelsModifierName: "' + window.pixelsModifierName + '"');
+        log('Modifier box visible: ' + isModifierBoxVisible);
 
-        // Check if modifier box is visible to determine which formula to use
-        const isModifierBoxVisible =
-          window.ModifierBox &&
-          window.ModifierBox.isVisible &&
-          window.ModifierBox.isVisible();
+        // Choose formula based on modifier box visibility
         const formula = isModifierBoxVisible
           ? pixelsFormulaWithModifier
           : pixelsFormulaSimple;
 
-        log('Modifier box visible: ' + isModifierBoxVisible);
         log('Formula before replacement: ' + formula);
 
         let message = formula
@@ -483,6 +488,15 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     //     int8View[0] = 1;
     //     let r = await _writer.writeValue(buffer);
     // }
+  }
+
+  // Expose Pixel class for testing
+  if (typeof window !== 'undefined') {
+    window.Pixel = Pixel;
+    window.postChatMessage = postChatMessage;
+  } else if (typeof global !== 'undefined') {
+    global.Pixel = Pixel;
+    global.postChatMessage = postChatMessage;
   }
 
   //
