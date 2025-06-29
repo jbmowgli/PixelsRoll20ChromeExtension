@@ -183,7 +183,6 @@
                 <div class="pixels-controls">
                     <button class="add-modifier-btn" type="button" title="Add Row">Add</button>
                     <button class="pixels-minimize" title="Minimize">−</button>
-                    <button class="pixels-close" title="Close">×</button>
                 </div>
             </div>
             <div class="pixels-content">
@@ -231,40 +230,8 @@
     modifierBox.style.left = '60px';
     modifierBox.style.right = 'auto';
 
-    // Add close and minimize functionality
-    const closeBtn = modifierBox.querySelector('.pixels-close');
+    // Add minimize functionality
     const minimizeBtn = modifierBox.querySelector('.pixels-minimize');
-
-    if (closeBtn) {
-      console.log('Close button found, adding event listener');
-      closeBtn.addEventListener('click', e => {
-        console.log('Close button clicked - hiding modifier box');
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Debug: log current state before hiding
-        console.log(
-          'Before hide - display:',
-          modifierBox.style.display,
-          'isVisible:',
-          isModifierBoxVisible
-        );
-
-        hideModifierBox();
-
-        // Debug: log state after hiding
-        setTimeout(() => {
-          console.log(
-            'After hide - display:',
-            modifierBox.style.display,
-            'isVisible:',
-            isModifierBoxVisible
-          );
-        }, 10);
-      });
-    } else {
-      console.error('Close button not found!');
-    }
 
     if (minimizeBtn) {
       console.log('Minimize button found, adding event listener');

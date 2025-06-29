@@ -98,7 +98,8 @@ describe('ModifierBox Main Module', () => {
       // Check buttons
       expect(element.querySelector('.add-modifier-btn')).toBeTruthy();
       expect(element.querySelector('.pixels-minimize')).toBeTruthy();
-      expect(element.querySelector('.pixels-close')).toBeTruthy();
+      // Close button has been removed - only controlled from popup
+      expect(element.querySelector('.pixels-close')).toBeFalsy();
 
       // Check content area
       const content = element.querySelector('.pixels-content');
@@ -245,14 +246,12 @@ describe('ModifierBox Main Module', () => {
   });
 
   describe('Event Handlers', () => {
-    test('should set up close button functionality', async () => {
+    test('should verify close button is not present (controlled from popup only)', async () => {
       const element = await window.ModifierBox.create();
       const closeBtn = element.querySelector('.pixels-close');
 
-      simulateEvent(closeBtn, 'click');
-
-      expect(element.style.display).toBe('none');
-      expect(window.ModifierBox.isVisible()).toBe(false);
+      // Close button should not exist - functionality moved to popup
+      expect(closeBtn).toBe(null);
     });
 
     test('should set up minimize button functionality', async () => {

@@ -449,9 +449,20 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
             result
         );
         log('pixelsModifierName: "' + window.pixelsModifierName + '"');
-        log('Formula before replacement: ' + pixelsFormula);
 
-        let message = pixelsFormula
+        // Check if modifier box is visible to determine which formula to use
+        const isModifierBoxVisible =
+          window.ModifierBox &&
+          window.ModifierBox.isVisible &&
+          window.ModifierBox.isVisible();
+        const formula = isModifierBoxVisible
+          ? pixelsFormulaWithModifier
+          : pixelsFormulaSimple;
+
+        log('Modifier box visible: ' + isModifierBoxVisible);
+        log('Formula before replacement: ' + formula);
+
+        let message = formula
           .replaceAll('#modifier_name', window.pixelsModifierName)
           .replaceAll('#face_value', diceValue.toString())
           .replaceAll('#pixel_name', this._name)
@@ -518,8 +529,17 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
   log('Starting Pixels Roll20 extension');
 
   var pixels = [];
-  var pixelsFormula =
+
+  // Formula when modifier box is visible (shows modifier details)
+  var pixelsFormulaWithModifier =
     '&{template:default} {{name=#modifier_name}} {{Pixel Die=[[#face_value]]}} {{Modifier=[[#modifier]]}} {{Total=[[#face_value + #modifier]]}}';
+
+  // Formula when modifier box is hidden (simplified display)
+  var pixelsFormulaSimple =
+    '&{template:default} {{name=Result}} {{Pixel Dice=[[#result]]}}';
+
+  // Legacy formula variable for backward compatibility
+  var pixelsFormula = pixelsFormulaWithModifier;
 
   // Only set up message listener if in extension context
   if (
