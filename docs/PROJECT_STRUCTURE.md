@@ -57,6 +57,7 @@ PixelsRoll20ChromeExtension/
 │   ├── USER_GUIDE.md            # Comprehensive user documentation
 │   ├── TROUBLESHOOTING.md       # Common issues and solutions
 │   ├── QUICK_REFERENCE.md       # Quick command reference
+│   ├── PROJECT_STRUCTURE.md     # This file
 │   └── PRIVACY_POLICY.md        # Privacy policy
 ├── Copilot-Feedback/            # GitHub Copilot documentation (gitignored)
 ├── .github/                     # GitHub configuration
@@ -75,7 +76,6 @@ PixelsRoll20ChromeExtension/
 ├── .gitignore                 # Git exclusion rules
 ├── README.md                  # Project documentation
 ├── LICENSE                    # License file
-├── PROJECT_STRUCTURE.md       # This file
 ├── test.html                  # Manual testing page
 └── test-resize.html           # UI resize testing page
 ```
