@@ -54,7 +54,7 @@ PixelsRoll20ChromeExtension/
 ├── docs/                         # Documentation
 │   ├── DEVELOPER_GUIDE.md       # Developer setup and guidelines
 │   ├── INSTALLATION.md          # Installation instructions
-│   ├── USER_GUIDE.md            # User documentation
+│   ├── USER_GUIDE.md            # Comprehensive user documentation
 │   ├── TROUBLESHOOTING.md       # Common issues and solutions
 │   ├── QUICK_REFERENCE.md       # Quick command reference
 │   └── PRIVACY_POLICY.md        # Privacy policy
@@ -76,7 +76,6 @@ PixelsRoll20ChromeExtension/
 ├── README.md                  # Project documentation
 ├── LICENSE                    # License file
 ├── PROJECT_STRUCTURE.md       # This file
-├── NAMING_STANDARDIZATION.md  # Documentation of naming conventions
 ├── test.html                  # Manual testing page
 └── test-resize.html           # UI resize testing page
 ```
