@@ -28,5 +28,5 @@ build/
 logs/
 *.log
 
-#Feedback Dcokumentation
+# Feedback Documentation
 Copilot-Feedback/

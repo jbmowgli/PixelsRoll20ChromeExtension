@@ -4,7 +4,7 @@
 
 ### Requirements
 
-- Chrome browser
+- Chrome(ium) browser
 - Code editor
 - Basic JavaScript knowledge
 
@@ -14,16 +14,6 @@
 2. Open chrome://extensions/
 3. Enable Developer Mode
 4. Click "Load unpacked" and select the project folder
-
-## Project Structure
-
-```
-src/
-├── background/     # Extension background script
-├── content/       # Roll20 page scripts
-├── popup/         # Extension popup
-├── options/       # Settings page
-```
 
 ### Key Files
 
@@ -119,19 +109,7 @@ async function connectPixel() {
 }
 ```
 
-## Storage & Messaging
-
-### Chrome Storage
-
-```javascript
-// Save settings
-chrome.storage.sync.set({ modifier: 5 });
-
-// Load settings
-chrome.storage.sync.get(['modifier'], result => {
-  console.log('Modifier:', result.modifier);
-});
-```
+## Messaging
 
 ### Message Passing
 

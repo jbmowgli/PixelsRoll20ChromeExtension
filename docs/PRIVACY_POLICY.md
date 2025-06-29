@@ -25,15 +25,6 @@ The Pixels Roll20 Integration extension ("the Extension") is designed to connect
 - Transmit data to third parties
 - Access files outside of Roll20 pages
 
-## Data Storage
-
-### Local Storage Only
-
-- Modifier box settings are stored locally in your browser
-- No data is synchronized across devices
-- No data is sent to external servers
-- All data is cleared when you close your browser
-
 ### Bluetooth Data
 
 - Dice roll data is processed locally and immediately injected into Roll20
@@ -49,12 +40,6 @@ The Extension requests the following permissions:
 - **Purpose**: Interact with Roll20 pages
 - **Scope**: Only active Roll20 tabs
 - **Usage**: Inject dice roll results into Roll20 chat
-
-### scripting
-
-- **Purpose**: Execute content scripts on Roll20 pages
-- **Scope**: Roll20 domains only
-- **Usage**: Enable modifier box and dice integration
 
 ### bluetooth
 
@@ -96,4 +81,4 @@ For questions about this privacy policy or the Extension's data practices, pleas
 
 ## Attribution
 
-This Extension is based on the original Pixels Roll20 Chrome Extension by Olivier Basille and the GameWithPixels team, used under MIT License.
+This Extension is based on the original Pixels Roll20 Chrome Extension by the GameWithPixels team, used under MIT License.

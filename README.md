@@ -35,20 +35,8 @@ Connect your Pixels dice to Roll20 via Bluetooth for seamless physical dice roll
 - **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common problems
 - **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Technical docs
 
-## Project Structure
-
-```
-src/
-├── content/         # Roll20 integration scripts
-├── popup/          # Extension popup
-├── background/     # Background scripts
-└── options/        # Settings page
-```
-
 ## Technical Notes
 
-- **Modern Pixels**: UUID `a6b90001-7a5a-43f2-a962-350c8edc9b5b`
-- **Legacy Pixels**: UUID `6e400001-b5a3-f393-e0a9-e50e24dcca9e`
 - Uses Roll20's macro system for dice results
 - Chrome extension with Bluetooth Web API
 
@@ -66,4 +54,4 @@ Pixels are smart dice with LEDs and sensors. Learn more at [gamewithpixels.com](
 
 ## License
 
-This project is licensed under the MIT License. Based on the original [Pixels Roll20 Chrome Extension](https://github.com/GameWithPixels/PixelsRoll20ChromeExtension) by Olivier Basille and the GameWithPixels team.
+This project is licensed under the MIT License. Based on the original [Pixels Roll20 Chrome Extension](https://github.com/GameWithPixels/PixelsRoll20ChromeExtension) by the GameWithPixels team.

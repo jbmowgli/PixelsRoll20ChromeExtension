@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Chrome browser (version 88+)
+- Chrome(ium) browser
 - Bluetooth-enabled computer
 - Pixels dice
 - Roll20 account
@@ -11,7 +11,7 @@
 
 ### 1. Get the Extension
 
-- Download from GitHub or clone the repo
+- Download zip from GitHub or clone the repo
 - Extract to a folder if needed
 
 ### 2. Load in Chrome

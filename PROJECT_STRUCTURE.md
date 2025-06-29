@@ -10,23 +10,22 @@ PixelsRoll20ChromeExtension/
 │   ├── background/               # Background script
 │   │   └── background.js         # Extension background script
 │   ├── content/                  # Content scripts (injected into Roll20)
-│   │   ├── common/               # Shared utilities
+│   │   ├── common/               # Shared utilities (camelCase naming)
 │   │   │   ├── themeDetector.js  # Roll20 theme detection module
 │   │   │   ├── cssLoader.js      # CSS loading utility
 │   │   │   └── htmlLoader.js     # HTML template loading utility
-│   │   ├── modifierBox/          # Modifier box component
-│   │   │   ├── modifierBox.js    # Main modifier box module
+│   │   ├── modifierBox/          # Modifier box component (camelCase naming)
+│   │   │   ├── index.js          # Main component entry point
+│   │   │   ├── modifierBox.js    # Core modifier box functionality
 │   │   │   ├── modifierBox.html  # HTML template
 │   │   │   ├── themeManager.js   # Theme styling and updates
 │   │   │   ├── dragHandler.js    # Drag functionality
-│   │   │   ├── positionManager.js # Positioning logic
 │   │   │   ├── rowManager.js     # Row management (add/remove modifiers)
 │   │   │   └── styles/           # CSS stylesheets
 │   │   │       ├── modifierBox.css    # Base styles
 │   │   │       ├── minimized.css      # Minimized state styles
 │   │   │       └── lightTheme.css     # Light theme overrides
-│   │   └── Roll20Integration/    # Roll20 platform integration
-│   │       └── index.js          # Main Roll20 integration and Bluetooth handling
+│   │   └── roll20.js             # Main Roll20 integration and Bluetooth handling
 │   ├── popup/                    # Extension popup
 │   │   ├── popup.html           # Popup UI
 │   │   ├── popup.css            # Popup styles
@@ -36,16 +35,50 @@ PixelsRoll20ChromeExtension/
 │       ├── options.css          # Options styles
 │       └── options.js           # Options logic
 ├── assets/                       # Static assets
-│   └── images/                   # Images and icons
-│       └── logo-64.png          # Extension icon
-├── tests/                        # Test files
-│   ├── test.html                # Main test page for development
-│   └── bluetooth-test.html      # Bluetooth functionality tests
+│   ├── images/                   # Images and icons
+│   │   └── logo-128.png         # Extension icon
+│   ├── screenshots/              # Project screenshots
+│   └── New Screenshots/          # Updated screenshots
+├── tests/                        # Test infrastructure
+│   └── jest/                     # Jest unit tests
+│       ├── setup.js              # Test environment setup
+│       ├── ModifierBox/          # ModifierBox component tests
+│       │   ├── index.test.js     # Main component tests
+│       │   ├── themeManager.test.js # Theme management tests
+│       │   ├── dragHandler.test.js  # Drag functionality tests
+│       │   └── rowManager.test.js   # Row management tests
+│       ├── roll20-basic.test.js  # Basic Roll20 integration tests
+│       ├── roll20-simple.test.js # Simple Roll20 functionality tests
+│       ├── experimental/         # Experimental test suites
+│       └── README.md            # Testing documentation
 ├── docs/                         # Documentation
-├── manifest.json                 # Chrome extension manifest
-├── README.md                     # Project documentation
-├── LICENSE                       # License file
-└── PROJECT_STRUCTURE.md         # This file
+│   ├── DEVELOPER_GUIDE.md       # Developer setup and guidelines
+│   ├── INSTALLATION.md          # Installation instructions
+│   ├── USER_GUIDE.md            # User documentation
+│   ├── TROUBLESHOOTING.md       # Common issues and solutions
+│   ├── QUICK_REFERENCE.md       # Quick command reference
+│   └── PRIVACY_POLICY.md        # Privacy policy
+├── Copilot-Feedback/            # GitHub Copilot documentation (gitignored)
+├── .github/                     # GitHub configuration
+│   └── copilot-instructions.md  # GitHub Copilot configuration
+├── .copilot/                    # Copilot configuration
+│   └── instructions.md          # Development instructions for Copilot
+├── .husky/                      # Git hooks
+│   └── pre-commit              # Pre-commit hook script
+├── coverage/                    # Test coverage reports (gitignored)
+├── node_modules/               # Dependencies (gitignored)
+├── manifest.json               # Chrome extension manifest
+├── package.json                # NPM configuration and scripts
+├── package-lock.json           # NPM dependency lock file
+├── .prettierrc                 # Prettier configuration
+├── .prettierignore            # Prettier exclusion rules
+├── .gitignore                 # Git exclusion rules
+├── README.md                  # Project documentation
+├── LICENSE                    # License file
+├── PROJECT_STRUCTURE.md       # This file
+├── NAMING_STANDARDIZATION.md  # Documentation of naming conventions
+├── test.html                  # Manual testing page
+└── test-resize.html           # UI resize testing page
 ```
 
 ## File Descriptions
@@ -81,9 +114,12 @@ The content scripts are organized by component for better maintainability:
 
 ##### ModifierBox Component (`src/content/modifierBox/`)
 
-- **modifierBox.js**: Main modifier box module (singleton pattern)
-  - Core modifier box functionality
-  - Component coordination and initialization
+- **index.js**: Main component entry point and coordination
+  - Component initialization and lifecycle management
+  - Integration with Roll20 page and other components
+- **modifierBox.js**: Core modifier box functionality (singleton pattern)
+  - Main modifier box business logic
+  - Component coordination and state management
   - HTML template loading and fallback handling
 - **modifierBox.html**: HTML template
   - Clean separation of HTML structure
@@ -91,12 +127,11 @@ The content scripts are organized by component for better maintainability:
 - **themeManager.js**: Theme styling and updates
   - Dynamic CSS injection and theme adaptation
   - External CSS file loading and management
+  - Roll20 theme detection integration
 - **dragHandler.js**: Drag functionality
   - Mouse-based drag and drop behavior
   - Position updating during drag operations
-- **positionManager.js**: Positioning logic
-  - Intelligent positioning relative to Roll20 UI
-  - Window resize handling
+  - Event handling and state management
 - **rowManager.js**: Row management
   - Add/remove modifier rows
   - Radio button and input event handling
@@ -106,7 +141,14 @@ The content scripts are organized by component for better maintainability:
   - **minimized.css**: Styles for minimized state with text truncation
   - **lightTheme.css**: Light theme color overrides
 
-##### Roll20Integration Component (`src/content/Roll20Integration/`)
+##### Roll20 Integration (`src/content/roll20.js`)
+
+- **roll20.js**: Main Roll20 integration and Bluetooth handling
+  - Bluetooth connection management with Pixels dice
+  - Dice roll handling and macro integration
+  - Message passing with extension popup
+  - Chat message posting to Roll20
+  - ModifierBox component integration
 
 - **index.js**: Main Roll20 integration and Bluetooth handling
   - Bluetooth connection management with Pixels dice
@@ -128,81 +170,182 @@ The content scripts are organized by component for better maintainability:
 
 ### Assets (`assets/`)
 
-- **images/**: Extension icons and images
+- **images/**: Extension icons and images (logo-128.png)
+- **screenshots/**: Development and user screenshots
+- **New Screenshots/**: Updated promotional screenshots
 
 ### Tests (`tests/`)
 
-- **test.html**: Development test page for UI components
-- **bluetooth-test.html**: Bluetooth functionality testing
-- **modifier-box-test.html**: Browser-based modifier box testing
-- **jest/**: Jest unit tests directory
+- **jest/**: Jest unit test infrastructure
   - **setup.js**: Jest test environment setup and mocks
-  - **modifierBox/**: Component-specific test suites
-    - **index.test.js**: Main modifier box module tests
+  - **ModifierBox/**: Component-specific test suites (camelCase directory)
+    - **index.test.js**: Main modifier box component tests
     - **themeManager.test.js**: Theme management tests
     - **dragHandler.test.js**: Drag functionality tests
-    - **positionManager.test.js**: Positioning logic tests
     - **rowManager.test.js**: Row management tests
+  - **roll20-basic.test.js**: Basic Roll20 integration tests
+  - **roll20-simple.test.js**: Simple Roll20 functionality tests
+  - **experimental/**: Experimental test suites (in development)
+  - **README.md**: Testing documentation and guidelines
+
+### Development Configuration
+
+- **.copilot/**: GitHub Copilot configuration
+  - **instructions.md**: Development instructions for AI assistance
+- **.github/**: GitHub-specific configuration
+  - **copilot-instructions.md**: GitHub Copilot configuration
+- **.husky/**: Git hooks configuration
+  - **pre-commit**: Pre-commit hook for code quality
+- **Copilot-Feedback/**: AI-generated documentation (gitignored)
+- **.prettierrc**: Prettier code formatting configuration
+- **.prettierignore**: Prettier exclusion rules
+- **.gitignore**: Git exclusion rules
+- **package.json**: NPM configuration, scripts, and dependencies
+- **package-lock.json**: NPM dependency lock file
 
 ## Development Workflow
 
 1. **Content Scripts**: Modify files in `src/content/` for Roll20 integration features
+   - **Common utilities**: Update shared functionality in `src/content/common/`
+   - **ModifierBox**: Update component files in `src/content/modifierBox/`
+   - **Roll20 integration**: Update main integration in `src/content/roll20.js`
 2. **UI Changes**: Update popup files in `src/popup/` for extension interface
-3. **Testing**: Use files in `tests/` for development and debugging
-   - **Browser Testing**: Open `tests/test.html` for manual UI testing
-   - **Unit Testing**: Run `npm test` for automated Jest tests
+3. **Testing**: Use comprehensive Jest test suite
+   - **Unit Testing**: Run `npm test` for automated Jest tests (141 tests)
    - **Coverage**: Run `npm run test:coverage` for test coverage reports
-4. **Assets**: Add images/icons to `assets/images/`
+   - **Watch Mode**: Run `npm run test:watch` for development
+   - **Manual Testing**: Use `test.html` and `test-resize.html` for browser testing
+4. **Code Quality**: Pre-commit hooks ensure quality
+   - **Automatic formatting**: Prettier runs on all staged files
+   - **Test validation**: All tests must pass before commit
+5. **Assets**: Add images/icons to `assets/images/`
 
 ## Build Process
 
-The extension loads files directly from their organized locations. No build step is required - the manifest.json references the correct paths in the new structure.
+The extension loads files directly from their organized locations with camelCase naming conventions. No build step is required - the manifest.json references the correct paths in the standardized structure.
+
+### Code Quality Tools
+
+- **Prettier**: Automatic code formatting (`.prettierrc` configuration)
+- **Husky**: Git hooks for pre-commit validation
+- **lint-staged**: Run formatting and tests on staged files only
+- **Jest**: Comprehensive unit testing with 141 stable tests
 
 ## Testing Infrastructure
 
-The project includes robust Jest test coverage:
+The project includes robust Jest test coverage with pre-commit validation:
 
 ### Working Test Suites (141 tests passing)
 
-- **ModifierBox**: 96 tests covering UI, themes, drag & drop, row management
+- **ModifierBox Components**: 96 tests covering UI, themes, drag & drop, row management
 - **Roll20 Integration**: 45 tests covering messaging, Bluetooth, error handling
 
 ### Test Files Status
 
 ```
-✅ tests/jest/modifierBox/index.test.js          - 31 tests passing
-✅ tests/jest/modifierBox/dragHandler.test.js    - 26 tests passing
-✅ tests/jest/modifierBox/themeManager.test.js   - 24 tests passing
-✅ tests/jest/modifierBox/rowManager.test.js     - 15 tests passing
+✅ tests/jest/ModifierBox/index.test.js          - 31 tests passing
+✅ tests/jest/ModifierBox/dragHandler.test.js    - 26 tests passing
+✅ tests/jest/ModifierBox/themeManager.test.js   - 24 tests passing
+✅ tests/jest/ModifierBox/rowManager.test.js     - 15 tests passing
 ✅ tests/jest/roll20-basic.test.js               - 21 tests passing
 ✅ tests/jest/roll20-simple.test.js              - 24 tests passing
 
-⚠️  tests/jest/roll20.test.js                   - Complex mocking issues
-⚠️  tests/jest/BluetoothConnection.test.js      - Bluetooth API mocking
-⚠️  tests/jest/ExtensionMessaging.test.js       - Chrome API mocking
-⚠️  tests/jest/ChatIntegration.test.js          - DOM integration
-⚠️  tests/jest/Pixel.test.js                    - Advanced scenarios
-⚠️  tests/jest/roll20-*.test.js (others)        - Experimental tests
+🧪 tests/jest/experimental/                      - Development test suites
+   ├── BluetoothConnection.test.js              - Bluetooth API mocking challenges
+   ├── ExtensionMessaging.test.js               - Chrome API mocking complexity
+   ├── ChatIntegration.test.js                  - DOM integration scenarios
+   ├── Pixel.test.js                            - Advanced Pixels dice scenarios
+   └── roll20-*.test.js                         - Complex Roll20 integration tests
 ```
 
 ### Test Commands
 
 ```bash
-# Run stable tests only
-npm test -- tests/jest/roll20-basic.test.js tests/jest/roll20-simple.test.js tests/jest/modifierBox/
-
-# Run all tests (includes failing ones)
+# Run all stable tests (recommended)
 npm test
+
+# Run tests in watch mode for development
+npm run test:watch
+
+# Generate coverage reports
+npm run test:coverage
+
+# Run specific test suites
+npm test -- tests/jest/ModifierBox/
+npm test -- tests/jest/roll20-basic.test.js
 ```
 
-## Legacy Testing Section
+### Pre-Commit Testing
 
-The project also includes both manual and automated testing:
+- **Automatic execution**: All tests run before each commit
+- **Quality gate**: Commits blocked if any tests fail
+- **Fast feedback**: Tests complete in ~0.6 seconds
 
-- **Manual Testing**: Browser-based test files for UI and integration testing
-- **Unit Testing**: Jest test suites with comprehensive coverage of ModifierBox components
-- **Mock Setup**: Chrome extension APIs and browser dependencies are mocked for testing
-- **Test Commands**:
-  - `npm test`: Run all tests
-  - `npm run test:watch`: Run tests in watch mode
-  - `npm run test:coverage`: Generate coverage reports
+## Project Standards and Conventions
+
+### Naming Conventions
+
+The project follows consistent **camelCase** naming for files and directories:
+
+- ✅ `src/content/modifierBox/` (not `ModifierBox/`)
+- ✅ `src/content/common/` (not `Common/`)
+- ✅ `tests/jest/ModifierBox/` (test directories may use PascalCase for clarity)
+
+### Code Quality Standards
+
+- **Prettier**: Automatic code formatting enforced via pre-commit hooks
+- **Jest**: Comprehensive unit testing with 141 stable tests
+- **ESLint**: Code quality and consistency (integrated with Jest)
+- **Git Hooks**: Pre-commit validation prevents broken commits
+
+### Documentation Standards
+
+- **GitHub Copilot Integration**: All summary documents in `Copilot-Feedback/`
+- **Comprehensive Docs**: Developer guides, troubleshooting, and API references
+- **Inline Documentation**: JSDoc comments for complex functions
+- **README Files**: Component-specific documentation where appropriate
+
+### Development Environment
+
+- **Node.js**: Package management and testing infrastructure
+- **Chrome Extension APIs**: Manifest V3 compliance
+- **Modern JavaScript**: ES6+ features with browser compatibility
+- **Modular Architecture**: Clear separation of concerns and responsibilities
+
+## Quick Reference
+
+### Common Development Commands
+
+```bash
+# Setup and dependencies
+npm install                    # Install dependencies and setup git hooks
+
+# Testing
+npm test                      # Run all stable tests
+npm run test:watch           # Run tests in watch mode
+npm run test:coverage        # Generate coverage reports
+
+# Code quality
+npm run format              # Format all files with Prettier
+npm run format:check        # Check formatting without writing
+
+# Manual testing
+# Open test.html in browser for UI component testing
+# Open test-resize.html for responsive behavior testing
+```
+
+### Key Configuration Files
+
+- **manifest.json**: Chrome extension configuration
+- **package.json**: NPM scripts and dependencies
+- **.prettierrc**: Code formatting rules
+- **.husky/pre-commit**: Git hook for quality checks
+- **tests/jest/setup.js**: Test environment configuration
+
+### Project Health
+
+- ✅ **141 tests passing** with comprehensive coverage
+- ✅ **Pre-commit hooks** enforcing code quality
+- ✅ **Consistent naming** following camelCase conventions
+- ✅ **Modern tooling** with Prettier, Husky, and Jest
+- ✅ **Documentation** up-to-date and comprehensive
