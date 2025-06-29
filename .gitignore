@@ -22,7 +22,10 @@ build/
 
 # Extension packaging
 *.zip
-!PixelsRoll20Extension-v*.zip
+chrome-store-package/
+
+# Specific packaging script outputs
+PixelsRoll20Extension-v*.zip
 
 # Logs
 logs/
