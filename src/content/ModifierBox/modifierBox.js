@@ -371,26 +371,9 @@
       }
     }
 
-    // Update the selected modifier based on current values
-    if (
-      modifierBox &&
-      typeof window.pixelsModifierName !== 'undefined' &&
-      typeof window.pixelsModifier !== 'undefined'
-    ) {
-      const selectedRadio = modifierBox.querySelector(
-        'input[name="modifier-select"]:checked'
-      );
-      if (selectedRadio) {
-        const index = selectedRadio.value;
-        const rows = modifierBox.querySelectorAll('.modifier-row');
-        const row = rows[parseInt(index)];
-        if (row) {
-          const nameInput = row.querySelector('.modifier-name');
-          const valueInput = row.querySelector('.modifier-value');
-          if (nameInput) nameInput.value = window.pixelsModifierName;
-          if (valueInput) valueInput.value = window.pixelsModifier;
-        }
-      }
+    // Sync global state with current UI values (not the other way around)
+    if (modifierBox && window.ModifierBoxRowManager) {
+      window.ModifierBoxRowManager.updateSelectedModifier(modifierBox);
     }
   }
 

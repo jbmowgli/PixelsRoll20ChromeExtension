@@ -6,6 +6,41 @@
 (function () {
   let rowCounter = 1; // Start from 1 since we have row 0
 
+  // Function to clear modifier state
+  function clearModifierState(modifierBox) {
+    console.log('Clearing modifier state');
+
+    // Clear global variables
+    if (typeof window.pixelsModifierName !== 'undefined') {
+      window.pixelsModifierName = '';
+    }
+    if (typeof window.pixelsModifier !== 'undefined') {
+      window.pixelsModifier = '0';
+    }
+
+    // Update header title to show no modifier selected
+    if (modifierBox) {
+      const headerTitle = modifierBox.querySelector('.pixels-title');
+      if (headerTitle) {
+        const logoImg = headerTitle.querySelector('.pixels-logo');
+        if (logoImg) {
+          headerTitle.innerHTML = `<img src="${logoImg.src}" alt="Pixels" class="pixels-logo"> Pixels Modifier Box`;
+        } else {
+          headerTitle.textContent = 'Pixels Modifier Box';
+        }
+      }
+    }
+
+    // Send message to extension about clearing the modifier
+    if (typeof window.sendMessageToExtension === 'function') {
+      window.sendMessageToExtension({
+        action: 'modifierChanged',
+        modifier: '0',
+        name: '',
+      });
+    }
+  }
+
   // Export functions to global scope
   window.ModifierBoxRowManager = {
     setupModifierRowLogic: setupModifierRowLogic,
@@ -13,6 +48,9 @@
     removeModifierRow: removeModifierRow,
     updateEventListeners: updateEventListeners,
     updateSelectedModifier: updateSelectedModifier,
+    clearModifierState: clearModifierState,
+    reindexRows: reindexRows,
+    clearModifierState: clearModifierState,
     getRowCounter: () => rowCounter,
     setRowCounter: value => (rowCounter = value),
   };
@@ -146,11 +184,37 @@
           updateSelectedModifierCallback();
         }
       } else {
-        console.log('No remaining rows found');
+        console.log('No remaining rows found, clearing global variables');
+        // Clear global variables since no rows remain
+        clearModifierState(modifierBox);
       }
     }
 
+    // Reindex rows to maintain consistency
+    reindexRows(modifierBox);
+
     console.log(`Successfully removed modifier row with index ${index}`);
+  }
+
+  // Function to reindex all rows after deletion
+  function reindexRows(modifierBox) {
+    const rows = modifierBox.querySelectorAll('.modifier-row');
+    rows.forEach((row, index) => {
+      const radio = row.querySelector('.modifier-radio');
+      const nameInput = row.querySelector('.modifier-name');
+      const valueInput = row.querySelector('.modifier-value');
+
+      if (radio) {
+        radio.value = index.toString();
+        radio.id = `mod-${index}`;
+      }
+      if (nameInput) {
+        nameInput.setAttribute('data-index', index.toString());
+      }
+      if (valueInput) {
+        valueInput.setAttribute('data-index', index.toString());
+      }
+    });
   }
 
   function updateEventListeners(modifierBox, updateSelectedModifierCallback) {
@@ -202,9 +266,9 @@
       'input[name="modifier-select"]:checked'
     );
     if (selectedRadio) {
-      const index = parseInt(selectedRadio.value);
-      const rows = modifierBox.querySelectorAll('.modifier-row');
-      const row = rows[index];
+      // Find the row that contains this radio button directly
+      // instead of using the radio value as an array index
+      const row = selectedRadio.closest('.modifier-row');
       if (row) {
         const nameInput = row.querySelector('.modifier-name');
         const valueInput = row.querySelector('.modifier-value');
@@ -256,6 +320,10 @@
           });
         }
       }
+    } else {
+      // No radio button is selected, clear global variables
+      console.log('No modifier selected, clearing global variables');
+      clearModifierState(modifierBox);
     }
   }
 

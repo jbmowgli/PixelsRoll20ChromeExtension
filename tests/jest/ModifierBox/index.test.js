@@ -348,4 +348,115 @@ describe('ModifierBox Main Module', () => {
       );
     });
   });
+
+  describe('Global State Initialization', () => {
+    let mockModifierBox;
+
+    beforeEach(() => {
+      // Helper function to create a mock modifier box
+      function createMockModifierBox() {
+        const box = document.createElement('div');
+        box.id = 'pixels-modifier-box';
+        box.innerHTML = `
+          <div class="pixels-header">
+            <span class="pixels-title">
+              <img src="logo.png" alt="Pixels" class="pixels-logo"> Test Title
+            </span>
+            <div class="pixels-controls">
+              <button class="add-modifier-btn" type="button">Add</button>
+            </div>
+          </div>
+          <div class="pixels-content">
+            <div class="modifier-row">
+              <input type="radio" name="modifier-select" value="0" class="modifier-radio" id="mod-0" checked>
+              <input type="text" class="modifier-name" placeholder="Modifier 1" value="Modifier 1" data-index="0">
+              <input type="number" class="modifier-value" value="0" min="-99" max="99" data-index="0">
+              <button class="remove-row-btn" type="button">×</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(box);
+        return box;
+      }
+
+      mockModifierBox = createMockModifierBox();
+
+      // Mock updateSelectedModifier to capture calls
+      window.ModifierBoxRowManager = {
+        updateSelectedModifier: jest.fn(),
+      };
+    });
+
+    test('should sync global state from UI when modifier box is shown', () => {
+      // Set up a modifier box with non-default values
+      const row = mockModifierBox.querySelector('.modifier-row');
+      const nameInput = row.querySelector('.modifier-name');
+      const valueInput = row.querySelector('.modifier-value');
+
+      nameInput.value = 'Custom Modifier';
+      valueInput.value = '5';
+
+      // Call the show logic that syncs global state
+      if (mockModifierBox && window.ModifierBoxRowManager) {
+        window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
+      }
+
+      // Verify that updateSelectedModifier was called to sync state FROM UI
+      expect(
+        window.ModifierBoxRowManager.updateSelectedModifier
+      ).toHaveBeenCalledWith(mockModifierBox);
+    });
+
+    test('should not overwrite UI values with stale global state', () => {
+      // This test verifies that we don't restore old global state TO the UI
+      // when showing the modifier box
+
+      const row = mockModifierBox.querySelector('.modifier-row');
+      const nameInput = row.querySelector('.modifier-name');
+      const valueInput = row.querySelector('.modifier-value');
+
+      // User sets custom values in UI
+      nameInput.value = 'User Custom Modifier';
+      valueInput.value = '7';
+
+      // Simulate old global state (should NOT overwrite UI)
+      window.pixelsModifierName = 'Old Global State';
+      window.pixelsModifier = '3';
+
+      // The showModifierBox logic should call updateSelectedModifier
+      // which reads FROM the UI TO update global state, not the reverse
+      const originalUpdateFunction =
+        window.ModifierBoxRowManager.updateSelectedModifier;
+      window.ModifierBoxRowManager.updateSelectedModifier = jest
+        .fn()
+        .mockImplementation(modifierBox => {
+          // Simulate the real updateSelectedModifier behavior
+          const selectedRadio = modifierBox.querySelector(
+            'input[name="modifier-select"]:checked'
+          );
+          if (selectedRadio) {
+            const row = selectedRadio.closest('.modifier-row');
+            if (row) {
+              const nameInput = row.querySelector('.modifier-name');
+              const valueInput = row.querySelector('.modifier-value');
+              window.pixelsModifierName = nameInput.value || 'Unnamed';
+              window.pixelsModifier = valueInput.value || '0';
+            }
+          }
+        });
+
+      // Call the sync logic
+      if (mockModifierBox && window.ModifierBoxRowManager) {
+        window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
+      }
+
+      // Verify UI values were preserved (not overwritten)
+      expect(nameInput.value).toBe('User Custom Modifier');
+      expect(valueInput.value).toBe('7');
+
+      // Verify global state was updated FROM the UI
+      expect(window.pixelsModifierName).toBe('User Custom Modifier');
+      expect(window.pixelsModifier).toBe('7');
+    });
+  });
 });

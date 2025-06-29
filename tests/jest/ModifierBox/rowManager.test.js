@@ -383,6 +383,124 @@ describe('ModifierBox Row Manager', () => {
       // First row should still be selected
       expect(firstRadio.checked).toBe(true);
     });
+
+    test('should clear global state when removing selected row and no rows remain', () => {
+      // Create a mock modifier box with only one row
+      const singleRowBox = document.createElement('div');
+      singleRowBox.innerHTML = `
+        <div class="pixels-title">Pixels Modifier Box</div>
+        <div class="modifier-row">
+          <input type="radio" name="modifier" value="0" class="modifier-radio" checked>
+          <input type="text" value="Test Modifier" class="modifier-name">
+          <input type="number" value="5" class="modifier-value">
+          <button class="remove-row-btn">×</button>
+        </div>
+      `;
+
+      // Set up global state as if this modifier was selected
+      window.pixelsModifierName = 'Test Modifier';
+      window.pixelsModifier = '5';
+      window.sendMessageToExtension = jest.fn();
+
+      const row = singleRowBox.querySelector('.modifier-row');
+      const radio = row.querySelector('.modifier-radio');
+
+      // Verify initial state
+      expect(radio.checked).toBe(true);
+      expect(window.pixelsModifierName).toBe('Test Modifier');
+      expect(window.pixelsModifier).toBe('5');
+
+      // Since this is the only row, it should reset instead of removing
+      window.ModifierBoxRowManager.removeModifierRow(
+        row,
+        singleRowBox,
+        mockCallback
+      );
+
+      // Row should still exist but with default values
+      const remainingRow = singleRowBox.querySelector('.modifier-row');
+      expect(remainingRow).not.toBeNull();
+
+      const nameInput = remainingRow.querySelector('.modifier-name');
+      const valueInput = remainingRow.querySelector('.modifier-value');
+      const remainingRadio = remainingRow.querySelector('.modifier-radio');
+
+      expect(nameInput.value).toBe('Modifier 1');
+      expect(valueInput.value).toBe('0');
+      expect(remainingRadio.checked).toBe(true);
+      expect(mockCallback).toHaveBeenCalled();
+    });
+
+    test('should update global state when selected row is deleted and another row becomes selected', () => {
+      // Set up initial state - second row is selected
+      const rows = mockModifierBox.querySelectorAll('.modifier-row');
+      const firstRow = rows[0];
+      const secondRow = rows[1];
+
+      // Set first row values
+      const firstNameInput = firstRow.querySelector('.modifier-name');
+      const firstValueInput = firstRow.querySelector('.modifier-value');
+      firstNameInput.value = 'First Modifier';
+      firstValueInput.value = '3';
+
+      // Select second row initially
+      const secondRadio = secondRow.querySelector('.modifier-radio');
+      secondRadio.checked = true;
+
+      // Set up global state as if second row was selected
+      window.pixelsModifierName = 'Second Modifier';
+      window.pixelsModifier = '2';
+      window.sendMessageToExtension = jest.fn();
+
+      // Remove the selected (second) row
+      window.ModifierBoxRowManager.removeModifierRow(
+        secondRow,
+        mockModifierBox,
+        mockCallback
+      );
+
+      // First row should now be selected
+      const firstRadio = firstRow.querySelector('.modifier-radio');
+      expect(firstRadio.checked).toBe(true);
+
+      // Callback should have been called to update global state
+      expect(mockCallback).toHaveBeenCalled();
+
+      // Verify that the second row is gone
+      const remainingRows = mockModifierBox.querySelectorAll('.modifier-row');
+      expect(remainingRows.length).toBe(1);
+    });
+
+    test('should use clearModifierState function consistently', () => {
+      // Test that clearModifierState is exported and works correctly
+      expect(window.ModifierBoxRowManager.clearModifierState).toBeInstanceOf(
+        Function
+      );
+
+      // Set up some global state
+      window.pixelsModifierName = 'Test';
+      window.pixelsModifier = '10';
+      window.sendMessageToExtension = jest.fn();
+
+      const mockBox = document.createElement('div');
+      mockBox.innerHTML = '<div class="pixels-title">Test Title</div>';
+
+      // Call clearModifierState
+      window.ModifierBoxRowManager.clearModifierState(mockBox);
+
+      // Verify state is cleared
+      expect(window.pixelsModifierName).toBe('');
+      expect(window.pixelsModifier).toBe('0');
+      expect(window.sendMessageToExtension).toHaveBeenCalledWith({
+        action: 'modifierChanged',
+        modifier: '0',
+        name: '',
+      });
+
+      // Verify title is reset
+      const title = mockBox.querySelector('.pixels-title');
+      expect(title.textContent).toBe('Pixels Modifier Box');
+    });
   });
 
   describe('updateEventListeners', () => {
@@ -639,6 +757,167 @@ describe('ModifierBox Row Manager', () => {
       window.ModifierBoxRowManager.setRowCounter(0);
       expect(window.ModifierBoxRowManager.getRowCounter()).toBe(0);
     });
+  });
+
+  describe('Row Reindexing', () => {
+    let mockModifierBox;
+    let mockCallback;
+
+    beforeEach(() => {
+      mockModifierBox = createMockModifierBox();
+      mockCallback = jest.fn();
+    });
+
+    test('should reindex rows correctly after deletion', () => {
+      // Create 3 rows
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+
+      // Set different values for each row to track them
+      const rows = mockModifierBox.querySelectorAll('.modifier-row');
+      expect(rows.length).toBe(3); // Original + 2 added
+
+      // Set names to track which is which
+      rows[0].querySelector('.modifier-name').value = 'First Row';
+      rows[1].querySelector('.modifier-name').value = 'Second Row';
+      rows[2].querySelector('.modifier-name').value = 'Third Row';
+
+      // Verify initial radio values
+      expect(rows[0].querySelector('.modifier-radio').value).toBe('0');
+      expect(rows[1].querySelector('.modifier-radio').value).toBe('1');
+      expect(rows[2].querySelector('.modifier-radio').value).toBe('2');
+
+      // Select and delete the first row
+      rows[0].querySelector('.modifier-radio').checked = true;
+      window.ModifierBoxRowManager.removeModifierRow(
+        rows[0],
+        mockModifierBox,
+        mockCallback
+      );
+
+      // Check remaining rows
+      const remainingRows = mockModifierBox.querySelectorAll('.modifier-row');
+      expect(remainingRows.length).toBe(2);
+
+      // Verify that the remaining rows are reindexed correctly
+      expect(remainingRows[0].querySelector('.modifier-radio').value).toBe('0');
+      expect(remainingRows[1].querySelector('.modifier-radio').value).toBe('1');
+
+      // Verify the content is what we expect (should be "Second Row" and "Third Row")
+      expect(remainingRows[0].querySelector('.modifier-name').value).toBe(
+        'Second Row'
+      );
+      expect(remainingRows[1].querySelector('.modifier-name').value).toBe(
+        'Third Row'
+      );
+
+      // Verify first remaining row is selected
+      expect(remainingRows[0].querySelector('.modifier-radio').checked).toBe(
+        true
+      );
+    });
+
+    test('should correctly update global state after reindexing', () => {
+      // Create 3 rows with specific values
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+
+      const rows = mockModifierBox.querySelectorAll('.modifier-row');
+
+      // Set specific values for tracking
+      rows[0].querySelector('.modifier-name').value = 'Row A';
+      rows[0].querySelector('.modifier-value').value = '1';
+
+      rows[1].querySelector('.modifier-name').value = 'Row B';
+      rows[1].querySelector('.modifier-value').value = '2';
+
+      rows[2].querySelector('.modifier-name').value = 'Row C';
+      rows[2].querySelector('.modifier-value').value = '3';
+
+      // Select Row A (first row)
+      rows[0].querySelector('.modifier-radio').checked = true;
+
+      // Mock the updateSelectedModifier to capture what gets called
+      const updateCallbackMock = jest.fn();
+
+      // Delete Row A
+      window.ModifierBoxRowManager.removeModifierRow(
+        rows[0],
+        mockModifierBox,
+        updateCallbackMock
+      );
+
+      // Should have called the callback to update with the new selection
+      expect(updateCallbackMock).toHaveBeenCalled();
+
+      // Verify the first remaining row (originally Row B) is selected
+      const remainingRows = mockModifierBox.querySelectorAll('.modifier-row');
+      expect(remainingRows[0].querySelector('.modifier-radio').checked).toBe(
+        true
+      );
+      expect(remainingRows[0].querySelector('.modifier-name').value).toBe(
+        'Row B'
+      );
+      expect(remainingRows[0].querySelector('.modifier-value').value).toBe('2');
+    });
+
+    test('should use closest() method to find row instead of array index', () => {
+      // This test verifies the fix for the core issue
+      // Create multiple rows
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+      window.ModifierBoxRowManager.addModifierRow(
+        mockModifierBox,
+        mockCallback
+      );
+
+      const rows = mockModifierBox.querySelectorAll('.modifier-row');
+
+      // Set different values
+      rows[0].querySelector('.modifier-name').value = 'Original First';
+      rows[0].querySelector('.modifier-value').value = '10';
+
+      rows[1].querySelector('.modifier-name').value = 'Original Second';
+      rows[1].querySelector('.modifier-value').value = '20';
+
+      rows[2].querySelector('.modifier-name').value = 'Original Third';
+      rows[2].querySelector('.modifier-value').value = '30';
+
+      // Delete the first row while second row is selected
+      rows[1].querySelector('.modifier-radio').checked = true;
+      window.ModifierBoxRowManager.removeModifierRow(
+        rows[0],
+        mockModifierBox,
+        mockCallback
+      );
+
+      // Now call updateSelectedModifier to see what it picks up
+      window.pixelsModifierName = '';
+      window.pixelsModifier = '0';
+
+      window.ModifierBoxRowManager.updateSelectedModifier(mockModifierBox);
+
+      // Should have the values from the row that was originally second (now first)
+      // which should be "Original Second" with value "20"
+      expect(window.pixelsModifierName).toBe('Original Second');
+      expect(window.pixelsModifier).toBe('20');
+    });
+
+    // ...existing code...
   });
 
   // Helper function to create a mock modifier box
