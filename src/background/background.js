@@ -1,19 +1,40 @@
 'use strict';
 
 chrome.runtime.onInstalled.addListener(function () {
-  // Storage example
-  //chrome.storage.sync.set({color: '#3aa757'}, function() { console.log("The color is green."); });
+  console.log('Pixels Roll20 Extension installed successfully');
 
-  chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
-    chrome.declarativeContent.onPageChanged.addRules([
-      {
-        conditions: [
-          new chrome.declarativeContent.PageStateMatcher({
-            pageUrl: { hostEquals: 'app.roll20.net' },
-          }),
-        ],
-        actions: [new chrome.declarativeContent.ShowPageAction()],
-      },
-    ]);
+  // Initialize storage if needed
+  chrome.storage.sync.get(['pixelsSettings'], function (result) {
+    if (!result.pixelsSettings) {
+      chrome.storage.sync.set(
+        {
+          pixelsSettings: {
+            autoConnect: true,
+            showModifierBox: true,
+            theme: 'auto',
+          },
+        },
+        function () {
+          console.log('Default settings initialized');
+        }
+      );
+    }
   });
+});
+
+// Handle messages from content scripts
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'getSettings') {
+    chrome.storage.sync.get(['pixelsSettings'], function (result) {
+      sendResponse(result.pixelsSettings || {});
+    });
+    return true; // Will respond asynchronously
+  }
+
+  if (request.action === 'saveSettings') {
+    chrome.storage.sync.set({ pixelsSettings: request.settings }, function () {
+      sendResponse({ success: true });
+    });
+    return true; // Will respond asynchronously
+  }
 });
