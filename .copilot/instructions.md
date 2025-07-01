@@ -2,19 +2,7 @@
 
 ## Summary Document Location Rule
 
-**CRITICAL**: All summary documents, progress reports, analysis reports, and documentation files created during development assistance MUST be placed in the `Copilot-Feedback/` directory.
-
-## Document Types for Copilot-Feedback/
-
-- Progress reports
-- Analysis summaries
-- Refactoring summaries
-- Test reports
-- Code review summaries
-- Architecture decisions
-- Performance analysis
-- Development assistance summaries
-- Any `.md` files created during Copilot sessions
+Please refrain from creating summary documents. Markdown documents should be limited to docs that are valuable for the end user unless otherwise requested
 
 ## File Naming
 
@@ -26,7 +14,8 @@ If `Copilot-Feedback/` doesn't exist, create it automatically when placing summa
 
 ## Project Standards
 
-- camelCase for file/directory names
+- camelCase for file
+- PascalCase for Component Directories
 - Comprehensive error handling
 - Jest test coverage maintenance
 - Chrome Extension Manifest V3 compliance

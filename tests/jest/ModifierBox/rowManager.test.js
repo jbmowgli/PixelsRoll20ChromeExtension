@@ -24,7 +24,7 @@ describe('ModifierBox Row Manager', () => {
     window.pixelsModifierName = 'Test Modifier';
     window.pixelsModifier = '5';
 
-    loadModule('src/content/modifierBox/rowManager.js');
+    loadModule('src/content/ModifierBox/rowManager.js');
   });
 
   describe('Module Initialization', () => {

@@ -14,7 +14,7 @@ function loadModule(modulePath) {
 describe('ModifierBox Drag Handler', () => {
   beforeEach(() => {
     resetMocks();
-    loadModule('src/content/modifierBox/dragHandler.js');
+    loadModule('src/content/ModifierBox/dragHandler.js');
   });
 
   describe('Module Initialization', () => {

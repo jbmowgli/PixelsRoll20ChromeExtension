@@ -33,7 +33,7 @@ describe('ModifierBox Theme Manager', () => {
     };
 
     // Load the theme manager module
-    loadModule('src/content/modifierBox/themeManager.js');
+    loadModule('src/content/ModifierBox/themeManager.js');
   });
 
   describe('Module Initialization', () => {
