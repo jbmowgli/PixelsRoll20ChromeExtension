@@ -4,6 +4,7 @@
   "description": "Connect Pixels dice to Roll20 via Bluetooth with advanced modifier support and seamless integration",
   "scripts": {
     "test": "jest",
+    "test:fast": "jest --maxWorkers=1 --no-cache --no-watchman",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "format": "prettier --write \"**/*.{js,json,html,css,md}\"",
@@ -34,7 +35,8 @@
       "<rootDir>/tests/jest/setup.js"
     ],
     "testMatch": [
-      "<rootDir>/tests/jest/**/*.test.js"
+      "<rootDir>/tests/jest/**/*.test.js",
+      "!<rootDir>/tests/jest/experimental/**/*.test.js"
     ],
     "collectCoverageFrom": [
       "src/content/**/*.js",
@@ -46,7 +48,13 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/tests/jest/experimental/"
-    ]
+    ],
+    "maxWorkers": 1,
+    "testTimeout": 5000,
+    "detectOpenHandles": false,
+    "forceExit": true,
+    "cache": false,
+    "watchman": false
   },
   "lint-staged": {
     "*.{js,json,html,css,md}": [
