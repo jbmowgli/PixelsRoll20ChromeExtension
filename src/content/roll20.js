@@ -228,25 +228,35 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     if (!device.gatt.connected) {
       log('Attempting to reconnect to ' + device.name);
       try {
+        // First, ensure we're disconnected cleanly
+        if (device.gatt.connected) {
+          device.gatt.disconnect();
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+        }
+
         const server = await device.gatt.connect();
 
+        // Wait a moment for the connection to stabilize
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Verify connection is still active
+        if (!server.connected) {
+          throw new Error('Connection lost immediately after connecting');
+        }
+
         // Detect which type of Pixel this is and use appropriate UUIDs
-        let serviceUuid, notifyUuid;
+        let service, notifyUuid;
         try {
           // Try modern UUIDs first
-          await server.getPrimaryService(PIXELS_SERVICE_UUID);
-          serviceUuid = PIXELS_SERVICE_UUID;
+          service = await server.getPrimaryService(PIXELS_SERVICE_UUID);
           notifyUuid = PIXELS_NOTIFY_CHARACTERISTIC;
           log('Reconnecting to modern Pixels die');
         } catch (error) {
           // Fall back to legacy UUIDs
-          await server.getPrimaryService(PIXELS_LEGACY_SERVICE_UUID);
-          serviceUuid = PIXELS_LEGACY_SERVICE_UUID;
+          service = await server.getPrimaryService(PIXELS_LEGACY_SERVICE_UUID);
           notifyUuid = PIXELS_LEGACY_NOTIFY_CHARACTERISTIC;
           log('Reconnecting to legacy Pixels die');
         }
-
-        const service = await server.getPrimaryService(serviceUuid);
         const notify = await service.getCharacteristic(notifyUuid);
 
         await notify.startNotifications();
@@ -257,12 +267,36 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
 
         // Restart connection monitoring
         startConnectionMonitoring(pixel);
+
+        // Reset retry count on successful reconnection
+        pixel._reconnectAttempts = 0;
       } catch (error) {
         log('Failed to reconnect to ' + device.name + ': ' + error);
-        // Try again in 10 seconds
-        setTimeout(() => {
-          attemptReconnection(device, pixel);
-        }, 10000);
+
+        // Implement exponential backoff
+        pixel._reconnectAttempts = (pixel._reconnectAttempts || 0) + 1;
+        const maxAttempts = 5;
+
+        if (pixel._reconnectAttempts < maxAttempts) {
+          const delay = Math.min(
+            5000 * Math.pow(2, pixel._reconnectAttempts - 1),
+            60000
+          ); // Cap at 1 minute
+          log(
+            `Retry ${pixel._reconnectAttempts}/${maxAttempts} in ${delay / 1000} seconds`
+          );
+
+          setTimeout(() => {
+            attemptReconnection(device, pixel);
+          }, delay);
+        } else {
+          log(
+            `Max reconnection attempts reached for ${device.name}. Giving up.`
+          );
+          sendTextToExtension(
+            `Failed to reconnect to ${pixel.name} after ${maxAttempts} attempts`
+          );
+        }
       }
     }
   }

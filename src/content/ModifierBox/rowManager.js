@@ -90,6 +90,7 @@
     const newRow = document.createElement('div');
     newRow.className = 'modifier-row';
     newRow.innerHTML = `
+            <div class="drag-handle" title="Drag to reorder">⋮⋮</div>
             <input type="radio" name="modifier-select" value="${rowCounter}" class="modifier-radio" id="mod-${rowCounter}">
             <input type="text" class="modifier-name" placeholder="Modifier ${rowCounter + 1}" value="Modifier ${rowCounter + 1}" data-index="${rowCounter}">
             <input type="number" class="modifier-value" value="0" min="-99" max="99" data-index="${rowCounter}">

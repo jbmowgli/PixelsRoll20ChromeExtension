@@ -187,6 +187,7 @@
             </div>
             <div class="pixels-content">
                 <div class="modifier-row">
+                    <div class="drag-handle" title="Drag to reorder">⋮⋮</div>
                     <input type="radio" name="modifier-select" value="0" class="modifier-radio" id="mod-0" checked>
                     <input type="text" class="modifier-name" placeholder="Modifier 1" value="Modifier 1" data-index="0">
                     <input type="number" class="modifier-value" value="0" min="-99" max="99" data-index="0">
@@ -314,6 +315,26 @@
       modifierBox,
       updateCallback
     );
+
+    // Setup drag and drop for rows (if available)
+    if (window.RowDragDrop) {
+      // Add drag handles to existing rows that don't have them
+      const existingRows = modifierBox.querySelectorAll('.modifier-row');
+      existingRows.forEach(row => {
+        if (!row.querySelector('.drag-handle')) {
+          window.RowDragDrop.addDragHandle(row);
+        }
+      });
+
+      window.modifierRowDragDrop = new window.RowDragDrop(
+        '#pixels-modifier-box .pixels-content',
+        '.modifier-row',
+        window.ModifierBoxRowManager
+      );
+      console.log('Row drag and drop initialized');
+    } else {
+      console.warn('RowDragDrop not available - drag and drop disabled');
+    }
 
     // Start theme monitoring
     window.ModifierBoxThemeManager.startThemeMonitoring((newTheme, colors) => {
