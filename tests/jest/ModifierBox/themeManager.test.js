@@ -79,15 +79,15 @@ describe('ModifierBox Theme Manager', () => {
       // Should attempt to load CSS files
       expect(window.CSSLoader.loadMultipleCSS).toHaveBeenCalledWith([
         expect.objectContaining({
-          path: 'src/content/modifierBox/styles/modifierBox.css',
+          path: 'src/content/ModifierBox/styles/modifierBox.css',
           id: 'pixels-modifier-box-base-styles',
         }),
         expect.objectContaining({
-          path: 'src/content/modifierBox/styles/minimized.css',
+          path: 'src/content/ModifierBox/styles/minimized.css',
           id: 'pixels-modifier-box-minimized-styles',
         }),
         expect.objectContaining({
-          path: 'src/content/modifierBox/styles/lightTheme.css',
+          path: 'src/content/ModifierBox/styles/lightTheme.css',
           id: 'pixels-modifier-box-light-theme-styles',
         }),
       ]);

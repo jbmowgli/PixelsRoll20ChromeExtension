@@ -29,14 +29,14 @@
         "https://app.roll20.net/editor/*"
       ],
       "js": [
-        "src/content/common/themeDetector.js",
-        "src/content/common/cssLoader.js",
-        "src/content/common/htmlLoader.js",
-        "src/content/modifierBox/themeManager.js",
-        "src/content/modifierBox/dragHandler.js",
-        "src/content/modifierBox/rowManager.js",
-        "src/content/modifierBox/dragDrop.js",
-        "src/content/modifierBox/modifierBox.js",
+        "src/content/Common/themeDetector.js",
+        "src/content/Common/cssLoader.js",
+        "src/content/Common/htmlLoader.js",
+        "src/content/ModifierBox/themeManager.js",
+        "src/content/ModifierBox/dragHandler.js",
+        "src/content/ModifierBox/rowManager.js",
+        "src/content/ModifierBox/dragDrop.js",
+        "src/content/ModifierBox/modifierBox.js",
         "src/content/roll20.js"
       ]
     }
@@ -45,8 +45,8 @@
     {
       "resources": [
         "assets/images/*",
-        "src/content/modifierBox/styles/*.css",
-        "src/content/modifierBox/*.html"
+        "src/content/ModifierBox/styles/*.css",
+        "src/content/ModifierBox/*.html"
       ],
       "matches": ["https://roll20.net/*", "https://app.roll20.net/*"]
     }
