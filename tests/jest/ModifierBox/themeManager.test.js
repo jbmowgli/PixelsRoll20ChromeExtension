@@ -193,17 +193,24 @@ describe('ModifierBox Theme Manager', () => {
       }).not.toThrow();
     });
 
-    test('should force reflow on elements', () => {
-      const offsetHeightSpy = jest
-        .spyOn(HTMLElement.prototype, 'offsetHeight', 'get')
-        .mockReturnValue(100);
+    test('should apply theme class to body element', () => {
+      const mockBody = document.body;
+      
+      // Mock ThemeDetector
+      global.window.ThemeDetector = {
+        getThemeColors: jest.fn().mockReturnValue({
+          theme: 'light',
+          background: '#ffffff',
+          text: '#333333',
+          // other colors...
+        })
+      };
 
       window.ModifierBoxThemeManager.updateTheme(mockModifierBox);
 
-      // Should trigger reflow
-      expect(offsetHeightSpy).toHaveBeenCalled();
-
-      offsetHeightSpy.mockRestore();
+      // Should apply the theme class to body
+      expect(mockBody.classList.contains('roll20-light-theme')).toBe(true);
+      expect(mockBody.classList.contains('roll20-dark-theme')).toBe(false);
     });
   });
 

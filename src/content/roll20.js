@@ -655,6 +655,13 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
           });
           pixels = [];
           sendStatusToExtension();
+        } else if (msg.action == 'getTheme') {
+          log('Received theme request');
+          // Get current theme from ThemeDetector
+          const theme = window.ThemeDetector ? window.ThemeDetector.detectTheme() : 'dark';
+          log('Sending theme response: ' + theme);
+          sendResponse({ theme: theme });
+          return true; // Keep the message channel open for async response
         }
       });
     } catch (error) {

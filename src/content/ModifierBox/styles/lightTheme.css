@@ -11,15 +11,24 @@
   border-bottom-color: #dddddd !important;
 }
 
-.roll20-light-theme #pixels-modifier-box .pixels-controls button {
+/* High specificity button overrides for light theme */
+.roll20-light-theme #pixels-modifier-box .pixels-controls button,
+.roll20-light-theme #pixels-modifier-box .pixels-controls .add-modifier-btn,
+.roll20-light-theme #pixels-modifier-box .pixels-controls .pixels-minimize,
+.roll20-light-theme #pixels-modifier-box .remove-row-btn {
   color: #333333 !important;
+  background-color: #f8f9fa !important;
+  border-color: #dddddd !important;
+}
+
+.roll20-light-theme #pixels-modifier-box .pixels-controls button:hover,
+.roll20-light-theme #pixels-modifier-box .pixels-controls .add-modifier-btn:hover,
+.roll20-light-theme #pixels-modifier-box .pixels-controls .pixels-minimize:hover,
+.roll20-light-theme #pixels-modifier-box .remove-row-btn:hover {
   background-color: #e9ecef !important;
 }
 
-.roll20-light-theme #pixels-modifier-box .pixels-controls button:hover {
-  background-color: #dee2e6 !important;
-}
-
+/* Clear All button remains red */
 .roll20-light-theme #pixels-modifier-box .clear-all-btn {
   color: #ffffff !important;
   background-color: #dc3545 !important;
@@ -54,36 +63,11 @@
   border-color: #cccccc !important;
 }
 
-.roll20-light-theme #pixels-modifier-box .remove-row-btn {
-  color: #333333 !important;
-  background-color: #e9ecef !important;
-}
-
-.roll20-light-theme #pixels-modifier-box .remove-row-btn:hover {
-  background-color: #dee2e6 !important;
-}
-
 .roll20-light-theme #pixels-modifier-box .modifier-row input[type='text'],
 .roll20-light-theme #pixels-modifier-box .modifier-row input[type='number'] {
   color: #333333 !important;
   background-color: #ffffff !important;
   border-color: #cccccc !important;
-}
-
-.roll20-light-theme #pixels-modifier-box .remove-row-btn {
-  color: #666666 !important;
-  background-color: #f8f9fa !important;
-  border-color: #dddddd !important;
-}
-
-.roll20-light-theme #pixels-modifier-box .add-row-btn {
-  color: #666666 !important;
-  border-color: #cccccc !important;
-}
-
-.roll20-light-theme #pixels-modifier-box .add-row-btn:hover {
-  border-color: #4caf50 !important;
-  color: #4caf50 !important;
 }
 
 .roll20-light-theme #pixels-modifier-box .pixels-resize-handle {

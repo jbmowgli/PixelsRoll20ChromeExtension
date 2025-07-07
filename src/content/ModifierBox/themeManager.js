@@ -18,47 +18,19 @@
       updateTheme(modifierBox);
     },
     forceElementUpdates: function (modifierBox) {
-      // Force immediate style updates on problematic elements
+      // Now that we use CSS classes, just re-apply the theme class to ensure proper styling
       if (!modifierBox) return;
-
+      
       const colors = window.ThemeDetector
         ? window.ThemeDetector.getThemeColors()
-        : {
-            theme: 'dark',
-            primary: '#4CAF50',
-            background: '#2b2b2b',
-            text: '#ffffff',
-            input: '#333333',
-            inputBorder: '#555555',
-            button: '#444444',
-            border: '#555555',
-          };
+        : { theme: 'dark' };
 
-      // Force update all inputs
-      const inputs = modifierBox.querySelectorAll(
-        'input[type="text"], input[type="number"]'
-      );
-      inputs.forEach(input => {
-        input.style.setProperty('color', colors.text, 'important');
-        input.style.setProperty('background-color', colors.input, 'important');
-        input.style.setProperty(
-          'border-color',
-          colors.inputBorder,
-          'important'
-        );
-      });
-
-      // Force update all remove buttons
-      const buttons = modifierBox.querySelectorAll('.remove-row-btn');
-      buttons.forEach(button => {
-        button.style.setProperty('color', colors.text, 'important');
-        button.style.setProperty(
-          'background-color',
-          colors.button,
-          'important'
-        );
-        button.style.setProperty('border-color', colors.border, 'important');
-      });
+      // Re-apply theme class to body
+      const body = document.body;
+      body.classList.remove('roll20-light-theme', 'roll20-dark-theme');
+      body.classList.add(`roll20-${colors.theme}-theme`);
+      
+      console.log(`Force updated theme class: roll20-${colors.theme}-theme`);
     },
   };
 
@@ -155,127 +127,15 @@
           border: '#555555',
         };
 
-    // Define element styles to update
-    const elementsToUpdate = [
-      {
-        selector: '#pixels-modifier-box',
-        styles: {
-          'background-color': colors.background,
-          color: colors.text,
-          'border-color': colors.border,
-        },
-      },
-      {
-        selector: '.pixels-header',
-        styles: {
-          'background-color': colors.button,
-          color: colors.text,
-          'border-bottom-color': colors.border,
-        },
-      },
-      {
-        selector: '.pixels-content',
-        styles: {
-          'background-color': colors.background,
-          color: colors.text,
-        },
-      },
-      {
-        selector: '.current-roll',
-        styles: {
-          'background-color': colors.button,
-          color: colors.text,
-          'border-color': colors.border,
-        },
-      },
-      {
-        selector: '.modifier-input',
-        styles: {
-          'background-color': colors.input,
-          color: colors.text,
-          'border-color': colors.inputBorder,
-        },
-      },
-      {
-        selector: '.modifier-row input[type="text"]',
-        styles: {
-          'background-color': colors.input,
-          color: colors.text,
-          'border-color': colors.inputBorder,
-        },
-      },
-      {
-        selector: '.modifier-row input[type="number"]',
-        styles: {
-          'background-color': colors.input,
-          color: colors.text,
-          'border-color': colors.inputBorder,
-        },
-      },
-      {
-        selector: '.remove-row-btn',
-        styles: {
-          'background-color': colors.button,
-          color: colors.text,
-          'border-color': colors.border,
-        },
-      },
-    ];
+    // Apply theme class to body element for CSS rules to work
+    const body = document.body;
+    body.classList.remove('roll20-light-theme', 'roll20-dark-theme');
+    body.classList.add(`roll20-${colors.theme}-theme`);
+    
+    console.log(`Applied theme class: roll20-${colors.theme}-theme`);
 
-    // Apply styles immediately to force visual update
-    elementsToUpdate.forEach(({ selector, styles }) => {
-      const elements = modifierBox.querySelectorAll(selector);
-      elements.forEach(element => {
-        Object.keys(styles).forEach(property => {
-          element.style.setProperty(property, styles[property], 'important');
-        });
-      });
-    });
-
-    // Force update on all input elements specifically
-    const allInputs = modifierBox.querySelectorAll(
-      'input[type="text"], input[type="number"]'
-    );
-    allInputs.forEach(input => {
-      input.style.setProperty('color', colors.text, 'important');
-      input.style.setProperty('background-color', colors.input, 'important');
-      input.style.setProperty('border-color', colors.inputBorder, 'important');
-      // Force re-render by temporarily changing a property
-      const originalOpacity = input.style.opacity;
-      input.style.opacity = '0.99';
-      input.offsetHeight; // Force reflow
-      input.style.opacity = originalOpacity;
-    });
-
-    // Force update on all remove buttons specifically
-    const allRemoveButtons = modifierBox.querySelectorAll('.remove-row-btn');
-    allRemoveButtons.forEach(button => {
-      button.style.setProperty('color', colors.text, 'important');
-      button.style.setProperty('background-color', colors.button, 'important');
-      button.style.setProperty('border-color', colors.border, 'important');
-      // Force re-render
-      const originalOpacity = button.style.opacity;
-      button.style.opacity = '0.99';
-      button.offsetHeight; // Force reflow
-      button.style.opacity = originalOpacity;
-    });
-
-    // Also update the modifier box itself if it matches the selector
-    if (modifierBox.id === 'pixels-modifier-box') {
-      const boxStyles = elementsToUpdate[0].styles;
-      Object.keys(boxStyles).forEach(property => {
-        modifierBox.style.setProperty(
-          property,
-          boxStyles[property],
-          'important'
-        );
-      });
-    }
-
-    // Final forced reflow on the entire modifier box
-    modifierBox.style.display = 'none';
-    modifierBox.offsetHeight; // Force reflow
-    modifierBox.style.display = 'block';
+    // Let CSS handle the styling now that we have the proper theme class applied
+    console.log(`Theme update complete. ${colors.theme} theme applied via CSS classes.`);
   }
 
   function startThemeMonitoring(onThemeChangeCallback) {

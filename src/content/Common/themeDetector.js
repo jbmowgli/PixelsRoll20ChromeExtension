@@ -8,7 +8,22 @@
   const ThemeDetector = {
     // Detect current Roll20 theme
     detectTheme() {
-      // Check for Roll20's theme classes on body or html
+      // First priority: Check Roll20's localStorage colorTheme setting
+      try {
+        const roll20Theme = localStorage.getItem('colorTheme');
+        if (roll20Theme === 'dark' || roll20Theme === 'light') {
+          console.log(`Theme detected from Roll20 localStorage: ${roll20Theme}`);
+          return roll20Theme;
+        } else if (roll20Theme) {
+          console.log(`Unexpected Roll20 theme value: ${roll20Theme}, falling back to other detection`);
+        } else {
+          console.log('No colorTheme found in localStorage, falling back to other detection');
+        }
+      } catch (error) {
+        console.warn('Could not access Roll20 localStorage colorTheme:', error);
+      }
+
+      // Second priority: Check for Roll20's theme classes on body or html
       const body = document.body;
       const html = document.documentElement;
 
@@ -114,65 +129,36 @@
     // Get Roll20 theme colors
     getThemeColors() {
       const theme = this.detectTheme();
-      const computedStyle = getComputedStyle(document.documentElement);
+      console.log(`Getting theme colors for detected theme: ${theme}`);
 
-      // Try to extract actual Roll20 colors
-      const colors = {
-        theme: theme,
-        primary: computedStyle.getPropertyValue('--primary-color') || '#4CAF50',
-        background:
-          computedStyle.getPropertyValue('--background-color') ||
-          computedStyle.getPropertyValue('--main-bg') ||
-          (theme === 'dark' ? '#2b2b2b' : '#ffffff'),
-        surface:
-          computedStyle.getPropertyValue('--surface-color') ||
-          (theme === 'dark' ? '#1a1a1a' : '#f5f5f5'),
-        border:
-          computedStyle.getPropertyValue('--border-color') ||
-          (theme === 'dark' ? '#555555' : '#cccccc'),
-        text:
-          computedStyle.getPropertyValue('--text-color') ||
-          (theme === 'dark' ? '#ffffff' : '#000000'),
-        textSecondary:
-          computedStyle.getPropertyValue('--text-secondary') ||
-          (theme === 'dark' ? '#cccccc' : '#666666'),
-        input:
-          computedStyle.getPropertyValue('--input-bg') ||
-          (theme === 'dark' ? '#333333' : '#ffffff'),
-        inputBorder:
-          computedStyle.getPropertyValue('--input-border') ||
-          (theme === 'dark' ? '#555555' : '#cccccc'),
-        button:
-          computedStyle.getPropertyValue('--button-bg') ||
-          (theme === 'dark' ? '#444444' : '#e0e0e0'),
-        buttonHover:
-          computedStyle.getPropertyValue('--button-hover') ||
-          (theme === 'dark' ? '#555555' : '#d0d0d0'),
+      // Define static, clean theme colors
+      const colors = theme === 'dark' ? {
+        theme: 'dark',
+        primary: '#4CAF50',
+        background: '#2b2b2b',
+        surface: '#1e1e1e',
+        border: '#444444',
+        text: '#ffffff',
+        textSecondary: '#cccccc',
+        input: '#333333',
+        inputBorder: '#555555',
+        button: '#404040',
+        buttonHover: '#505050',
+      } : {
+        theme: 'light',
+        primary: '#4CAF50',
+        background: '#ffffff',
+        surface: '#f8f9fa',
+        border: '#dee2e6',
+        text: '#212529',
+        textSecondary: '#6c757d',
+        input: '#ffffff',
+        inputBorder: '#ced4da',
+        button: 'rgb(248, 249, 250)',
+        buttonHover: '#e9ecef',
       };
 
-      // Try to detect actual Roll20 colors by sampling chat container
-      const chatContainer = document.querySelector(
-        '.textchatcontainer, #textchat'
-      );
-      if (chatContainer) {
-        const chatStyle = getComputedStyle(chatContainer);
-        if (
-          chatStyle.backgroundColor &&
-          chatStyle.backgroundColor !== 'rgba(0, 0, 0, 0)'
-        ) {
-          colors.background = chatStyle.backgroundColor;
-        }
-        if (
-          chatStyle.borderColor &&
-          chatStyle.borderColor !== 'rgba(0, 0, 0, 0)'
-        ) {
-          colors.border = chatStyle.borderColor;
-        }
-        if (chatStyle.color) {
-          colors.text = chatStyle.color;
-        }
-      }
-
+      console.log('Final theme colors:', colors);
       return colors;
     },
 
@@ -180,7 +166,33 @@
     onThemeChange(callback) {
       let currentTheme = this.detectTheme();
 
-      // Create mutation observer to watch for theme changes
+      // Monitor localStorage changes for Roll20's colorTheme
+      const originalSetItem = localStorage.setItem;
+      localStorage.setItem = function(key, value) {
+        if (key === 'colorTheme' && (value === 'dark' || value === 'light')) {
+          const newTheme = value;
+          if (newTheme !== currentTheme) {
+            currentTheme = newTheme;
+            console.log(`Theme changed via localStorage: ${newTheme}`);
+            callback(newTheme, ThemeDetector.getThemeColors());
+          }
+        }
+        return originalSetItem.apply(this, arguments);
+      };
+
+      // Listen for storage events (changes from other tabs/windows)
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'colorTheme' && (e.newValue === 'dark' || e.newValue === 'light')) {
+          const newTheme = e.newValue;
+          if (newTheme !== currentTheme) {
+            currentTheme = newTheme;
+            console.log(`Theme changed via storage event: ${newTheme}`);
+            callback(newTheme, ThemeDetector.getThemeColors());
+          }
+        }
+      });
+
+      // Create mutation observer to watch for theme changes (fallback)
       const observer = new MutationObserver(mutations => {
         const newTheme = this.detectTheme();
         if (newTheme !== currentTheme) {

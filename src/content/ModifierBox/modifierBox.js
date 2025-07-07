@@ -364,6 +364,10 @@
       window.ModifierBoxThemeManager.updateTheme(modifierBox);
     });
 
+    // Apply initial theme immediately
+    console.log('Applying initial theme to modifier box...');
+    window.ModifierBoxThemeManager.updateTheme(modifierBox);
+
     // Update header to show initial modifier
     window.ModifierBoxRowManager.updateSelectedModifier(modifierBox);
 
@@ -411,6 +415,13 @@
         window.ModifierBoxThemeManager.updateTheme(modifierBox);
         // Also force element-specific updates
         window.ModifierBoxThemeManager.forceElementUpdates(modifierBox);
+        
+        // Apply theme again after a short delay to ensure CSS is fully loaded
+        setTimeout(() => {
+          console.log('Applying delayed theme update...');
+          window.ModifierBoxThemeManager.updateTheme(modifierBox);
+          window.ModifierBoxThemeManager.forceElementUpdates(modifierBox);
+        }, 100);
       }
     }
 
