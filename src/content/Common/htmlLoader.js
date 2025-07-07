@@ -31,9 +31,20 @@
       }
 
       // For Chrome extensions, we need to get the full URL
-      const fullPath = chrome.runtime
-        ? chrome.runtime.getURL(templatePath)
-        : templatePath;
+      let fullPath;
+      try {
+        if (chrome && chrome.runtime && chrome.runtime.getURL) {
+          fullPath = chrome.runtime.getURL(templatePath);
+        } else {
+          throw new Error('Chrome runtime not available');
+        }
+      } catch (error) {
+        console.error('Error getting chrome extension URL:', error);
+        reject(new Error(`Chrome extension context not available: ${error.message}`));
+        return;
+      }
+
+      console.log(`Loading template from: ${fullPath}`);
 
       // Fetch the HTML content
       fetch(fullPath)
