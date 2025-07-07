@@ -611,11 +611,49 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         if (msg.action == 'getStatus') {
           sendStatusToExtension();
         } else if (msg.action == 'setModifier') {
+          // Instead of overwriting the UI, sync FROM the UI TO the global variables
+          // This prevents resetting user-entered values when the popup initializes
+          if (typeof window.ModifierBox !== 'undefined') {
+            const modifierBox = window.ModifierBox.getElement();
+            if (modifierBox) {
+              // Check if the modifier box has any user data
+              const selectedRadio = modifierBox.querySelector(
+                'input[name="modifier-select"]:checked'
+              );
+              if (selectedRadio) {
+                const index = parseInt(selectedRadio.value);
+                const rows = modifierBox.querySelectorAll('.modifier-row');
+                const row = rows[index];
+                if (row) {
+                  const valueInput = row.querySelector('.modifier-value');
+                  const nameInput = row.querySelector('.modifier-name');
+                  
+                  // If there's already user data in the UI, sync FROM UI TO global vars
+                  if (valueInput && nameInput) {
+                    const currentValue = valueInput.value;
+                    const currentName = nameInput.value;
+                    
+                    // Only update if the UI has meaningful data
+                    if (currentValue !== '' && currentName !== '') {
+                      window.pixelsModifier = currentValue;
+                      window.pixelsModifierName = currentName;
+                      log('Synced FROM UI: modifier=' + currentValue + ', name=' + currentName);
+                      saveModifierSettings();
+                      return; // Exit early, don't overwrite UI
+                    }
+                  }
+                }
+              }
+            }
+          }
+          
+          // If no meaningful UI data exists, then apply the popup's value
           if (window.pixelsModifier != msg.modifier) {
             window.pixelsModifier = msg.modifier || '0';
-            log('Updated modifier: ' + window.pixelsModifier);
-            saveModifierSettings(); // Save to localStorage
-            // Update floating box if it exists and ModifierBox is loaded
+            log('Updated modifier from popup: ' + window.pixelsModifier);
+            saveModifierSettings();
+            
+            // Only update UI if there's no existing meaningful data
             if (typeof window.ModifierBox !== 'undefined') {
               const modifierBox = window.ModifierBox.getElement();
               if (modifierBox) {
@@ -628,7 +666,10 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
                   const row = rows[index];
                   if (row) {
                     const valueInput = row.querySelector('.modifier-value');
-                    if (valueInput) valueInput.value = window.pixelsModifier;
+                    if (valueInput && (valueInput.value === '' || valueInput.value === '0')) {
+                      valueInput.value = window.pixelsModifier;
+                      log('Updated UI with popup value: ' + window.pixelsModifier);
+                    }
                   }
                 }
               }
