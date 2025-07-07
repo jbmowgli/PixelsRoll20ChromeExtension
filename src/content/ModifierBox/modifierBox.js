@@ -328,11 +328,11 @@
       updateCallback
     );
 
-    // Try to load saved modifier rows from sessionStorage
+    // Try to load saved modifier rows from localStorage
     if (window.ModifierBoxRowManager.loadModifierRows) {
       const loaded = window.ModifierBoxRowManager.loadModifierRows(modifierBox, updateCallback);
       if (loaded) {
-        console.log('Successfully loaded modifier rows from sessionStorage');
+        console.log('Successfully loaded modifier rows from localStorage');
       } else {
         console.log('No saved modifier rows found, using default');
       }

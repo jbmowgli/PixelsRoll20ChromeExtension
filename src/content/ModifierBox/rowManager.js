@@ -105,7 +105,7 @@
     // Update event listeners for all rows
     updateEventListeners(modifierBox, updateSelectedModifierCallback);
 
-    // Save the updated state to sessionStorage
+    // Save the updated state to localStorage
     saveModifierRows(modifierBox);
 
     // Force theme updates on the new elements
@@ -160,7 +160,7 @@
         updateSelectedModifierCallback();
       }
 
-      // Save the updated state to sessionStorage
+      // Save the updated state to localStorage
       saveModifierRows(modifierBox);
 
       return;
@@ -189,7 +189,7 @@
     // Reindex rows to maintain consistency
     reindexRows(modifierBox);
 
-    // Save the updated state to sessionStorage
+    // Save the updated state to localStorage
     saveModifierRows(modifierBox);
   }
 
@@ -294,12 +294,12 @@
           console.log(`Updated pixelsModifier to: "${window.pixelsModifier}"`);
         }
 
-        // Save the updated values to sessionStorage
+        // Save the updated values to localStorage
         if (typeof window.updateModifierSettings === 'function') {
           window.updateModifierSettings(window.pixelsModifier, window.pixelsModifierName);
         }
 
-        // Save the modifier rows state to sessionStorage
+        // Save the modifier rows state to localStorage
         saveModifierRows(modifierBox);
 
         // Update the header title to show the selected modifier
@@ -335,7 +335,7 @@
     }
   }
 
-  // Function to save all modifier rows to sessionStorage
+  // Function to save all modifier rows to localStorage
   function saveModifierRows(modifierBox) {
     if (!modifierBox) return;
 
@@ -370,25 +370,25 @@
         lastUpdated: Date.now()
       };
 
-      sessionStorage.setItem('pixels_modifier_rows', JSON.stringify(modifierState));
-      console.log('Saved modifier rows to sessionStorage:', modifierState);
+      localStorage.setItem('pixels_modifier_rows', JSON.stringify(modifierState));
+      console.log('Saved modifier rows to localStorage:', modifierState);
     } catch (error) {
       console.error('Error saving modifier rows:', error);
     }
   }
 
-  // Function to load modifier rows from sessionStorage
+  // Function to load modifier rows from localStorage
   function loadModifierRows(modifierBox, updateSelectedModifierCallback) {
     if (!modifierBox) return false;
 
     try {
-      const stored = sessionStorage.getItem('pixels_modifier_rows');
+      const stored = localStorage.getItem('pixels_modifier_rows');
       if (!stored) return false;
 
       const modifierState = JSON.parse(stored);
       if (!modifierState.rows || !Array.isArray(modifierState.rows)) return false;
 
-      console.log('Loading modifier rows from sessionStorage:', modifierState);
+      console.log('Loading modifier rows from localStorage:', modifierState);
 
       // Restore row counter
       if (modifierState.rowCounter) {
@@ -449,7 +449,7 @@
   // Function to clear stored modifier rows
   function clearStoredModifierRows() {
     try {
-      sessionStorage.removeItem('pixels_modifier_rows');
+      localStorage.removeItem('pixels_modifier_rows');
       console.log('Cleared stored modifier rows');
     } catch (error) {
       console.error('Error clearing stored modifier rows:', error);

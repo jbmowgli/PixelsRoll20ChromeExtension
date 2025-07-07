@@ -614,7 +614,7 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
           if (window.pixelsModifier != msg.modifier) {
             window.pixelsModifier = msg.modifier || '0';
             log('Updated modifier: ' + window.pixelsModifier);
-            saveModifierSettings(); // Save to sessionStorage
+            saveModifierSettings(); // Save to localStorage
             // Update floating box if it exists and ModifierBox is loaded
             if (typeof window.ModifierBox !== 'undefined') {
               const modifierBox = window.ModifierBox.getElement();

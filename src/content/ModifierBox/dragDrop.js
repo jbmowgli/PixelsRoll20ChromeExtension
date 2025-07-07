@@ -182,7 +182,7 @@ class RowDragDrop {
       if (modifierBox) {
         this.rowManager.reindexRows(modifierBox);
         
-        // Save the new order to sessionStorage after reindexing
+        // Save the new order to localStorage after reindexing
         if (typeof this.rowManager.saveModifierRows === 'function') {
           this.rowManager.saveModifierRows(modifierBox);
         }
