@@ -310,6 +310,16 @@
       updateCallback
     );
 
+    // Try to load saved modifier rows from sessionStorage
+    if (window.ModifierBoxRowManager.loadModifierRows) {
+      const loaded = window.ModifierBoxRowManager.loadModifierRows(modifierBox, updateCallback);
+      if (loaded) {
+        console.log('Successfully loaded modifier rows from sessionStorage');
+      } else {
+        console.log('No saved modifier rows found, using default');
+      }
+    }
+
     // Setup drag and drop for rows (if available)
     if (window.RowDragDrop) {
       // Add drag handles to existing rows that don't have them

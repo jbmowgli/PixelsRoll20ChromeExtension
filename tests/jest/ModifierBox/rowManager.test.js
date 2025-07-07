@@ -543,9 +543,9 @@ describe('ModifierBox Row Manager', () => {
         mockCallback
       );
 
-      expect(radioSpy).toHaveBeenCalledWith('change', mockCallback);
-      expect(nameSpy).toHaveBeenCalledWith('input', mockCallback);
-      expect(valueSpy).toHaveBeenCalledWith('input', mockCallback);
+      expect(radioSpy).toHaveBeenCalledWith('change', expect.any(Function));
+      expect(nameSpy).toHaveBeenCalledWith('input', expect.any(Function));
+      expect(valueSpy).toHaveBeenCalledWith('input', expect.any(Function));
     });
 
     test('should setup remove button onclick handlers', () => {

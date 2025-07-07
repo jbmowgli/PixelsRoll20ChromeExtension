@@ -48,7 +48,9 @@
     updateSelectedModifier: updateSelectedModifier,
     clearModifierState: clearModifierState,
     reindexRows: reindexRows,
-    clearModifierState: clearModifierState,
+    saveModifierRows: saveModifierRows,
+    loadModifierRows: loadModifierRows,
+    clearStoredModifierRows: clearStoredModifierRows,
     getRowCounter: () => rowCounter,
     setRowCounter: value => (rowCounter = value),
   };
@@ -102,6 +104,9 @@
     // Update event listeners for all rows
     updateEventListeners(modifierBox, updateSelectedModifierCallback);
 
+    // Save the updated state to sessionStorage
+    saveModifierRows(modifierBox);
+
     // Force theme updates on the new elements
     if (
       window.ModifierBoxThemeManager &&
@@ -154,6 +159,9 @@
         updateSelectedModifierCallback();
       }
 
+      // Save the updated state to sessionStorage
+      saveModifierRows(modifierBox);
+
       return;
     }
 
@@ -179,6 +187,9 @@
 
     // Reindex rows to maintain consistency
     reindexRows(modifierBox);
+
+    // Save the updated state to sessionStorage
+    saveModifierRows(modifierBox);
   }
 
   // Function to reindex all rows after deletion
@@ -222,13 +233,22 @@
       // Add event listeners (removing duplicates isn't critical since
       // addEventListener with the same function reference won't add duplicates)
       if (radio && updateSelectedModifierCallback) {
-        radio.addEventListener('change', updateSelectedModifierCallback);
+        radio.addEventListener('change', () => {
+          updateSelectedModifierCallback();
+          saveModifierRows(modifierBox);
+        });
       }
       if (nameInput && updateSelectedModifierCallback) {
-        nameInput.addEventListener('input', updateSelectedModifierCallback);
+        nameInput.addEventListener('input', () => {
+          updateSelectedModifierCallback();
+          saveModifierRows(modifierBox);
+        });
       }
       if (valueInput && updateSelectedModifierCallback) {
-        valueInput.addEventListener('input', updateSelectedModifierCallback);
+        valueInput.addEventListener('input', () => {
+          updateSelectedModifierCallback();
+          saveModifierRows(modifierBox);
+        });
       }
 
       // For remove button, we need to ensure we get the right row
@@ -273,10 +293,13 @@
           console.log(`Updated pixelsModifier to: "${window.pixelsModifier}"`);
         }
 
-        // Save the updated values to campaign-specific localStorage
+        // Save the updated values to sessionStorage
         if (typeof window.updateModifierSettings === 'function') {
           window.updateModifierSettings(window.pixelsModifier, window.pixelsModifierName);
         }
+
+        // Save the modifier rows state to sessionStorage
+        saveModifierRows(modifierBox);
 
         // Update the header title to show the selected modifier
         const headerTitle = modifierBox.querySelector('.pixels-title');
@@ -308,6 +331,127 @@
     } else {
       // No radio button is selected, clear global variables
       clearModifierState(modifierBox);
+    }
+  }
+
+  // Function to save all modifier rows to sessionStorage
+  function saveModifierRows(modifierBox) {
+    if (!modifierBox) return;
+
+    try {
+      const rows = modifierBox.querySelectorAll('.modifier-row');
+      const rowsData = [];
+      let selectedIndex = -1;
+
+      // Capture rows in their current DOM order (preserves drag-and-drop order)
+      rows.forEach((row, domIndex) => {
+        const radio = row.querySelector('.modifier-radio');
+        const nameInput = row.querySelector('.modifier-name');
+        const valueInput = row.querySelector('.modifier-value');
+
+        if (nameInput && valueInput) {
+          rowsData.push({
+            name: nameInput.value || `Modifier ${domIndex + 1}`,
+            value: valueInput.value || '0',
+            originalIndex: radio ? radio.value : domIndex.toString() // Store original index for reference
+          });
+
+          if (radio && radio.checked) {
+            selectedIndex = domIndex; // Use DOM index for selection
+          }
+        }
+      });
+
+      const modifierState = {
+        rows: rowsData,
+        selectedIndex: selectedIndex,
+        rowCounter: rowCounter,
+        lastUpdated: Date.now()
+      };
+
+      sessionStorage.setItem('pixels_modifier_rows', JSON.stringify(modifierState));
+      console.log('Saved modifier rows to sessionStorage:', modifierState);
+    } catch (error) {
+      console.error('Error saving modifier rows:', error);
+    }
+  }
+
+  // Function to load modifier rows from sessionStorage
+  function loadModifierRows(modifierBox, updateSelectedModifierCallback) {
+    if (!modifierBox) return false;
+
+    try {
+      const stored = sessionStorage.getItem('pixels_modifier_rows');
+      if (!stored) return false;
+
+      const modifierState = JSON.parse(stored);
+      if (!modifierState.rows || !Array.isArray(modifierState.rows)) return false;
+
+      console.log('Loading modifier rows from sessionStorage:', modifierState);
+
+      // Restore row counter
+      if (modifierState.rowCounter) {
+        rowCounter = modifierState.rowCounter;
+      }
+
+      // Clear existing rows
+      const content = modifierBox.querySelector('.pixels-content');
+      if (!content) return false;
+
+      // Remove all existing modifier rows
+      const existingRows = content.querySelectorAll('.modifier-row');
+      existingRows.forEach(row => row.remove());
+
+      // Recreate rows from stored data
+      modifierState.rows.forEach((rowData, index) => {
+        const newRow = document.createElement('div');
+        newRow.className = 'modifier-row';
+        newRow.innerHTML = `
+          <div class="drag-handle" title="Drag to reorder">⋮⋮</div>
+          <input type="radio" name="modifier-select" value="${index}" class="modifier-radio" id="mod-${index}">
+          <input type="text" class="modifier-name" placeholder="Modifier ${index + 1}" value="${rowData.name}" data-index="${index}">
+          <input type="number" class="modifier-value" value="${rowData.value}" min="-99" max="99" data-index="${index}">
+          <button class="remove-row-btn" type="button">×</button>
+        `;
+
+        content.appendChild(newRow);
+      });
+
+      // Restore selected row
+      if (modifierState.selectedIndex >= 0 && modifierState.selectedIndex < modifierState.rows.length) {
+        const selectedRadio = modifierBox.querySelector(`input[name="modifier-select"][value="${modifierState.selectedIndex}"]`);
+        if (selectedRadio) {
+          selectedRadio.checked = true;
+        }
+      }
+
+      // Update event listeners for all rows
+      updateEventListeners(modifierBox, updateSelectedModifierCallback);
+
+      // Update the selected modifier to sync global variables
+      if (updateSelectedModifierCallback) {
+        updateSelectedModifierCallback();
+      }
+
+      // Force theme updates on the restored elements
+      if (window.ModifierBoxThemeManager && window.ModifierBoxThemeManager.forceElementUpdates) {
+        window.ModifierBoxThemeManager.forceElementUpdates(modifierBox);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error loading modifier rows:', error);
+      return false;
+    }
+  }
+
+  // Function to clear stored modifier rows
+  function clearStoredModifierRows() {
+    try {
+      sessionStorage.removeItem('pixels_modifier_rows');
+      console.log('Cleared stored modifier rows');
+    } catch (error) {
+      console.error('Error clearing stored modifier rows:', error);
     }
   }
 })();

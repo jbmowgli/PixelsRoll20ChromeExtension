@@ -181,6 +181,11 @@ class RowDragDrop {
       const modifierBox = this.container.closest('#pixels-modifier-box');
       if (modifierBox) {
         this.rowManager.reindexRows(modifierBox);
+        
+        // Save the new order to sessionStorage after reindexing
+        if (typeof this.rowManager.saveModifierRows === 'function') {
+          this.rowManager.saveModifierRows(modifierBox);
+        }
       }
     }
 

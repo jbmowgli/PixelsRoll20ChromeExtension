@@ -610,6 +610,7 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
           if (window.pixelsModifier != msg.modifier) {
             window.pixelsModifier = msg.modifier || '0';
             log('Updated modifier: ' + window.pixelsModifier);
+            saveModifierSettings(); // Save to sessionStorage
             // Update floating box if it exists and ModifierBox is loaded
             if (typeof window.ModifierBox !== 'undefined') {
               const modifierBox = window.ModifierBox.getElement();
@@ -660,7 +661,56 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     }
   }
 
+  //
+  // Session Storage Functions (simple, no campaign ID dependency)
+  //
+  function saveModifierSettings() {
+    try {
+      const settings = {
+        modifier: window.pixelsModifier,
+        modifierName: window.pixelsModifierName,
+        lastUpdated: Date.now()
+      };
+      sessionStorage.setItem('pixels_roll20_settings', JSON.stringify(settings));
+      log('Saved modifier settings to sessionStorage');
+    } catch (error) {
+      log('Error saving modifier settings:', error);
+    }
+  }
+
+  function loadModifierSettings() {
+    try {
+      const stored = sessionStorage.getItem('pixels_roll20_settings');
+      if (stored) {
+        const settings = JSON.parse(stored);
+        window.pixelsModifier = settings.modifier || '0';
+        window.pixelsModifierName = settings.modifierName || 'Modifier 1';
+        log(`Loaded modifier settings: ${window.pixelsModifier}, ${window.pixelsModifierName}`);
+        return true;
+      }
+    } catch (error) {
+      log('Error loading modifier settings:', error);
+    }
+    return false;
+  }
+
+  function updateModifierSettings(modifier, modifierName) {
+    window.pixelsModifier = modifier || '0';
+    window.pixelsModifierName = modifierName || 'Modifier 1';
+    saveModifierSettings();
+    log(`Updated modifier settings: ${modifier}, ${modifierName}`);
+  }
+
+  // Make functions available globally
+  window.saveModifierSettings = saveModifierSettings;
+  window.loadModifierSettings = loadModifierSettings;
+  window.updateModifierSettings = updateModifierSettings;
+
   sendStatusToExtension();
+
+  // Load modifier settings from sessionStorage
+  log('Loading modifier settings from sessionStorage...');
+  loadModifierSettings();
 
   // Show modifier box by default
   log('Attempting to show modifier box automatically...');
