@@ -49,6 +49,10 @@
   display: none !important;
 }
 
+#pixels-modifier-box.minimized .clear-all-btn {
+  display: none !important;
+}
+
 #pixels-modifier-box.minimized .pixels-resize-handle {
   display: none !important;
 }

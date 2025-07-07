@@ -277,6 +277,22 @@ describe('Roll20.js - Comprehensive Tests', () => {
         global.window.sendMessageToExtension({ action: 'test' });
       }).not.toThrow();
 
+      // Should not log "Extension context invalidated" errors - they are handled silently
+      expect(console.log).not.toHaveBeenCalledWith(
+        'Could not send message to extension:',
+        expect.any(Error)
+      );
+    });
+
+    test('should log other sendMessage errors', () => {
+      mockChrome.runtime.sendMessage.mockImplementation(() => {
+        throw new Error('Some other error');
+      });
+
+      expect(() => {
+        global.window.sendMessageToExtension({ action: 'test' });
+      }).not.toThrow();
+
       expect(console.log).toHaveBeenCalledWith(
         'Could not send message to extension:',
         expect.any(Error)

@@ -51,7 +51,11 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         chrome.runtime.sendMessage(data);
       }
     } catch (error) {
-      console.log('Could not send message to extension:', error);
+      // Only log if it's not the common "Extension context invalidated" error
+      if (!error.message.includes('Extension context invalidated')) {
+        console.log('Could not send message to extension:', error);
+      }
+      // Extension context invalidated is normal when extension is reloaded - ignore silently
     }
   };
 
@@ -662,7 +666,7 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
   }
 
   //
-  // Session Storage Functions (simple, no campaign ID dependency)
+  // Local Storage Functions (persistent storage)
   //
   function saveModifierSettings() {
     try {
@@ -671,8 +675,8 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         modifierName: window.pixelsModifierName,
         lastUpdated: Date.now()
       };
-      sessionStorage.setItem('pixels_roll20_settings', JSON.stringify(settings));
-      log('Saved modifier settings to sessionStorage');
+      localStorage.setItem('pixels_roll20_settings', JSON.stringify(settings));
+      log('Saved modifier settings to localStorage');
     } catch (error) {
       log('Error saving modifier settings:', error);
     }
@@ -680,7 +684,7 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
 
   function loadModifierSettings() {
     try {
-      const stored = sessionStorage.getItem('pixels_roll20_settings');
+      const stored = localStorage.getItem('pixels_roll20_settings');
       if (stored) {
         const settings = JSON.parse(stored);
         window.pixelsModifier = settings.modifier || '0';
@@ -701,15 +705,27 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     log(`Updated modifier settings: ${modifier}, ${modifierName}`);
   }
 
+  function clearAllModifierSettings() {
+    try {
+      localStorage.removeItem('pixels_roll20_settings');
+      window.pixelsModifier = '0';
+      window.pixelsModifierName = 'Modifier 1';
+      log('Cleared all modifier settings from localStorage');
+    } catch (error) {
+      log('Error clearing modifier settings:', error);
+    }
+  }
+
   // Make functions available globally
   window.saveModifierSettings = saveModifierSettings;
   window.loadModifierSettings = loadModifierSettings;
   window.updateModifierSettings = updateModifierSettings;
+  window.clearAllModifierSettings = clearAllModifierSettings;
 
   sendStatusToExtension();
 
-  // Load modifier settings from sessionStorage
-  log('Loading modifier settings from sessionStorage...');
+  // Load modifier settings from localStorage
+  log('Loading modifier settings from localStorage...');
   loadModifierSettings();
 
   // Show modifier box by default

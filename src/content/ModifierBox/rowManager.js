@@ -51,6 +51,7 @@
     saveModifierRows: saveModifierRows,
     loadModifierRows: loadModifierRows,
     clearStoredModifierRows: clearStoredModifierRows,
+    resetAllRows: resetAllRows,
     getRowCounter: () => rowCounter,
     setRowCounter: value => (rowCounter = value),
   };
@@ -453,5 +454,56 @@
     } catch (error) {
       console.error('Error clearing stored modifier rows:', error);
     }
+  }
+
+  // Function to reset all rows to default values
+  function resetAllRows(modifierBox, updateSelectedModifierCallback) {
+    if (!modifierBox) {
+      console.error('resetAllRows: modifierBox is required');
+      return;
+    }
+
+    // Remove all existing rows
+    const content = modifierBox.querySelector('.pixels-content');
+    if (!content) {
+      console.error('resetAllRows: content area not found');
+      return;
+    }
+
+    // Clear all existing rows
+    content.innerHTML = '';
+
+    // Reset row counter
+    rowCounter = 1;
+
+    // Create single default row
+    const defaultRow = document.createElement('div');
+    defaultRow.className = 'modifier-row';
+    defaultRow.innerHTML = `
+      <div class="drag-handle" title="Drag to reorder">⋮⋮</div>
+      <input type="radio" name="modifier-select" value="0" class="modifier-radio" id="mod-0" checked>
+      <input type="text" class="modifier-name" placeholder="Modifier 1" value="Modifier 1" data-index="0">
+      <input type="number" class="modifier-value" value="0" min="-99" max="99" data-index="0">
+      <button class="remove-row-btn" type="button">×</button>
+    `;
+
+    content.appendChild(defaultRow);
+
+    // Reset global variables
+    window.pixelsModifier = '0';
+    window.pixelsModifierName = 'Modifier 1';
+
+    // Update event listeners for the new row
+    updateEventListeners(modifierBox, updateSelectedModifierCallback);
+
+    // Update selected modifier display
+    if (updateSelectedModifierCallback) {
+      updateSelectedModifierCallback();
+    }
+
+    // Clear stored modifier rows
+    clearStoredModifierRows();
+
+    console.log('All rows reset to default');
   }
 })();

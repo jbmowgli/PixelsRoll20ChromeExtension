@@ -48,6 +48,7 @@
         window.ModifierBoxRowManager.updateSelectedModifier(modifierBox);
       }
     },
+    clearAll: clearAllModifiers,
   };
 
   async function createModifierBox() {
@@ -176,6 +177,7 @@
                 </span>
                 <div class="pixels-controls">
                     <button class="add-modifier-btn" type="button" title="Add Row">Add</button>
+                    <button class="clear-all-btn" type="button" title="Clear All">Clear All</button>
                     <button class="pixels-minimize" title="Minimize">−</button>
                 </div>
             </div>
@@ -227,6 +229,22 @@
 
     // Add minimize functionality
     const minimizeBtn = modifierBox.querySelector('.pixels-minimize');
+    
+    // Add clear all functionality
+    const clearAllBtn = modifierBox.querySelector('.clear-all-btn');
+    
+    if (clearAllBtn) {
+      console.log('Clear All button found, adding event listener');
+      clearAllBtn.addEventListener('click', e => {
+        console.log('Clear All button clicked');
+        e.preventDefault();
+        e.stopPropagation();
+        
+        clearAllModifiers();
+      });
+    } else {
+      console.error('Clear All button not found!');
+    }
 
     if (minimizeBtn) {
       console.log('Minimize button found, adding event listener');
@@ -416,6 +434,34 @@
     } else {
       console.error('Cannot hide - modifierBox is null');
     }
+  }
+
+  function clearAllModifiers() {
+    console.log('clearAllModifiers called');
+    
+    if (!modifierBox) {
+      console.error('Cannot clear modifiers - modifierBox is null');
+      return;
+    }
+
+    // Clear localStorage
+    if (typeof window.clearAllModifierSettings === 'function') {
+      window.clearAllModifierSettings();
+    }
+
+    // Reset all rows using rowManager
+    if (window.ModifierBoxRowManager && window.ModifierBoxRowManager.resetAllRows) {
+      const updateCallback = () => {
+        if (window.ModifierBoxRowManager.updateSelectedModifier) {
+          window.ModifierBoxRowManager.updateSelectedModifier(modifierBox);
+        }
+      };
+      window.ModifierBoxRowManager.resetAllRows(modifierBox, updateCallback);
+    } else {
+      console.error('ModifierBoxRowManager.resetAllRows not available');
+    }
+
+    console.log('All modifiers cleared successfully');
   }
 
   // Cleanup on page unload

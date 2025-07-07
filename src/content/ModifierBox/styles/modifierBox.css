@@ -52,7 +52,8 @@
 }
 
 #pixels-modifier-box .pixels-controls button {
-  width: 24px !important;
+  width: auto !important;
+  min-width: 24px !important;
   height: 24px !important;
   border: none !important;
   border-radius: 4px !important;
@@ -65,17 +66,20 @@
   color: #ffffff !important;
   background-color: #444444 !important;
   transition: background-color 0.2s ease !important;
+  padding: 0 6px !important;
+  white-space: nowrap !important;
 }
 
 #pixels-modifier-box .pixels-controls button:hover {
   background-color: #666666 !important;
 }
 
-#pixels-modifier-box .add-modifier-btn {
-  width: auto !important;
-  padding: 4px 8px !important;
-  font-size: 11px !important;
-  border-radius: 3px !important;
+#pixels-modifier-box .clear-all-btn {
+  background-color: #d32f2f !important;
+}
+
+#pixels-modifier-box .clear-all-btn:hover {
+  background-color: #f44336 !important;
 }
 
 /* Content Area */
@@ -385,4 +389,11 @@
 #pixels-modifier-box .modifier-row:not(.dragging):hover {
   background-color: rgba(255, 255, 255, 0.05) !important;
   border-radius: 4px !important;
+}
+
+/* Specific styling for the minimize button to keep it square */
+#pixels-modifier-box .pixels-minimize {
+  width: 24px !important;
+  min-width: 24px !important;
+  padding: 0 !important;
 }
