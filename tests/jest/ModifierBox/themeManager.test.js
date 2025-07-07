@@ -132,9 +132,6 @@ describe('ModifierBox Theme Manager', () => {
         '#pixels-modifier-box-styles-fallback'
       );
       expect(styleElements.length).toBe(1);
-      expect(console.log).toHaveBeenCalledWith(
-        'Fallback modifier box styles already added, skipping'
-      );
     });
 
     test('should include comprehensive CSS rules in fallback', () => {
@@ -178,22 +175,11 @@ describe('ModifierBox Theme Manager', () => {
 
       // Check that styles were applied (we can't easily test the exact values due to browser differences)
       expect(window.ThemeDetector.getThemeColors).toHaveBeenCalled();
-
-      // Verify the theme update process was called
-      expect(console.log).toHaveBeenCalledWith(
-        'Updating modifier box theme...'
-      );
-      expect(console.log).toHaveBeenCalledWith(
-        'Theme update completed with immediate style application'
-      );
     });
 
     test('should handle null modifier box gracefully', () => {
       window.ModifierBoxThemeManager.updateTheme(null);
-
-      expect(console.log).toHaveBeenCalledWith(
-        'updateTheme called but modifierBox is null'
-      );
+      // Should not throw any errors
     });
 
     test('should use fallback colors when ThemeDetector is not available', () => {
@@ -202,9 +188,9 @@ describe('ModifierBox Theme Manager', () => {
       window.ModifierBoxThemeManager.updateTheme(mockModifierBox);
 
       // Should still complete without error
-      expect(console.log).toHaveBeenCalledWith(
-        'Theme update completed with immediate style application'
-      );
+      expect(() => {
+        window.ModifierBoxThemeManager.updateTheme(mockModifierBox);
+      }).not.toThrow();
     });
 
     test('should force reflow on elements', () => {
@@ -275,9 +261,6 @@ describe('ModifierBox Theme Manager', () => {
       window.ModifierBoxThemeManager.startThemeMonitoring(mockCallback);
 
       expect(window.ThemeDetector.onThemeChange).toHaveBeenCalled();
-      expect(console.log).toHaveBeenCalledWith(
-        'Starting theme monitoring for modifier box...'
-      );
     });
 
     test('should not start monitoring if ThemeDetector is unavailable', () => {
@@ -286,10 +269,7 @@ describe('ModifierBox Theme Manager', () => {
 
       window.ModifierBoxThemeManager.startThemeMonitoring(mockCallback);
 
-      // Should not throw error or log starting message
-      expect(console.log).not.toHaveBeenCalledWith(
-        'Starting theme monitoring for modifier box...'
-      );
+      // Should not throw error
     });
 
     test('should not start multiple observers', () => {
@@ -311,9 +291,6 @@ describe('ModifierBox Theme Manager', () => {
       window.ModifierBoxThemeManager.stopThemeMonitoring();
 
       expect(mockObserver.disconnect).toHaveBeenCalled();
-      expect(console.log).toHaveBeenCalledWith(
-        'Stopping theme monitoring for modifier box...'
-      );
     });
 
     test('should handle stopping monitoring when no observer exists', () => {
@@ -347,21 +324,12 @@ describe('ModifierBox Theme Manager', () => {
 
       window.ModifierBoxThemeManager.forceThemeRefresh(mockModifierBox);
 
-      // Verify the console message was logged
-      expect(console.log).toHaveBeenCalledWith('Forcing theme refresh...');
-
       // The function should run without errors
       expect(mockModifierBox).toBeTruthy();
     });
   });
 
   describe('Integration', () => {
-    test('should log initialization message', () => {
-      expect(console.log).toHaveBeenCalledWith(
-        'ModifierBoxThemeManager module initialized'
-      );
-    });
-
     test('should work with different theme color schemes', () => {
       const lightTheme = {
         theme: 'light',
@@ -383,11 +351,6 @@ describe('ModifierBox Theme Manager', () => {
       expect(() => {
         window.ModifierBoxThemeManager.updateTheme(mockBox);
       }).not.toThrow();
-
-      expect(console.log).toHaveBeenCalledWith(
-        'Using theme colors:',
-        lightTheme
-      );
     });
   });
 });

@@ -15,7 +15,6 @@
     stopThemeMonitoring: stopThemeMonitoring,
     forceThemeRefresh: function (modifierBox) {
       // Force an immediate theme refresh
-      console.log('Forcing theme refresh...');
       updateTheme(modifierBox);
     },
     forceElementUpdates: function (modifierBox) {
@@ -64,8 +63,6 @@
   };
 
   function addModifierBoxStyles() {
-    console.log('Loading modifier box styles from external CSS files...');
-
     // Check if CSSLoader is available
     if (!window.CSSLoader) {
       console.error(
@@ -94,7 +91,7 @@
     // Load all CSS files
     window.CSSLoader.loadMultipleCSS(cssFiles)
       .then(() => {
-        console.log('All modifier box CSS files loaded successfully');
+        // CSS files loaded successfully
       })
       .catch(error => {
         console.error(
@@ -109,11 +106,8 @@
   function addInlineStyles() {
     const styleId = 'pixels-modifier-box-styles-fallback';
     if (document.getElementById(styleId)) {
-      console.log('Fallback modifier box styles already added, skipping');
       return;
     }
-
-    console.log('Adding fallback inline modifier box styles...');
 
     const style = document.createElement('style');
     style.id = styleId;
@@ -140,16 +134,12 @@
         `;
 
     document.head.appendChild(style);
-    console.log('Fallback modifier box styles added successfully');
   }
 
   function updateTheme(modifierBox) {
     if (!modifierBox) {
-      console.log('updateTheme called but modifierBox is null');
       return;
     }
-
-    console.log('Updating modifier box theme...');
 
     // Get current theme colors
     const colors = window.ThemeDetector
@@ -164,8 +154,6 @@
           button: '#444444',
           border: '#555555',
         };
-
-    console.log('Using theme colors:', colors);
 
     // Define element styles to update
     const elementsToUpdate = [
@@ -288,15 +276,11 @@
     modifierBox.style.display = 'none';
     modifierBox.offsetHeight; // Force reflow
     modifierBox.style.display = 'block';
-
-    console.log('Theme update completed with immediate style application');
   }
 
   function startThemeMonitoring(onThemeChangeCallback) {
     if (window.ThemeDetector && !themeObserver) {
-      console.log('Starting theme monitoring for modifier box...');
       themeObserver = window.ThemeDetector.onThemeChange((newTheme, colors) => {
-        console.log('Theme changed to:', newTheme, colors);
         if (onThemeChangeCallback) {
           onThemeChangeCallback(newTheme, colors);
         }
@@ -306,11 +290,8 @@
 
   function stopThemeMonitoring() {
     if (themeObserver) {
-      console.log('Stopping theme monitoring for modifier box...');
       themeObserver.disconnect();
       themeObserver = null;
     }
   }
-
-  console.log('ModifierBoxThemeManager module initialized');
 })();

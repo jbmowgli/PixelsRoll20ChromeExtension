@@ -129,9 +129,6 @@ describe('ModifierBox Main Module', () => {
       const secondElement = await window.ModifierBox.create();
 
       expect(firstElement).toBe(secondElement);
-      expect(console.log).toHaveBeenCalledWith(
-        'Modifier box already exists, returning existing instance'
-      );
     });
 
     test('should adopt existing modifier box from DOM', async () => {
@@ -148,9 +145,6 @@ describe('ModifierBox Main Module', () => {
       const element = await window.ModifierBox.create();
 
       expect(element).toBe(existingBox);
-      expect(console.log).toHaveBeenCalledWith(
-        'Found existing modifier box in DOM, adopting it'
-      );
 
       // Check that "D20" was updated to "Modifier 1"
       const nameInput = element.querySelector('.modifier-name');

@@ -84,8 +84,6 @@ class RowDragDrop {
 
     // Change cursor
     document.body.style.cursor = 'grabbing';
-
-    console.log('Mouse down on drag handle');
   }
 
   handleMouseMove(e) {
@@ -115,8 +113,6 @@ class RowDragDrop {
     this.draggedElement.style.opacity = '0.7';
     this.draggedElement.style.transform = 'rotate(2deg)';
     this.draggedElement.style.zIndex = '10000';
-
-    console.log('Started dragging');
   }
 
   updateDragPosition(e) {
@@ -188,7 +184,6 @@ class RowDragDrop {
       }
     }
 
-    console.log('Drag completed');
     this.cleanup();
   }
 

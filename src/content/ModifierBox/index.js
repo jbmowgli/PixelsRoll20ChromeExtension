@@ -250,7 +250,25 @@
           isModifierBoxVisible
         );
 
+        // Debug: log current state before hiding
+        console.log(
+          'Before hide - display:',
+          modifierBox.style.display,
+          'isVisible:',
+          isModifierBoxVisible
+        );
+
         hideModifierBox();
+
+        // Debug: log state after hiding
+        setTimeout(() => {
+          console.log(
+            'After hide - display:',
+            modifierBox.style.display,
+            'isVisible:',
+            isModifierBoxVisible
+          );
+        }, 10);
 
         // Debug: log state after hiding
         setTimeout(() => {

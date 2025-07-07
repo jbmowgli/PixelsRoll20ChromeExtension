@@ -221,8 +221,6 @@
     draggedElement = null;
     placeholder = null;
     isDragging = false;
-
-    console.log('Row reordering completed');
   }
 
   function cleanup() {

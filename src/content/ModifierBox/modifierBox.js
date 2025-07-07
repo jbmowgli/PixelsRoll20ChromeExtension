@@ -51,8 +51,6 @@
   };
 
   async function createModifierBox() {
-    console.log('Creating modifier box...');
-
     // Check if required modules are available
     if (
       !window.ModifierBoxThemeManager ||
@@ -67,14 +65,12 @@
 
     // Singleton check - ensure only one instance exists
     if (modifierBox) {
-      console.log('Modifier box already exists, returning existing instance');
       return modifierBox;
     }
 
     // Check if an existing modifier box exists in the DOM
     const existingBox = document.getElementById('pixels-modifier-box');
     if (existingBox) {
-      console.log('Found existing modifier box in DOM, adopting it');
       modifierBox = existingBox;
       isModifierBoxVisible = existingBox.style.display !== 'none';
 
@@ -144,11 +140,9 @@
       isModifierBoxVisible = true;
       isInitialized = true;
 
-      console.log('Modifier box created from template and added to page');
       return modifierBox;
     } catch (error) {
       console.error('Failed to load HTML template:', error);
-      console.log('Falling back to inline HTML creation');
       return createModifierBoxFallback();
     }
   }

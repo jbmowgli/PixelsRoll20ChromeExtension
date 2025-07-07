@@ -42,6 +42,79 @@
       .info {
         background-color: #2d4a5a;
       }
+      
+      /* Basic modifier box styles for testing */
+      #pixels-modifier-box {
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        width: 300px;
+        background: #2a2a2a;
+        border: 1px solid #555;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        font-family: Arial, sans-serif;
+        color: white;
+      }
+      
+      .pixels-header {
+        background: #333;
+        padding: 8px 12px;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .pixels-content {
+        padding: 12px;
+      }
+      
+      .modifier-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        padding: 4px;
+        background: #333;
+        border-radius: 4px;
+      }
+      
+      .drag-handle {
+        cursor: grab;
+        padding: 4px;
+        margin-right: 8px;
+        color: #888;
+      }
+      
+      .drag-handle:active {
+        cursor: grabbing;
+      }
+      
+      .modifier-radio, .modifier-name, .modifier-value {
+        margin-right: 8px;
+      }
+      
+      .modifier-name, .modifier-value {
+        background: #444;
+        border: 1px solid #666;
+        color: white;
+        padding: 4px;
+        border-radius: 2px;
+      }
+      
+      .remove-row-btn, .add-modifier-btn {
+        background: #666;
+        border: none;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 2px;
+        cursor: pointer;
+      }
+      
+      .remove-row-btn:hover, .add-modifier-btn:hover {
+        background: #777;
+      }
     </style>
   </head>
   <body>
@@ -80,11 +153,12 @@
     </div>
 
     <!-- Load the modifier box modules -->
-    <script src="../src/content/common/themeDetector.js"></script>
-    <script src="../src/content/common/cssLoader.js"></script>
-    <script src="../src/content/common/htmlLoader.js"></script>
+    <script src="../src/content/Common/themeDetector.js"></script>
+    <script src="../src/content/Common/cssLoader.js"></script>
+    <script src="../src/content/Common/htmlLoader.js"></script>
     <script src="../src/content/ModifierBox/themeManager.js"></script>
     <script src="../src/content/ModifierBox/dragHandler.js"></script>
+    <script src="../src/content/ModifierBox/dragDropManager.js"></script>
     <script src="../src/content/ModifierBox/rowManager.js"></script>
     <script src="../src/content/ModifierBox/dragDrop.js"></script>
     <script src="../src/content/ModifierBox/modifierBox.js"></script>
@@ -104,7 +178,17 @@
           if (typeof chrome === 'undefined') {
             window.chrome = {
               runtime: {
-                getURL: path => '../' + path,
+                getURL: path => {
+                  // Handle different path formats
+                  if (path.startsWith('src/')) {
+                    return '../' + path;
+                  } else if (path.startsWith('assets/')) {
+                    return '../' + path;
+                  } else if (path.startsWith('content/')) {
+                    return '../src/' + path;
+                  }
+                  return '../' + path;
+                },
               },
             };
           }
@@ -112,11 +196,41 @@
           // Initialize global variables that the modifier box expects
           window.pixelsModifierName = 'Modifier 1';
           window.pixelsModifier = '0';
+          
+          // Mock extension messaging function
+          window.sendMessageToExtension = function(message) {
+            // Mock function for testing
+          };
 
+          // Check if required modules are loaded
+          const requiredModules = [
+            'HTMLLoader',
+            'ModifierBoxThemeManager', 
+            'ModifierBoxDragHandler',
+            'ModifierBoxRowManager'
+          ];
+          
+          const missingModules = requiredModules.filter(module => !window[module]);
+          if (missingModules.length > 0) {
+            updateStatus(`Missing modules: ${missingModules.join(', ')}`, 'error');
+            return;
+          }
+
+          updateStatus('Creating modifier box...', 'info');
+          
           // Create the modifier box
           testModifierBox = await window.ModifierBox.create();
 
           if (testModifierBox) {
+            // Ensure the modifier box is attached to our test container instead of body
+            const container = document.getElementById('modifier-container');
+            if (container && testModifierBox.parentNode !== container) {
+              if (testModifierBox.parentNode) {
+                testModifierBox.parentNode.removeChild(testModifierBox);
+              }
+              container.appendChild(testModifierBox);
+            }
+            
             await window.ModifierBox.show();
             updateStatus('Modifier box created successfully!', 'success');
           } else {
@@ -198,9 +312,21 @@
       // Auto-create modifier box on page load
       window.addEventListener('load', () => {
         setTimeout(() => {
+          // Check which modules loaded successfully
+          const modules = [
+            'HTMLLoader',
+            'ModifierBoxThemeManager', 
+            'ModifierBoxDragHandler',
+            'ModifierBoxRowManager',
+            'ModifierBox'
+          ];
+          
+          const loadedModules = modules.filter(module => window[module]);
+          const missingModules = modules.filter(module => !window[module]);
+          
           updateStatus(
-            'Page loaded. Click "Create Modifier Box" to begin testing.',
-            'info'
+            `Page loaded. ${loadedModules.length}/${modules.length} modules loaded. Click "Create Modifier Box" to begin testing.`,
+            missingModules.length > 0 ? 'error' : 'info'
           );
         }, 100);
       });

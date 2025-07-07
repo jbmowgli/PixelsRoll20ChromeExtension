@@ -8,8 +8,6 @@
 
   // Function to clear modifier state
   function clearModifierState(modifierBox) {
-    console.log('Clearing modifier state');
-
     // Clear global variables
     if (typeof window.pixelsModifierName !== 'undefined') {
       window.pixelsModifierName = '';
@@ -111,8 +109,6 @@
     ) {
       window.ModifierBoxThemeManager.forceElementUpdates(modifierBox);
     }
-
-    console.log(`Added modifier row ${rowCounter - 1}`);
   }
 
   function removeModifierRow(
@@ -144,7 +140,6 @@
 
     // If this is the only row left, reset it to default values instead of removing
     if (totalRows === 1) {
-      console.log('Only one row left, resetting instead of removing');
       const nameInput = rowElement.querySelector('.modifier-name');
       const valueInput = rowElement.querySelector('.modifier-value');
 
@@ -159,33 +154,24 @@
         updateSelectedModifierCallback();
       }
 
-      console.log('Reset the last remaining modifier row to default values');
       return;
     }
 
-    console.log('Proceeding to remove row');
-
     // Check if this row was selected
     const wasSelected = radio.checked;
-    console.log('Row was selected:', wasSelected);
 
     // Remove the row
-    console.log('Removing row element from DOM');
     rowElement.remove();
-
-    console.log('Row removed, checking if need to select another row');
 
     // If the removed row was selected, select the first remaining row
     if (wasSelected) {
       const firstRadio = modifierBox.querySelector('.modifier-radio');
       if (firstRadio) {
-        console.log('Selecting first remaining row');
         firstRadio.checked = true;
         if (updateSelectedModifierCallback) {
           updateSelectedModifierCallback();
         }
       } else {
-        console.log('No remaining rows found, clearing global variables');
         // Clear global variables since no rows remain
         clearModifierState(modifierBox);
       }
@@ -193,8 +179,6 @@
 
     // Reindex rows to maintain consistency
     reindexRows(modifierBox);
-
-    console.log(`Successfully removed modifier row with index ${index}`);
   }
 
   // Function to reindex all rows after deletion
@@ -289,6 +273,11 @@
           console.log(`Updated pixelsModifier to: "${window.pixelsModifier}"`);
         }
 
+        // Save the updated values to campaign-specific localStorage
+        if (typeof window.updateModifierSettings === 'function') {
+          window.updateModifierSettings(window.pixelsModifier, window.pixelsModifierName);
+        }
+
         // Update the header title to show the selected modifier
         const headerTitle = modifierBox.querySelector('.pixels-title');
         if (headerTitle) {
@@ -307,11 +296,6 @@
           }
         }
 
-        console.log(`Selected modifier: ${modifierName} = ${modifierValue}`);
-        console.log(
-          `Global variables - pixelsModifierName: "${window.pixelsModifierName}", pixelsModifier: "${window.pixelsModifier}"`
-        );
-
         // Send message to extension if the function exists
         if (typeof window.sendMessageToExtension === 'function') {
           window.sendMessageToExtension({
@@ -323,10 +307,7 @@
       }
     } else {
       // No radio button is selected, clear global variables
-      console.log('No modifier selected, clearing global variables');
       clearModifierState(modifierBox);
     }
   }
-
-  console.log('ModifierBoxRowManager module initialized');
 })();

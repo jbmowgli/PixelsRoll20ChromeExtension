@@ -63,7 +63,6 @@
       } else {
         modifierBox.style.setProperty('height', 'auto', 'important');
       }
-      console.log('Restored to original size:', originalDimensions);
       e.preventDefault();
       e.stopPropagation();
     });
@@ -93,7 +92,6 @@
       if (!originalDimensions.height) {
         const rect = modifierBox.getBoundingClientRect();
         originalDimensions.height = rect.height;
-        console.log('Stored original dimensions:', originalDimensions);
       }
     }, 100);
 
@@ -201,11 +199,5 @@
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     }
-
-    console.log(
-      'Drag and resize functionality setup completed. Double-click resize handle to restore original size.'
-    );
   }
-
-  console.log('ModifierBoxDragHandler module initialized');
 })();
