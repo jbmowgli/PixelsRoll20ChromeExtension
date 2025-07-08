@@ -29,10 +29,10 @@
         "https://app.roll20.net/editor/*"
       ],
       "js": [
-        "src/common/sessionStorage.js",
-        "src/common/themeDetector.js",
-        "src/common/cssLoader.js",
-        "src/common/htmlLoader.js",
+        "src/utils/sessionStorage.js",
+        "src/utils/themeDetector.js",
+        "src/utils/cssLoader.js",
+        "src/utils/htmlLoader.js",
         "src/components/modifierBox/themeManager.js",
         "src/components/modifierBox/dragHandler.js",
         "src/components/modifierBox/rowManager.js",
