@@ -9,6 +9,12 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
   // Modifier Box Functions (delegated to modifierBox.js)
   //
   function showModifierBox() {
+    // Don't show modifier box in Roll20 popup windows
+    if (isRoll20PopupWindow()) {
+      log('Skipping modifier box display - this is a Roll20 popup window');
+      return;
+    }
+    
     if (typeof window.ModifierBox !== 'undefined') {
       if (!window.ModifierBox.isInitialized()) {
         log('ModifierBox module not initialized yet');
@@ -34,9 +40,44 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
     }
   }
 
+  // Pure function to check if a URL indicates a Roll20 popup window
+  function checkUrlForPopup(url) {
+    if (!url || typeof url !== 'string') {
+      return false;
+    }
+    
+    const urlLower = url.toLowerCase();
+    return (
+      urlLower.includes('popout') ||        // Journal popouts: /editor/popout
+      urlLower.includes('popout=true')       // Character sheet popouts: ?popout=true
+    );
+  }
+
+  // Detect if this is a Roll20 popup window (journal entry, character sheet, etc.)
+  function isRoll20PopupWindow() {
+    try {
+      const url = window.location.href;
+      const isPopup = checkUrlForPopup(url);
+      
+      if (isPopup) {
+        log('Detected Roll20 popup window - modifier box will not be shown');
+        log('URL:', url);
+      } else {
+        log('Main Roll20 page detected - modifier box will be shown');
+      }
+      
+      return isPopup;
+    } catch (error) {
+      log('Error detecting popup window:', error);
+      return false;
+    }
+  }
+
   // Make functions available globally for testing
   window.showModifierBox = showModifierBox;
   window.hideModifierBox = hideModifierBox;
+  window.isRoll20PopupWindow = isRoll20PopupWindow;
+  window.checkUrlForPopup = checkUrlForPopup; // Pure function for easier testing
 
   //
   // Message handler for extension communication
@@ -791,8 +832,13 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
   log('Attempting to show modifier box automatically...');
   setTimeout(() => {
     try {
-      showModifierBox();
-      log('Modifier box shown successfully on page load');
+      // Only show modifier box if not in a popup window
+      if (!isRoll20PopupWindow()) {
+        showModifierBox();
+        log('Modifier box shown successfully on page load');
+      } else {
+        log('Skipping automatic modifier box display - this is a Roll20 popup window');
+      }
     } catch (error) {
       log('Error showing modifier box: ' + error);
     }
