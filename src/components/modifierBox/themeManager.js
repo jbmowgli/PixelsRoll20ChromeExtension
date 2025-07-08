@@ -47,15 +47,15 @@
     // Define CSS files to load
     const cssFiles = [
       {
-        path: 'src/content/ModifierBox/styles/modifierBox.css',
+        path: 'src/components/modifierBox/styles/modifierBox.css',
         id: 'pixels-modifier-box-base-styles',
       },
       {
-        path: 'src/content/ModifierBox/styles/minimized.css',
+        path: 'src/components/modifierBox/styles/minimized.css',
         id: 'pixels-modifier-box-minimized-styles',
       },
       {
-        path: 'src/content/ModifierBox/styles/lightTheme.css',
+        path: 'src/components/modifierBox/styles/lightTheme.css',
         id: 'pixels-modifier-box-light-theme-styles',
       },
     ];
