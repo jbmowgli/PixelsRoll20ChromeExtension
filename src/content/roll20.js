@@ -499,9 +499,20 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
         log('Modifier box visible: ' + isModifierBoxVisible);
 
         // Choose formula based on modifier box visibility
-        const formula = isModifierBoxVisible
+        let formula = isModifierBoxVisible
           ? pixelsFormulaWithModifier
           : pixelsFormulaSimple;
+
+        // Add critical hit message if face value is 20
+        if (diceValue === 20 && isModifierBoxVisible) {
+          formula = formula.replace('{{Result=[[#face_value + #modifier]]}}', '{{<span style="color: #ff4444; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">CRITICAL!</span>}} {{Result=[[#face_value + #modifier]]}}');
+        }
+        
+        // Add fumble message if face value is 1
+        if (diceValue === 1 && isModifierBoxVisible) {
+          formula = formula.replace('{{Result=[[#face_value + #modifier]]}}', '{{<span style="color: #888888; font-size: 16px; font-style: italic; opacity: 0.7;">FUMBLE!</span>}} {{Result=[[#face_value + #modifier]]}}');
+        }
+
 
         log('Formula before replacement: ' + formula);
 
@@ -584,7 +595,7 @@ if (typeof window.roll20PixelsLoaded == 'undefined') {
 
   // Formula when modifier box is visible (shows modifier details)
   var pixelsFormulaWithModifier =
-    '&{template:default} {{name=#modifier_name}} {{Pixel Die=[[#face_value]]}} {{Modifier=[[#modifier]]}} {{Total=[[#face_value + #modifier]]}}';
+    '&{template:default} {{name=#modifier_name}} {{Result=[[#face_value + #modifier]]}}';
 
   // Formula when modifier box is hidden (simplified display)
   var pixelsFormulaSimple =
