@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 function loadModule(modulePath) {
-  const fullPath = path.join(__dirname, '../../../../../', modulePath);
+  const fullPath = path.join(__dirname, '../../../../', modulePath);
   const moduleCode = fs.readFileSync(fullPath, 'utf8');
   eval(moduleCode);
 }
