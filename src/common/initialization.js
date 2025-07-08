@@ -36,17 +36,10 @@
   function initializePixelsExtension() {
     console.log('Starting Pixels Roll20 extension');
 
-    // Initialize global cleanup for bluetooth connections
-    if (window.PixelsBluetoothManager && window.PixelsBluetoothManager.initializeGlobalCleanup) {
-      window.PixelsBluetoothManager.initializeGlobalCleanup();
-    }
+    // Note: Most functionality is now integrated into roll20.js
+    // This initialization mainly handles setup that needs to happen early
 
-    // Set up extension message listener
-    if (window.PixelsExtensionMessaging && window.PixelsExtensionMessaging.setupMessageListener) {
-      window.PixelsExtensionMessaging.setupMessageListener();
-    }
-
-    // Send initial status
+    // Send initial status if the function is available
     if (window.sendStatusToExtension) {
       window.sendStatusToExtension();
     }
@@ -57,7 +50,7 @@
       window.loadModifierSettings();
     }
 
-    // Show modifier box by default
+    // Show modifier box by default with a delay to ensure DOM is ready
     console.log('Attempting to show modifier box automatically...');
     setTimeout(() => {
       try {
@@ -73,13 +66,13 @@
 
   // Wait for all modules to be loaded before initializing
   function waitForModulesAndInitialize() {
+    // Since most functionality is now integrated into roll20.js,
+    // we only need to check for the essential modules that exist as separate files
     const requiredModules = [
       'PixelsSessionStorage',
-      'PixelsChatIntegration', 
-      'Pixel',
-      'PixelsBluetoothManager',
-      'PixelsExtensionMessaging',
-      'PixelsModifierBoxIntegration'
+      'ThemeDetector',
+      'CSSLoader',
+      'HTMLLoader'
     ];
 
     let attempts = 0;
@@ -95,6 +88,12 @@
         setTimeout(checkModules, 100);
       } else {
         console.warn('Some modules failed to load within timeout, initializing anyway');
+        // Log which modules are missing for debugging
+        requiredModules.forEach(module => {
+          if (!window[module]) {
+            console.warn(`Missing module: ${module}`);
+          }
+        });
         initializePixelsExtension();
       }
     }
