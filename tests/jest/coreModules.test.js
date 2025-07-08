@@ -50,7 +50,7 @@ describe('Core Modules - Structure Tests', () => {
     test('should have core module files', () => {
       // Test that the core module files exist by requiring them
       expect(() => {
-        require('../../src/content/Core/sessionStorage.js');
+        require('../../src/common/sessionStorage.js');
       }).not.toThrow();
     });
   });
@@ -58,7 +58,7 @@ describe('Core Modules - Structure Tests', () => {
   describe('Module Loading', () => {
     test('should load modules without errors', () => {
       // Load the core modules
-      require('../../src/content/Core/sessionStorage.js');
+      require('../../src/common/sessionStorage.js');
 
       // Test that modules have been loaded and created their namespaces
       expect(global.window.PixelsSessionStorage).toBeDefined();
@@ -66,7 +66,7 @@ describe('Core Modules - Structure Tests', () => {
 
     test('should maintain backward compatibility functions', () => {
       // Load the modules
-      require('../../src/content/Core/sessionStorage.js');
+      require('../../src/common/sessionStorage.js');
 
       // Check that backward compatibility functions exist
       expect(typeof global.window.saveModifierSettings).toBe('function');
@@ -79,7 +79,7 @@ describe('Core Modules - Structure Tests', () => {
   describe('Chrome Extension Integration', () => {
     test('should handle Chrome API calls without errors', () => {
       // Load the modules
-      require('../../src/content/Core/sessionStorage.js');
+      require('../../src/common/sessionStorage.js');
 
       // Test that localStorage functions work
       expect(() => {
@@ -91,7 +91,7 @@ describe('Core Modules - Structure Tests', () => {
   describe('Refactoring Validation', () => {
     test('should have successfully updated storage to localStorage', () => {
       // Load all modules
-      require('../../src/content/Core/sessionStorage.js');
+      require('../../src/common/sessionStorage.js');
 
       // Verify that all expected functionality is available
       expect(global.window.PixelsSessionStorage).toHaveProperty('saveModifierSettings');

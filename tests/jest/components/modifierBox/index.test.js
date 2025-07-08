@@ -8,7 +8,7 @@ const path = require('path');
 
 // Helper function to load a module file
 function loadModule(modulePath) {
-  const fullPath = path.join(__dirname, '../../../', modulePath);
+  const fullPath = path.join(__dirname, '../../../../', modulePath);
   const moduleCode = fs.readFileSync(fullPath, 'utf8');
   eval(moduleCode);
 }
@@ -38,7 +38,7 @@ describe('ModifierBox Main Module', () => {
     };
 
     // Load the main ModifierBox module
-    loadModule('src/content/ModifierBox/modifierBox.js');
+    loadModule('src/components/modifierBox/modifierBox.js');
   });
 
   describe('Module Initialization', () => {
@@ -65,7 +65,7 @@ describe('ModifierBox Main Module', () => {
     test('should prevent multiple initialization', () => {
       const consoleSpy = jest.spyOn(console, 'warn');
       // Try to load the module again
-      loadModule('src/content/ModifierBox/modifierBox.js');
+      loadModule('src/components/modifierBox/modifierBox.js');
       expect(consoleSpy).toHaveBeenCalledWith(
         'ModifierBox module already loaded, skipping re-initialization'
       );
@@ -174,7 +174,7 @@ describe('ModifierBox Main Module', () => {
 
       // Reload module
       delete window.ModifierBox;
-      loadModule('src/content/ModifierBox/modifierBox.js');
+      loadModule('src/components/modifierBox/modifierBox.js');
 
       const element = await window.ModifierBox.create();
 
@@ -334,7 +334,7 @@ describe('ModifierBox Main Module', () => {
 
       // Reload module to trigger event listener setup
       delete window.ModifierBox;
-      loadModule('src/content/ModifierBox/modifierBox.js');
+      loadModule('src/components/modifierBox/modifierBox.js');
 
       expect(addEventListener).toHaveBeenCalledWith(
         'beforeunload',

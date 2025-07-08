@@ -74,7 +74,7 @@ describe('Popup Theme System', () => {
     });
 
     // Load popup script
-    require('../../src/popup/popup.js');
+    require('../../src/components/popup/popup.js');
 
     // Simulate DOMContentLoaded
     document.dispatchEvent(new Event('DOMContentLoaded'));
@@ -96,7 +96,7 @@ describe('Popup Theme System', () => {
     });
 
     // Load popup script
-    require('../../src/popup/popup.js');
+    require('../../src/components/popup/popup.js');
 
     // Simulate DOMContentLoaded
     document.dispatchEvent(new Event('DOMContentLoaded'));
@@ -123,7 +123,7 @@ describe('Popup Theme System', () => {
     });
 
     // Load popup script
-    require('../../src/popup/popup.js');
+    require('../../src/components/popup/popup.js');
 
     // Simulate DOMContentLoaded
     document.dispatchEvent(new Event('DOMContentLoaded'));
@@ -151,7 +151,7 @@ describe('Popup Theme System', () => {
     });
 
     // Load popup script
-    require('../../src/popup/popup.js');
+    require('../../src/components/popup/popup.js');
 
     // Simulate DOMContentLoaded
     document.dispatchEvent(new Event('DOMContentLoaded'));

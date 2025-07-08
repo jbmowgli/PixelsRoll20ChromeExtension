@@ -120,7 +120,7 @@
 
       // Load the HTML template
       const htmlTemplate = await window.HTMLLoader.loadTemplate(
-        'src/content/ModifierBox/modifierBox.html',
+        'src/components/modifierBox/modifierBox.html',
         'modifierBox'
       );
 

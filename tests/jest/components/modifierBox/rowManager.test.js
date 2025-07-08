@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 function loadModule(modulePath) {
-  const fullPath = path.join(__dirname, '../../../', modulePath);
+  const fullPath = path.join(__dirname, '../../../../../', modulePath);
   const moduleCode = fs.readFileSync(fullPath, 'utf8');
   eval(moduleCode);
 }
@@ -24,7 +24,7 @@ describe('ModifierBox Row Manager', () => {
     window.pixelsModifierName = 'Test Modifier';
     window.pixelsModifier = '5';
 
-    loadModule('src/content/ModifierBox/rowManager.js');
+    loadModule('src/components/modifierBox/rowManager.js');
   });
 
   describe('Module Initialization', () => {

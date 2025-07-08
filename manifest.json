@@ -7,7 +7,7 @@
     "service_worker": "src/background/background.js"
   },
   "action": {
-    "default_popup": "src/popup/popup.html",
+    "default_popup": "src/components/popup/popup.html",
     "default_icon": {
       "16": "assets/images/logo-128.png",
       "32": "assets/images/logo-128.png",
@@ -21,7 +21,7 @@
     "48": "assets/images/logo-128.png",
     "128": "assets/images/logo-128.png"
   },
-  "options_page": "src/options/options.html",
+  "options_page": "src/components/options/options.html",
   "content_scripts": [
     {
       "matches": [
@@ -29,14 +29,14 @@
         "https://app.roll20.net/editor/*"
       ],
       "js": [
-        "src/content/Common/themeDetector.js",
-        "src/content/Common/cssLoader.js",
-        "src/content/Common/htmlLoader.js",
-        "src/content/ModifierBox/themeManager.js",
-        "src/content/ModifierBox/dragHandler.js",
-        "src/content/ModifierBox/rowManager.js",
-        "src/content/ModifierBox/dragDrop.js",
-        "src/content/ModifierBox/modifierBox.js",
+        "src/common/themeDetector.js",
+        "src/common/cssLoader.js",
+        "src/common/htmlLoader.js",
+        "src/components/modifierBox/themeManager.js",
+        "src/components/modifierBox/dragHandler.js",
+        "src/components/modifierBox/rowManager.js",
+        "src/components/modifierBox/dragDrop.js",
+        "src/components/modifierBox/modifierBox.js",
         "src/content/roll20.js"
       ]
     }
@@ -45,8 +45,8 @@
     {
       "resources": [
         "assets/images/*",
-        "src/content/ModifierBox/styles/*.css",
-        "src/content/ModifierBox/*.html"
+        "src/components/modifierBox/styles/*.css",
+        "src/components/modifierBox/*.html"
       ],
       "matches": ["https://roll20.net/*", "https://app.roll20.net/*"]
     }
